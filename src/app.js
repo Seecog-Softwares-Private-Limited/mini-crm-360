@@ -43,6 +43,7 @@ app.engine(
                     .replace(/\u2028/g, '\\u2028')
                     .replace(/\u2029/g, '\\u2029');
             },
+            eq: (a, b) => a === b,
         },
         runtimeOptions: {
             allowProtoPropertiesByDefault: true,
@@ -107,27 +108,27 @@ app.get('/register', (req, res) => res.render('register', { title: 'Register' })
 
 app.get('/dashboard', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('dashboard', { title: 'Dashboard', user });
+    res.render('dashboard', { title: 'Dashboard', user, activePage: 'dashboard' });
 });
 
 app.get('/customers', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('customers', { title: 'Customers', user });
+    res.render('customers', { title: 'Customers', user, activePage: 'customers' });
 });
 
 app.get('/business', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('business', { title: 'Business', user });
+    res.render('business', { title: 'Business', user, activePage: 'business' });
 });
 
 app.get('/templates', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('templates', { title: 'Templates', user });
+    res.render('templates', { title: 'Templates', user, activePage: 'templates' });
 });
 
 app.get('/campaigns', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('campaigns', { title: 'Campaigns', user });
+    res.render('campaigns', { title: 'Campaigns', user, activePage: 'campaigns' });
 });
 
 app.get('/clear-storage', (req, res) => {
