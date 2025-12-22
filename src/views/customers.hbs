@@ -22,19 +22,7 @@
             <a class="nav-link active" href="/customers"><i class="fas fa-users"></i> Customers</a>
             <a class="nav-link" href="/templates"><i class="fas fa-file-alt"></i> Templates</a>
             <a class="nav-link" href="/campaigns"><i class="fas fa-bullhorn"></i> Campaigns</a>
-            
           </div>
-
-          <!-- HR Tools Menu -->
-          {{!-- <div class="menu-toggle" onclick="toggleMenu('hr-submenu')">
-            <div class="nav-link">
-              <i class="fas fa-users-cog"></i> HR Tools
-              <i class="fas fa-chevron-down float-end"></i>
-            </div>
-          </div>
-          <div class="submenu show" id="hr-submenu">
-            <a class="nav-link" href="/employees"><i class="fas fa-user-tie"></i> Employee List</a>
-          </div> --}}
 
           <hr class="text-white-50" />
           <a class="nav-link" href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -88,6 +76,7 @@
                   <tr>
                     <th>Name</th>
                     <th>Phone</th>
+                    <th>WhatsApp</th>
                     <th>Business</th>
                     <th>Tags</th>
                     <th>Added</th>
@@ -96,7 +85,7 @@
                 </thead>
                 <tbody id="customersTableBody">
                   <tr>
-                    <td colspan="6" class="text-center py-4">
+                    <td colspan="7" class="text-center py-4">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                       </div>
@@ -129,10 +118,12 @@
               <option value="">Select Business</option>
             </select>
           </div>
+
           <div class="mb-3">
             <label for="customerName" class="form-label">Name</label>
             <input type="text" class="form-control" id="customerName" name="name" required />
           </div>
+
           <div class="mb-3">
             <label for="customerPhone" class="form-label">Phone Number (E.164 format)</label>
             <div class="input-group">
@@ -141,6 +132,17 @@
             </div>
             <small class="form-text text-muted">Enter 10-digit mobile number without +91</small>
           </div>
+
+          <!-- ✅ WhatsApp -->
+          <div class="mb-3">
+            <label for="customerWhatsApp" class="form-label">WhatsApp Number (optional)</label>
+            <div class="input-group">
+              <span class="input-group-text">+91</span>
+              <input type="tel" class="form-control" id="customerWhatsApp" name="whatsappE164" placeholder="9999999999" />
+            </div>
+            <small class="form-text text-muted">Leave blank to use same as Phone</small>
+          </div>
+
           <div class="mb-3">
             <label for="customerTags" class="form-label">Tags (comma separated)</label>
             <input type="text" class="form-control" id="customerTags" name="tags" placeholder="vip, regular, premium" />
@@ -166,24 +168,37 @@
       <div class="modal-body">
         <form id="editCustomerForm">
           <input type="hidden" id="editCustomerId" name="id" />
+
           <div class="mb-3">
             <label for="editCustomerBusiness" class="form-label">Business *</label>
             <select class="form-select" id="editCustomerBusiness" name="businessId" required>
               <option value="">Select Business</option>
             </select>
           </div>
+
           <div class="mb-3">
             <label for="editCustomerName" class="form-label">Name</label>
             <input type="text" class="form-control" id="editCustomerName" name="name" required />
           </div>
+
           <div class="mb-3">
             <label for="editCustomerPhone" class="form-label">Phone Number (E.164 format)</label>
             <div class="input-group">
               <span class="input-group-text">+91</span>
               <input type="tel" class="form-control" id="editCustomerPhone" name="phoneE164" placeholder="9999999999" required />
             </div>
-            <small class="form-text text-muted">Enter 10-digit mobile number without +91</small>
           </div>
+
+          <!-- ✅ WhatsApp -->
+          <div class="mb-3">
+            <label for="editCustomerWhatsApp" class="form-label">WhatsApp Number (optional)</label>
+            <div class="input-group">
+              <span class="input-group-text">+91</span>
+              <input type="tel" class="form-control" id="editCustomerWhatsApp" name="whatsappE164" placeholder="9999999999" />
+            </div>
+            <small class="form-text text-muted">Leave blank to use same as Phone</small>
+          </div>
+
           <div class="mb-3">
             <label for="editCustomerTags" class="form-label">Tags (comma separated)</label>
             <input type="text" class="form-control" id="editCustomerTags" name="tags" placeholder="vip, regular, premium" />
@@ -230,8 +245,10 @@
   const phoneToE164 = (v) => {
     if (!v) return '';
     const digits = String(v).replace(/\D/g, '');
+    if (!digits) return '';
     if (digits.startsWith('91') && digits.length === 12) return '+' + digits;
     if (digits.length === 10) return '+91' + digits;
+    if (digits.startsWith('0') && digits.length === 11) return '+91' + digits.slice(1);
     return '+' + digits;
   };
   const coerceId = (v) => (/^\d+$/.test(v) ? Number(v) : v);
@@ -244,7 +261,6 @@
       updateBusinessFilters();
     } catch (err) {
       console.error('Error loading businesses:', err);
-      // leave dropdowns with placeholders
     }
   }
 
@@ -259,14 +275,12 @@
       updateTagFilter(customers);
     } catch (err) {
       console.error('Error loading customers:', err);
-      // fall back gracefully instead of showing a blocking error row
       customers = customers || [];
       displayCustomers(customers);
       updateTagFilter(customers);
     }
   }
 
-  // UI population
   function updateBusinessFilters() {
     const businessFilter = document.getElementById('businessFilter');
     const customerBusinessSelect = document.getElementById('customerBusiness');
@@ -280,14 +294,9 @@
       const id = b.id ?? b._id;
       const name = b.businessName || 'Untitled';
 
-      const optFilter = new Option(name, id);
-      businessFilter.add(optFilter);
-
-      const optAdd = new Option(name, id);
-      customerBusinessSelect.add(optAdd);
-
-      const optEdit = new Option(name, id);
-      editCustomerBusinessSelect.add(optEdit);
+      businessFilter.add(new Option(name, id));
+      customerBusinessSelect.add(new Option(name, id));
+      editCustomerBusinessSelect.add(new Option(name, id));
     });
   }
 
@@ -296,19 +305,20 @@
     const tags = new Set();
     (list || []).forEach((c) => (c.tags || []).forEach((t) => tags.add(t)));
     const keep = tagFilter.value;
+
     tagFilter.innerHTML =
       '<option value="">All Tags</option>' +
-      Array.from(tags)
-        .map((t) => `<option value="${t}">${t}</option>`)
-        .join('');
+      Array.from(tags).map((t) => `<option value="${t}">${t}</option>`).join('');
+
     tagFilter.value = keep;
   }
 
   function displayCustomers(customersToShow) {
     const tbody = document.getElementById('customersTableBody');
+
     if (!customersToShow || customersToShow.length === 0) {
       tbody.innerHTML =
-        '<tr><td colspan="6" class="text-center text-muted py-4">No customers found</td></tr>';
+        '<tr><td colspan="7" class="text-center text-muted py-4">No customers found</td></tr>';
       return;
     }
 
@@ -319,10 +329,12 @@
           (businesses || []).find((b) => String(b.id ?? b._id) === String(c.businessId));
         const bizName = biz ? (biz.businessName || '—') : 'No Business';
         const id = c.id ?? c._id;
+
         return `
           <tr>
             <td>${c.name || 'No Name'}</td>
             <td>${c.phoneE164 || ''}</td>
+            <td>${c.whatsappE164 || c.phoneE164 || ''}</td>
             <td>${bizName}</td>
             <td>${
               c.tags && c.tags.length
@@ -331,15 +343,17 @@
             }</td>
             <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
             <td>
-              <button class="btn btn-sm btn-outline-primary me-1" onclick="editCustomer(${JSON.stringify(
-                id
-              )})" title="Edit"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-sm btn-outline-primary me-1" onclick="editCustomer(${JSON.stringify(id)})" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
               <button class="btn btn-sm btn-outline-danger" onclick="deleteCustomer(${JSON.stringify(
                 id
               )}, '${(c.name || 'No Name').replace(/'/g, "\\'")}', '${(c.phoneE164 || '').replace(
-          /'/g,
-          "\\'"
-        )}')" title="Delete"><i class="fas fa-trash"></i></button>
+                /'/g,
+                "\\'"
+              )}')" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
             </td>
           </tr>`;
       })
@@ -360,6 +374,7 @@
         (c) =>
           (c.name || '').toLowerCase().includes(searchTerm) ||
           (c.phoneE164 || '').includes(searchTerm) ||
+          (c.whatsappE164 || '').includes(searchTerm) ||
           (c.tags || []).some((t) => t.toLowerCase().includes(searchTerm))
       );
     }
@@ -380,9 +395,14 @@
     const fd = new FormData(form);
 
     const businessIdVal = fd.get('businessId');
+
+    const phoneE164 = phoneToE164(fd.get('phoneE164'));
+    const whatsappE164 = phoneToE164(fd.get('whatsappE164')) || phoneE164; // ✅ fallback
+
     const payload = {
       name: fd.get('name'),
-      phoneE164: phoneToE164(fd.get('phoneE164')),
+      phoneE164,
+      whatsappE164, // ✅ send to backend
       businessId: coerceId(businessIdVal),
       tags: fd.get('tags')
         ? fd.get('tags').split(',').map((t) => t.trim()).filter(Boolean)
@@ -394,27 +414,18 @@
       const data = await apiCall('/customers', { method: 'POST', body: JSON.stringify(payload) });
 
       if (data && !data.error) {
-        // Close modal & reset
         bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'))?.hide();
         form.reset();
 
-        // Optimistically add to the list so the user sees it immediately
-        const bizObj = (businesses || []).find((b) => String(b.id ?? b._id) === String(payload.businessId));
-        const created =
-          (data.customer || data.data || data) && typeof (data.customer || data.data || data) === 'object'
-            ? (data.customer || data.data || data)
-            : { id: Date.now(), ...payload };
-
-        if (bizObj) created.business = bizObj;
+        const created = (data.customer || data.data || data) || payload;
         if (!created.createdAt) created.createdAt = new Date().toISOString();
 
-        customers = [created, ...customers];
+        customers = [created, ...(customers || [])];
         displayCustomers(customers);
         updateTagFilter(customers);
         showAlert('Customer added successfully!', 'success');
 
-        // Optional: try background refresh (won’t break UI if it fails)
-        loadCustomers();
+        loadCustomers(); // best effort refresh
       } else {
         showAlert((data && (data.message || data.error)) || 'Failed to add customer', 'danger');
       }
@@ -431,6 +442,7 @@
     document.getElementById('editCustomerName').value = c.name || '';
     document.getElementById('editCustomerBusiness').value = c.businessId || (c.business && (c.business.id ?? c.business._id)) || '';
     document.getElementById('editCustomerPhone').value = (c.phoneE164 || '').replace(/^\+91/, '');
+    document.getElementById('editCustomerWhatsApp').value = (c.whatsappE164 || '').replace(/^\+91/, '');
     document.getElementById('editCustomerTags').value = (c.tags || []).join(', ');
 
     new bootstrap.Modal(document.getElementById('editCustomerModal')).show();
@@ -441,9 +453,13 @@
     const fd = new FormData(form);
     const id = fd.get('id');
 
+    const phoneE164 = phoneToE164(fd.get('phoneE164'));
+    const whatsappE164 = phoneToE164(fd.get('whatsappE164')) || phoneE164; // ✅ fallback
+
     const payload = {
       name: fd.get('name'),
-      phoneE164: phoneToE164(fd.get('phoneE164')),
+      phoneE164,
+      whatsappE164, // ✅ send to backend
       businessId: coerceId(fd.get('businessId')),
       tags: fd.get('tags')
         ? fd.get('tags').split(',').map((t) => t.trim()).filter(Boolean)
@@ -477,7 +493,6 @@
     try {
       const data = await apiCall(`/customers/${currentDeleteId}`, { method: 'DELETE' });
       if (data === undefined || (data && !data.error)) {
-        // remove locally
         customers = (customers || []).filter((c) => String(c.id ?? c._id) !== String(currentDeleteId));
         displayCustomers(customers);
         updateTagFilter(customers);
@@ -485,7 +500,6 @@
         bootstrap.Modal.getInstance(document.getElementById('deleteCustomerModal'))?.hide();
         showAlert('Customer deleted successfully!', 'success');
 
-        // best-effort refresh
         loadCustomers();
       } else {
         showAlert((data.message || data.error) || 'Failed to delete customer', 'danger');

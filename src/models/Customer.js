@@ -2,7 +2,9 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../db/index.js';      // <-- add this
 
+import { Business } from './Business.js';
 const Customer = sequelize.define('Customer', {
+  
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   userId: {
     type: DataTypes.INTEGER, allowNull: false,
@@ -18,6 +20,13 @@ const Customer = sequelize.define('Customer', {
     type: DataTypes.STRING, allowNull: false,
     validate: { is: /^\+\d{8,15}$/ }
   },
+
+    whatsappE164: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      validate: { is: /^\+\d{8,15}$/ },
+    },
+    
   tags: { type: DataTypes.JSON, allowNull: true, defaultValue: [] },
   consentAt: { type: DataTypes.DATE, allowNull: true }
 }, {
@@ -27,4 +36,6 @@ const Customer = sequelize.define('Customer', {
 });
 
 
+
 export { Customer };
+
