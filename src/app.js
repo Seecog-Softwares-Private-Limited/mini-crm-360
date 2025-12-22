@@ -130,6 +130,22 @@ app.get('/campaigns', verifyUser, (req, res) => {
     res.render('campaigns', { title: 'Campaigns', user, activePage: 'campaigns' });
 });
 
+app.get('/documents', verifyUser, (req, res) => {
+    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    res.render('documents', { title: 'documents', user, activePage: 'documents' });
+});
+
+app.get('/document-types', verifyUser, (req, res) => {
+    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    res.render('documentTypes', { title: 'document-types', user, activePage: 'documentTypes' });
+});
+
+app.get('/employees', verifyUser, (req, res) => {
+    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    res.render('employees', { title: 'employees', user, activePage: 'employees' });
+});
+
+
 app.get('/clear-storage', (req, res) => {
     res.send(`
     <!DOCTYPE html>
