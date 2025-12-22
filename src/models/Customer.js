@@ -16,6 +16,12 @@ const Customer = sequelize.define('Customer', {
     references: { model: 'businesses', key: 'id' }
   },
   name: { type: DataTypes.STRING, allowNull: true },
+  
+  email: {
+  type: DataTypes.STRING(120),
+  allowNull: true,
+  validate: { isEmail: true },
+},
   phoneE164: {
     type: DataTypes.STRING, allowNull: false,
     validate: { is: /^\+\d{8,15}$/ }
@@ -26,7 +32,7 @@ const Customer = sequelize.define('Customer', {
       allowNull: true,
       validate: { is: /^\+\d{8,15}$/ },
     },
-    
+
   tags: { type: DataTypes.JSON, allowNull: true, defaultValue: [] },
   consentAt: { type: DataTypes.DATE, allowNull: true }
 }, {

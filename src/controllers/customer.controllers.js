@@ -1,56 +1,70 @@
-// controllers/customer.controllers.js
+// src/controllers/customer.controllers.js
 import { Customer } from "../models/Customer.js";
 import { Business } from "../models/Business.js";
 import { Op } from "sequelize";
+
+const isE164 = (v) => /^\+\d{8,15}$/.test(String(v || ""));
+const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || ""));
 
 /* ---------------- ADD CUSTOMER ---------------- */
 export const addCustomer = async (req, res) => {
   try {
     const userId = req.user.id;
-     const { name, phoneE164, whatsappE164, tags, consentAt } = req.body;
+    const { name, email, phoneE164, whatsappE164, tags, consentAt, businessId } = req.body;
 
-    if (!phoneE164 || !/^\+\d{8,15}$/.test(phoneE164)) {
-      return res.status(400).json({
-        error: "phoneE164 must be in E.164 format like +91xxxxxxxxxx",
-      });
+    // validations
+    if (email && !isEmail(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
     }
 
-       let wa = whatsappE164 || phoneE164;
-    if (wa && !/^\+\d{8,15}$/.test(wa)) {
-      return res.status(400).json({
-        error: "whatsappE164 must be E.164 like +91xxxxxxxxxx",
-      });
+    if (!phoneE164 || !isE164(phoneE164)) {
+      return res
+        .status(400)
+        .json({ error: "phoneE164 must be E.164 like +91xxxxxxxxxx" });
     }
 
-    // 🔥 Auto-detect business
-    const business = await Business.findOne({
-      where: { ownerId: userId },
-    });
-
-    if (!business) {
-      return res.status(400).json({
-        error: "Please create a business before adding customers",
-      });
+    const wa = whatsappE164 ? whatsappE164 : phoneE164;
+    if (wa && !isE164(wa)) {
+      return res
+        .status(400)
+        .json({ error: "whatsappE164 must be E.164 like +91xxxxxxxxxx" });
     }
 
+    // ✅ use selected businessId if provided, else auto-pick first business
+    let biz = null;
+
+    if (businessId) {
+      biz = await Business.findOne({ where: { id: businessId, ownerId: userId } });
+      if (!biz) return res.status(404).json({ error: "Business not found or not yours" });
+    } else {
+      biz = await Business.findOne({ where: { ownerId: userId } });
+      if (!biz) {
+        return res.status(400).json({ error: "Please create a business before adding customers" });
+      }
+    }
+
+    // ✅ Because unique index is (userId, phoneE164), keep where same
     const [customer, created] = await Customer.findOrCreate({
-      where: {
-        userId,
-        businessId: business.id,
-        phoneE164,
-      },
+      where: { userId, phoneE164 },
       defaults: {
+        businessId: biz.id,
         name: name || null,
-          whatsappE164: wa, // ✅ here
+        email: email || null,
+        whatsappE164: wa,
         tags: Array.isArray(tags) ? tags : [],
         consentAt: consentAt ? new Date(consentAt) : new Date(),
       },
     });
 
     if (!created) {
-      customer.name = name ?? customer.name;
-      if (Array.isArray(tags)) customer.tags = tags;
-      await customer.save();
+      await customer.update({
+        businessId: biz.id,
+        name: name ?? customer.name,
+        email: email ?? customer.email,
+        whatsappE164: wa ?? customer.whatsappE164,
+        tags: Array.isArray(tags) ? tags : customer.tags,
+        consentAt: consentAt ? new Date(consentAt) : customer.consentAt,
+      });
     }
 
     return res.status(201).json(customer);
@@ -72,37 +86,29 @@ export const listCustomers = async (req, res) => {
       const biz = await Business.findOne({
         where: { id: businessId, ownerId: userId },
       });
-      if (!biz)
-        return res
-          .status(404)
-          .json({ error: "Business not found or not yours" });
-
+      if (!biz) return res.status(404).json({ error: "Business not found or not yours" });
       where.businessId = businessId;
     }
 
     if (tag) {
-      // ✅ MySQL-safe
-      where.tags = {
-        [Op.like]: `%${tag}%`,
-      };
+      // MySQL-safe JSON search (basic)
+      where.tags = { [Op.like]: `%${tag}%` };
     }
 
-   // ✅ add this before findAll
-const limit = Math.min(parseInt(req.query.limit || "200", 10), 200);
+    const limit = Math.min(parseInt(req.query.limit || "200", 10), 200);
 
-const rows = await Customer.findAll({
-  where,
-  include: [
-    {
-      model: Business,
-      as: "business",
-      attributes: ["id", "businessName", "category"],
-    },
-  ],
-  order: [["createdAt", "DESC"]],
-  limit,
-});
-
+    const rows = await Customer.findAll({
+      where,
+      include: [
+        {
+          model: Business,
+          as: "business",
+          attributes: ["id", "businessName", "category"],
+        },
+      ],
+      order: [["createdAt", "DESC"]],
+      limit,
+    });
 
     return res.json(rows);
   } catch (e) {
@@ -116,51 +122,41 @@ export const updateCustomer = async (req, res) => {
   try {
     const userId = req.user.id;
     const customerId = req.params.id;
-   const { name, phoneE164, whatsappE164, tags, businessId } = req.body;
 
-    if (phoneE164 && !/^\+\d{8,15}$/.test(phoneE164)) {
-      return res.status(400).json({
-        error: "phoneE164 must be in E.164 format like +91xxxxxxxxxx",
-      });
+    const { name, email, phoneE164, whatsappE164, tags, businessId } = req.body;
+
+    if (email && !isEmail(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
     }
-    if (whatsappE164 && !/^\+\d{8,15}$/.test(whatsappE164)) {
-  return res.status(400).json({ error: "whatsappE164 must be E.164 like +91xxxxxxxxxx" });
-}
-
-await customer.update({
-  name: name ?? customer.name,
-  phoneE164: phoneE164 ?? customer.phoneE164,
-  whatsappE164: whatsappE164 ?? customer.whatsappE164, // ✅ new
-  tags: Array.isArray(tags) ? tags : customer.tags,
-  businessId: businessId ?? customer.businessId,
-});
-
-    const customer = await Customer.findOne({
-      where: { id: customerId, userId },
-    });
-
-    if (!customer)
-      return res.status(404).json({ error: "Customer not found" });
-
-    if (businessId && businessId !== customer.businessId) {
-      const biz = await Business.findOne({
-        where: { id: businessId, ownerId: userId },
-      });
-      if (!biz)
-        return res
-          .status(404)
-          .json({ error: "Business not found or not yours" });
+    if (phoneE164 && !isE164(phoneE164)) {
+      return res.status(400).json({ error: "phoneE164 must be E.164 like +91xxxxxxxxxx" });
+    }
+    if (whatsappE164 && !isE164(whatsappE164)) {
+      return res.status(400).json({ error: "whatsappE164 must be E.164 like +91xxxxxxxxxx" });
     }
 
+    const customer = await Customer.findOne({ where: { id: customerId, userId } });
+    if (!customer) return res.status(404).json({ error: "Customer not found" });
+
+    // verify business ownership if businessId changing
+    if (businessId && String(businessId) !== String(customer.businessId)) {
+      const biz = await Business.findOne({ where: { id: businessId, ownerId: userId } });
+      if (!biz) return res.status(404).json({ error: "Business not found or not yours" });
+    }
+
+    // ✅ update all fields correctly
     await customer.update({
       name: name ?? customer.name,
+      email: email ?? customer.email,
       phoneE164: phoneE164 ?? customer.phoneE164,
+      whatsappE164: whatsappE164 ?? customer.whatsappE164,
       tags: Array.isArray(tags) ? tags : customer.tags,
       businessId: businessId ?? customer.businessId,
     });
 
     return res.json(customer);
   } catch (e) {
+    console.error("updateCustomer error:", e);
     return res.status(500).json({ error: e.message });
   }
 };
@@ -171,16 +167,13 @@ export const deleteCustomer = async (req, res) => {
     const userId = req.user.id;
     const customerId = req.params.id;
 
-    const customer = await Customer.findOne({
-      where: { id: customerId, userId },
-    });
-
-    if (!customer)
-      return res.status(404).json({ error: "Customer not found" });
+    const customer = await Customer.findOne({ where: { id: customerId, userId } });
+    if (!customer) return res.status(404).json({ error: "Customer not found" });
 
     await customer.destroy();
     return res.json({ message: "Customer deleted successfully" });
   } catch (e) {
+    console.error("deleteCustomer error:", e);
     return res.status(500).json({ error: e.message });
   }
 };
