@@ -44,6 +44,7 @@ app.engine(
                     .replace(/\u2028/g, '\\u2028')
                     .replace(/\u2029/g, '\\u2029');
             },
+            eq: (a, b) => a === b,
         },
         runtimeOptions: {
             allowProtoPropertiesByDefault: true,
@@ -116,17 +117,17 @@ app.get('/customers', verifyUser, (req, res) => {
 
 app.get('/business', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('business', { title: 'Business', user });
+    res.render('business', { title: 'Business', user, activePage: 'business' });
 });
 
 app.get('/templates', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('templates', { title: 'Templates', user });
+    res.render('templates', { title: 'Templates', user, activePage: 'templates' });
 });
 
 app.get('/campaigns', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('campaigns', { title: 'Campaigns', user });
+    res.render('campaigns', { title: 'Campaigns', user, activePage: 'campaigns' });
 });
 
 app.get('/clear-storage', (req, res) => {
