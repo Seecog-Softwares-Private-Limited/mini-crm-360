@@ -47,5 +47,4 @@ const Business = sequelize.define('Business', {
   tableName: 'businesses',
   timestamps: true
 });
-
 export { Business };
