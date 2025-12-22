@@ -164,7 +164,7 @@
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="scheduleType" class="form-label">Schedule Type *</label>
-              <select class="form-select" id="scheduleType" required>
+              <select class="form-select" id="scheduleType" onchange="onScheduleTypeChange(this.value)" required>
                 <option value="immediate">Send Immediately</option>
                 <option value="scheduled">Schedule for Later</option>
               </select>
@@ -183,8 +183,8 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" onclick="createAndSendCampaign()"><i class="fas fa-paper-plane me-1"></i>Create & Send Now</button>
-        <button type="button" class="btn btn-primary" onclick="createCampaign()"><i class="fas fa-save me-1"></i>Create Campaign</button>
+        <button type="button" class="btn btn-success" id="actionCampaignBtn" onclick="createAndSendCampaign()"><i class="fas fa-paper-plane me-1"></i> Send Now</button>
+        
       </div>
     </div>
   </div>
@@ -746,4 +746,29 @@
     loadMetaTemplates();  // <- Meta templates!
     setupEventListeners();
   });
+
+  function onScheduleTypeChange(value) {
+  const dateGroup = document.getElementById('scheduleDateTimeGroup');
+  const dateInput = document.getElementById('scheduleDateTime');
+  const actionBtn = document.getElementById('actionCampaignBtn');
+
+  if (value === 'scheduled') {
+    // show date & time
+    dateGroup.style.display = 'block';
+    dateInput.required = true;
+
+    // switch to Schedule
+    actionBtn.innerHTML = '<i class="fas fa-clock me-1"></i>Schedule Now';
+    actionBtn.onclick = createCampaign;
+  } else {
+    // hide date & time
+    dateGroup.style.display = 'none';
+    dateInput.required = false;
+
+    // switch to Send
+    actionBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Send Now';
+    actionBtn.onclick = createAndSendCampaign;
+  }
+}
+
 </script>
