@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { setupSwagger } from './swagger.js';
 import { verifyUser } from './middleware/authMiddleware.js';
+import { renderDashboard } from "./controllers/dashboard.controller.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -99,6 +100,7 @@ import countryRoutes from './routes/country.routes.js';
 import businessAddressRoutes from './routes/businessAddress.routes.js';
 import emailTemplateRoutes from './routes/emailTemplate.routes.js';
 import { renderEmailTemplatesPage } from './controllers/emailTemplate.controller.js';
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 // ---------- Frontend pages ----------
 app.get('/', (req, res) => res.redirect('/login'));
@@ -106,15 +108,12 @@ app.get('/', (req, res) => res.redirect('/login'));
 app.get('/login', (req, res) => res.render('login', { title: 'Login' }));
 app.get('/register', (req, res) => res.render('register', { title: 'Register' }));
 
-app.get('/dashboard', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('dashboard', { title: 'Dashboard', user, activePage: 'dashboard' });
-});
+app.get('/dashboard', verifyUser, renderDashboard);
 
 app.get('/customers', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('customers', { title: 'Customers', user, activePage: 'customers' });
+  res.render('customers');
 });
+
 
 app.get('/business', verifyUser, (req, res) => {
     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
@@ -187,6 +186,7 @@ app.get('/api/v1/hello', (req, res) => res.json({ message: 'Hello, world!' }));
 setupSwagger(app);
 
 app.use('/api/v1', waRouter);
+app.use("/", dashboardRoutes)
 app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/templates', templateRouter);
 app.use('/api/v1/campaigns', campaignRouter);
@@ -198,6 +198,8 @@ app.use('/api/v1/designations', designationsRoutes);
 
 app.use('/api/leave-types', leaveTypesRoutes);
 app.use('/api/leave-requests', leaveRequestsRoutes);
+app.use("/", dashboardRoutes);
+
 
 // HR & Docs
 app.use(employeeRoutes);
