@@ -73,12 +73,13 @@ const handleSocialLoginCallback = async (req, res, profile, provider) => {
 // Helper function to get API base URL based on environment
 const getApiBaseUrl = () => {
   const nodeEnv = process.env.NODE_ENV || 'development';
-  const port = process.env.PORT || 3002;
+  const productionUrl = process.env.PRODUCTION_URL || 'https://petserviceinhome.com';
+  const developmentUrl = process.env.DEVELOPMENT_URL || `http://localhost:${process.env.PORT || 3002}`;
   
   if (nodeEnv === 'prod' || nodeEnv === 'production') {
-    return `https://petserviceinhome.com:${port}`;
+    return productionUrl;
   }
-  return `http://localhost:${port}`;
+  return developmentUrl;
 };
 
 export const googleAuth = asyncHandler(async (req, res) => {

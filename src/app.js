@@ -61,19 +61,24 @@ app.set('views', path.join(__dirname, 'views'));
 app.use((req, res, next) => {
   const nodeEnv = process.env.NODE_ENV || 'development';
   const port = process.env.PORT || 3002;
+  const productionUrl = process.env.PRODUCTION_URL || 'https://petserviceinhome.com';
+  const developmentUrl = process.env.DEVELOPMENT_URL || `http://localhost:${port}`;
   
   // Make environment variables available to all views
   res.locals.nodeEnv = nodeEnv;
   res.locals.port = port;
+  res.locals.productionUrl = productionUrl;
+  res.locals.developmentUrl = developmentUrl;
   res.locals.apiBase = (nodeEnv === 'prod' || nodeEnv === 'production') 
-    ? `https://petserviceinhome.com:${port}/api/v1`
-    : `http://localhost:${port}/api/v1`;
+    ? `${productionUrl}/api/v1`
+    : `${developmentUrl}/api/v1`;
   next();
 });
 app.use(
     cors({
         origin: [
-            'https://petserviceinhome.com:3002',
+            process.env.PRODUCTION_URL || 'https://petserviceinhome.com',
+            process.env.DEVELOPMENT_URL || 'http://localhost:3002',
             'http://localhost:5173',
             'https://bulk-whatsapp-manager-backend.onrender.com',
         ],
@@ -120,12 +125,13 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 // Helper function to get API_BASE based on environment
 const getApiBase = () => {
   const nodeEnv = process.env.NODE_ENV || 'development';
-  const port = process.env.PORT || 3002;
+  const productionUrl = process.env.PRODUCTION_URL || 'https://petserviceinhome.com';
+  const developmentUrl = process.env.DEVELOPMENT_URL || `http://localhost:${process.env.PORT || 3002}`;
   
   if (nodeEnv === 'prod' || nodeEnv === 'production') {
-    return `https://petserviceinhome.com:${port}/api/v1`;
+    return `${productionUrl}/api/v1`;
   }
-  return `http://localhost:${port}/api/v1`;
+  return `${developmentUrl}/api/v1`;
 };
 
 app.get('/', (req, res) => res.redirect('/login'));
