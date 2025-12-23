@@ -376,13 +376,14 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         // API Configuration - Set dynamically based on NODE_ENV
-        // If NODE_ENV is 'prod' or 'production', uses production server
-        // Otherwise uses localhost
+        // Uses PRODUCTION_URL or DEVELOPMENT_URL from environment variables
         const NODE_ENV = '{{nodeEnv}}' || 'development';
         const PORT = '{{port}}' || '3002';
+        const PRODUCTION_URL = '{{productionUrl}}' || 'https://petserviceinhome.com';
+        const DEVELOPMENT_URL = '{{developmentUrl}}' || `http://localhost:${PORT}`;
         const API_BASE = (NODE_ENV === 'prod' || NODE_ENV === 'production') 
-            ? `https://petserviceinhome.com:${PORT}/api/v1`
-            : `http://localhost:${PORT}/api/v1`;
+            ? `${PRODUCTION_URL}/api/v1`
+            : `${DEVELOPMENT_URL}/api/v1`;
 
         // Helper: detect if current page is login or register
         function isAuthPage() {
