@@ -44,11 +44,10 @@ export const addCustomer = async (req, res) => {
       }
     }
 
-    // ✅ Because unique index is (userId, phoneE164), keep where same
+    // ✅ Because unique index is (userId, businessId, phoneE164), include all three
     const [customer, created] = await Customer.findOrCreate({
-      where: { userId, phoneE164 },
+      where: { userId, businessId: biz.id, phoneE164 },
       defaults: {
-        businessId: biz.id,
         name: name || null,
         email: email || null,
         whatsappE164: wa,
@@ -230,6 +229,8 @@ export const bulkUploadCustomers = async (req, res) => {
                 });
             });
 
+        console.log('CSV parsed - rows:', rows.length, 'errors:', errors.length);
+
         // If there are validation errors, return them
         if (errors.length > 0 && rows.length === 0) {
             return res.status(400).json({
@@ -242,8 +243,11 @@ export const bulkUploadCustomers = async (req, res) => {
         const createdCustomers = [];
         let skipped = 0;
 
+        console.log('Starting bulk insert for', rows.length, 'rows');
+
         for (const customerData of rows) {
             try {
+                console.log('Processing customer:', customerData.phoneE164);
                 const [doc, created] = await Customer.findOrCreate({
                     where: {
                         businessId: customerData.businessId,
@@ -255,8 +259,10 @@ export const bulkUploadCustomers = async (req, res) => {
 
                 if (created) {
                     createdCustomers.push(doc);
+                    console.log('Created new customer:', doc.phoneE164);
                 } else {
                     skipped++;
+                    console.log('Updated existing customer:', doc.phoneE164);
                     // Optionally update existing customer
                     await doc.update({
                         name: customerData.name ?? doc.name,
@@ -265,12 +271,18 @@ export const bulkUploadCustomers = async (req, res) => {
                     });
                 }
             } catch (e) {
+                console.error('Error processing customer:', customerData.phoneE164, '- Error:', e.message);
+                if (e.errors) {
+                    console.error('Validation errors:', e.errors.map(err => err.message).join(', '));
+                }
                 errors.push({
                     phone: customerData.phoneE164,
                     error: e.message
                 });
             }
         }
+
+        console.log('Bulk insert complete - created:', createdCustomers.length, 'skipped:', skipped);
 
         res.status(201).json({
             success: true,

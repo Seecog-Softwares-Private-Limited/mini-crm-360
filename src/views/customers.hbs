@@ -108,13 +108,23 @@
       <div class="modal-body">
         <form
           method="POST"
-          action="/customers/bulk-upload"
+          action="/api/v1/customers/bulk-upload"
           enctype="multipart/form-data"
+          id="csvUploadForm"
         >
+
+          <!-- Business Selection -->
+          <div class="mb-3">
+            <label for="bulkUploadBusinessId" class="form-label">Business *</label>
+            <select class="form-select" id="bulkUploadBusinessId" name="businessId" required>
+              <option value="">Select a Business</option>
+            </select>
+            <small class="text-muted">Select the business to upload customers for</small>
+          </div>
 
           <!-- CSV File -->
           <div class="mb-3 d-flex justify-content-center">
-  <input type="file" id="csvUploadInput" name="csvFile" accept=".csv" hidden required>
+  <input type="file" id="csvUploadInput" name="file" accept=".csv" hidden required>
   <label for="csvUploadInput" class="btn btn-primary">
     <i class="fas fa-upload me-2"></i>Select CSV File
   </label>
@@ -124,7 +134,7 @@
 
           <!-- Actions -->
           <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" id="csvUploadBtn">
               Upload Data
             </button>
           </div>
@@ -333,6 +343,7 @@
       customers = Array.isArray(data)
         ? data
         : (data && (data.data || data.items || data.customers)) || [];
+      console.log('Loaded customers:', customers.length, customers);
       displayCustomers(customers);
       updateTagFilter(customers);
     } catch (err) {
@@ -550,6 +561,81 @@
     }
   }
 
+  // Load businesses for bulk upload dropdown
+  async function loadBusinessesForBulkUpload() {
+    try {
+      const data = await apiCall('/business');
+      const select = document.getElementById('bulkUploadBusinessId');
+      // Handle both array response and {data/business/items} responses
+      const businesses = Array.isArray(data) ? data : (data && (data.data || data.business || data.items)) || [];
+      if (businesses.length > 0) {
+        select.innerHTML = '<option value="">Select a Business</option>';
+        businesses.forEach(biz => {
+          const option = document.createElement('option');
+          option.value = biz.id;
+          option.textContent = biz.businessName || 'Untitled';
+          select.appendChild(option);
+        });
+      }
+    } catch (err) {
+      console.error('Error loading businesses for bulk upload:', err);
+    }
+  }
+
+  // Handle bulk upload form submission
+  document.getElementById('csvUploadForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById('csvUploadInput');
+    const businessIdSelect = document.getElementById('bulkUploadBusinessId');
+    const uploadBtn = document.getElementById('csvUploadBtn');
+
+    if (!fileInput.files.length) {
+      showAlert('Please select a CSV file', 'warning');
+      return;
+    }
+
+    if (!businessIdSelect.value) {
+      showAlert('Please select a business', 'warning');
+      return;
+    }
+
+    try {
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('businessId', businessIdSelect.value);
+
+      const response = await fetch('/api/v1/customers/bulk-upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        showAlert(`✅ Uploaded successfully! Created: ${data.created}, Skipped: ${data.skipped}`, 'success');
+        document.getElementById('csvUploadForm').reset();
+        fileInput.value = '';
+        bootstrap.Modal.getInstance(document.getElementById('csvUploadModal'))?.hide();
+        await loadCustomers();
+      } else {
+        showAlert((data && (data.message || data.error)) || 'Upload failed', 'danger');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      showAlert('Network error during upload', 'danger');
+    } finally {
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = 'Upload Data';
+    }
+  });
+
   function showAlert(message, type) {
     const el = document.createElement('div');
     el.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
@@ -561,6 +647,7 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     await loadBusinesses();
+    await loadBusinessesForBulkUpload();
     await loadCustomers();
   });
 
