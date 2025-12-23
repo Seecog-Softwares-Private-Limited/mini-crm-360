@@ -144,31 +144,65 @@ export const listCustomers = async (req, res) => {
       sortOrder = 'DESC' 
     } = req.query;
 
-    const where = { userId };
+    console.log('═══════════════════════════════════════');
+    console.log('LIST CUSTOMERS REQUEST');
+    console.log('═══════════════════════════════════════');
+    console.log('UserId:', userId);
+    console.log('Query params:', { tag, businessId, search, page, pageSize, sortBy, sortOrder });
 
+    // Build where clause properly
+    const whereConditions = [{ userId }];
+
+    // If businessId filter is provided, validate and apply it
     if (businessId) {
-      const biz = await Business.findOne({
-        where: { id: businessId, ownerId: userId },
-      });
-      if (!biz) return res.status(404).json({ error: "Business not found or not yours" });
-      where.businessId = businessId;
+      try {
+        const biz = await Business.findOne({
+          where: { id: businessId, ownerId: userId },
+        });
+        if (!biz) {
+          console.log('❌ Business not found or not owned by user');
+          return res.status(404).json({ error: "Business not found or not yours" });
+        }
+        whereConditions.push({ businessId });
+        console.log('✅ Filtering by businessId:', businessId);
+      } catch (bizErr) {
+        console.error('Error checking business:', bizErr);
+        return res.status(500).json({ error: "Failed to validate business", message: bizErr.message });
+      }
+    } else {
+      // If no businessId filter, show all customers for this user (with or without businessId)
+      console.log('✅ Showing all customers for user (no businessId filter)');
     }
 
     if (tag) {
       // MySQL-safe JSON search (basic)
-      where.tags = { [Op.like]: `%${tag}%` };
+      whereConditions.push({ tags: { [Op.like]: `%${tag}%` } });
     }
 
-    // Search functionality
+    // Search functionality - combine with userId using Op.and
     if (search && search.trim()) {
       const searchTerm = `%${search.trim()}%`;
-      where[Op.or] = [
-        { name: { [Op.like]: searchTerm } },
-        { email: { [Op.like]: searchTerm } },
-        { phoneE164: { [Op.like]: searchTerm } },
-        { whatsappE164: { [Op.like]: searchTerm } }
-      ];
+      whereConditions.push({
+        [Op.or]: [
+          { name: { [Op.like]: searchTerm } },
+          { email: { [Op.like]: searchTerm } },
+          { phoneE164: { [Op.like]: searchTerm } },
+          { whatsappE164: { [Op.like]: searchTerm } }
+        ]
+      });
     }
+
+    // Combine all conditions with Op.and (only if multiple conditions)
+    let where;
+    if (whereConditions.length === 1) {
+      where = whereConditions[0];
+    } else if (whereConditions.length > 1) {
+      where = { [Op.and]: whereConditions };
+    } else {
+      where = {};
+    }
+    
+    console.log('Where clause:', JSON.stringify(where, null, 2));
 
     // Pagination
     const pageNum = Math.max(parseInt(page, 10) || 1, 1);
@@ -182,6 +216,7 @@ export const listCustomers = async (req, res) => {
 
     // Get total count for pagination
     const totalCount = await Customer.count({ where });
+    console.log('Total customers matching filter:', totalCount);
 
     // Get paginated results
     const { rows, count } = await Customer.findAndCountAll({
@@ -191,12 +226,21 @@ export const listCustomers = async (req, res) => {
           model: Business,
           as: "business",
           attributes: ["id", "businessName", "category"],
+          required: false // LEFT JOIN - include customers even if business is null
         },
       ],
       order: [[sortField, orderDirection]],
       limit: size,
       offset: offset,
     });
+
+    console.log('Customers found:', rows.length);
+    console.log('Sample customer:', rows.length > 0 ? {
+      id: rows[0].id,
+      name: rows[0].name,
+      businessId: rows[0].businessId,
+      userId: rows[0].userId
+    } : 'No customers');
 
     const totalPages = Math.ceil(totalCount / size);
 
@@ -220,8 +264,20 @@ export const listCustomers = async (req, res) => {
       }
     });
   } catch (e) {
-    console.error("listCustomers error:", e);
-    return res.status(500).json({ error: "Failed to load customers" });
+    console.error("═══════════════════════════════════════");
+    console.error("❌ LIST CUSTOMERS ERROR");
+    console.error("═══════════════════════════════════════");
+    console.error("Error message:", e.message);
+    console.error("Error name:", e.name);
+    console.error("Error stack:", e.stack);
+    console.error("User ID:", req.user?.id);
+    console.error("Query params:", req.query);
+    console.error("═══════════════════════════════════════");
+    return res.status(500).json({ 
+      error: "Failed to load customers", 
+      message: e.message,
+      details: process.env.NODE_ENV === 'development' ? e.stack : undefined
+    });
   }
 };
 
@@ -388,19 +444,47 @@ export const bulkUploadCustomers = async (req, res) => {
 
     try {
         // Get business associated with the user (ownerId)
-        const business = await Business.findOne({
-            where: { ownerId: userId }
+        // Fetch the first business owned by this user (ordered by creation date)
+        let business = await Business.findOne({
+            where: { ownerId: userId },
+            order: [['createdAt', 'ASC']] // Get the oldest/first business
         });
 
+        // If no business exists, create a default one automatically
         if (!business) {
-            return res.status(400).json({
-                error: "No business found",
-                message: "Please create a business before uploading customers"
+            console.log('⚠️ No business found for user (ownerId:', userId + '), creating default business...');
+            
+            // Get user info for default business name
+            const user = req.user;
+            const defaultBusinessName = user.firstName && user.lastName 
+                ? `${user.firstName} ${user.lastName}'s Business`
+                : user.email 
+                    ? `${user.email.split('@')[0]}'s Business`
+                    : `Business ${userId}`;
+
+            // Create default business
+            business = await Business.create({
+                businessName: defaultBusinessName,
+                ownerId: userId,
+                country: 'India', // Default country
+                category: 'General', // Default category
+                timezone: 'Asia/Kolkata', // Default timezone
+                description: 'Auto-created business for customer management'
             });
+
+            console.log('✅ Created default business:', business.id, business.businessName);
         }
 
         const businessId = business.id;
-        console.log('✅ Found business for user:', businessId, business.businessName);
+        console.log('═══════════════════════════════════════');
+        console.log('✅ BUSINESS FOUND/CREATED FOR BULK UPLOAD');
+        console.log('═══════════════════════════════════════');
+        console.log('Business ID:', businessId);
+        console.log('Business Name:', business.businessName);
+        console.log('Owner ID (userId):', business.ownerId);
+        console.log('User ID (from req.user):', userId);
+        console.log('✅ All customers will be associated with this business');
+        console.log('═══════════════════════════════════════');
 
         const rows = [];
         const errors = [];
@@ -497,8 +581,10 @@ export const bulkUploadCustomers = async (req, res) => {
                     }
 
                     // Prepare customer data
+                    // Always use the businessId from the fetched business (ownerId)
                     const customerData = {
                         userId,
+                        businessId: businessId, // Always set from owner's business
                         name: name || null,
                         email: email || null,
                         phoneE164: phoneE164Formatted,
@@ -507,16 +593,7 @@ export const bulkUploadCustomers = async (req, res) => {
                         consentAt: consentAt ? new Date(consentAt) : new Date()
                     };
                     
-                    // Only add businessId if it's a valid number (not null/undefined/empty string)
-                    if (businessId !== null && businessId !== undefined && businessId !== '') {
-                        const bizId = parseInt(businessId);
-                        if (!isNaN(bizId) && bizId > 0) {
-                            customerData.businessId = bizId;
-                        }
-                    }
-                    // If businessId is invalid/null, leave it out (will be NULL in DB)
-                    
-                    console.log(`Row ${rowNum}: Prepared customer data:`, JSON.stringify(customerData, null, 2));
+                    console.log(`Row ${rowNum}: Customer data prepared with businessId: ${businessId}`);
                     rows.push(customerData);
                 })
                 .on('end', () => {
@@ -587,12 +664,20 @@ async function processBulkInsert(rows, errors, userId, businessId, res, resolve)
     console.log('Rows to process:', rows.length);
     console.log('Existing errors:', errors.length);
     console.log('UserId:', userId);
-    console.log('BusinessId:', businessId);
+    console.log('BusinessId (from ownerId):', businessId);
 
-    // businessId is already validated and fetched from user's business
-    // Use it directly for all customers
+    // Validate businessId - it should always be present (fetched from owner's business)
+    if (!businessId) {
+        console.error('❌ ERROR: businessId is null/undefined. Cannot proceed with bulk insert.');
+        return resolve(res.status(500).json({
+            error: "Business ID missing",
+            message: "Business ID is required for bulk customer upload. Please ensure you have a business associated with your account."
+        }));
+    }
+
     const validBusinessId = businessId;
     console.log('✅ Using businessId for all customers:', validBusinessId);
+    console.log('✅ All customers will be associated with business ID:', validBusinessId);
 
     // Bulk create customers (skip duplicates)
     const createdCustomers = [];
@@ -602,10 +687,10 @@ async function processBulkInsert(rows, errors, userId, businessId, res, resolve)
         try {
             console.log('Processing customer:', customerData.phoneE164);
             
-            // Override businessId with the user's business (always set from ownerId)
+            // Ensure businessId is always set from owner's business (override any CSV value)
             const finalCustomerData = {
                 ...customerData,
-                businessId: validBusinessId
+                businessId: validBusinessId // Always use owner's businessId
             };
             
             console.log('Final customer data:', JSON.stringify(finalCustomerData, null, 2));

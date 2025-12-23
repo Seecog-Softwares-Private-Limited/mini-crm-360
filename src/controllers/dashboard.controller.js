@@ -6,9 +6,15 @@ import { Campaign } from "../models/Campaign.js";
 
 export const renderDashboard = async (req, res) => {
   try {
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      console.error("Dashboard render error: User not authenticated");
+      return res.status(401).redirect('/login');
+    }
+
     const user = {
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
+      firstName: req.user.firstName || '',
+      lastName: req.user.lastName || '',
     };
 
     const userId = req.user.id;
@@ -23,24 +29,57 @@ export const renderDashboard = async (req, res) => {
     // ⚠️ If templates/campaigns don't have businessId column in DB, DON'T filter by businessId
     const whereCustomer = businessId ? { businessId, userId } : { userId };
 
-    const [businessCount, customerCount, whatsappTemplateCount, emailTemplateCount, campaignCount, recentCustomers] =
-      await Promise.all([
-        Business.count({ where: { ownerId: userId } }),
-        Customer.count({ where: whereCustomer }),
+    // Try to get counts with error handling for each
+    let businessCount = 0;
+    let customerCount = 0;
+    let whatsappTemplateCount = 0;
+    let emailTemplateCount = 0;
+    let campaignCount = 0;
+    let recentCustomers = [];
 
-        // ✅ WhatsApp templates (only by userId)
-        Template.count({ where: { userId } }),
-        // ✅ Email templates (only by userId, not deleted)
-        EmailTemplate.count({ where: { deleted: false } }),
-        Campaign.count({ where: { userId } }),
+    try {
+      businessCount = await Business.count({ where: { ownerId: userId } });
+    } catch (e) {
+      console.error("Error counting businesses:", e.message);
+    }
 
-        Customer.findAll({
-          where: whereCustomer,
-          order: [["createdAt", "DESC"]],
-          limit: 5,
-          include: [{ model: Business, as: "business" }],
-        }),
-      ]);
+    try {
+      customerCount = await Customer.count({ where: whereCustomer });
+    } catch (e) {
+      console.error("Error counting customers:", e.message);
+    }
+
+    try {
+      whatsappTemplateCount = await Template.count({ where: { userId } });
+    } catch (e) {
+      console.error("Error counting WhatsApp templates:", e.message);
+    }
+
+    try {
+      emailTemplateCount = await EmailTemplate.count({ where: { deleted: false } });
+    } catch (e) {
+      console.error("Error counting email templates:", e.message);
+      // If EmailTemplate table doesn't exist or has issues, set to 0
+      emailTemplateCount = 0;
+    }
+
+    try {
+      campaignCount = await Campaign.count({ where: { userId } });
+    } catch (e) {
+      console.error("Error counting campaigns:", e.message);
+    }
+
+    try {
+      recentCustomers = await Customer.findAll({
+        where: whereCustomer,
+        order: [["createdAt", "DESC"]],
+        limit: 5,
+        include: [{ model: Business, as: "business", required: false }],
+      });
+    } catch (e) {
+      console.error("Error fetching recent customers:", e.message);
+      recentCustomers = [];
+    }
 
     return res.render("dashboard", {
       title: "Dashboard",
@@ -54,11 +93,17 @@ export const renderDashboard = async (req, res) => {
         messages: 0,
         successRate: 0,
       },
-      recentCustomers,
+      recentCustomers: recentCustomers || [],
     });
   } catch (err) {
     console.error("Dashboard render error:", err);
-    return res.status(500).send("Failed to load dashboard");
+    console.error("Error stack:", err.stack);
+    console.error("Error details:", {
+      message: err.message,
+      name: err.name,
+      userId: req.user?.id,
+    });
+    return res.status(500).send(`Failed to load dashboard: ${err.message}`);
   }
 };
 
@@ -72,20 +117,48 @@ export const getDashboardCounts = async (req, res) => {
 
     const whereCustomer = businessId ? { businessId, userId } : { userId };
 
-    const [businesses, customers, whatsappTemplates, emailTemplates, campaigns] = await Promise.all([
-      Business.count({ where: { ownerId: userId } }),
-      Customer.count({ where: whereCustomer }),
+    // Get counts with individual error handling
+    let businesses = 0;
+    let customers = 0;
+    let whatsappTemplates = 0;
+    let emailTemplates = 0;
+    let campaigns = 0;
 
-      // ✅ WhatsApp templates (only by userId)
-      Template.count({ where: { userId } }),
-      // ✅ Email templates (only by userId, not deleted)
-      EmailTemplate.count({ where: { deleted: false } }),
-      Campaign.count({ where: { userId } }),
-    ]);
+    try {
+      businesses = await Business.count({ where: { ownerId: userId } });
+    } catch (e) {
+      console.error("Error counting businesses:", e.message);
+    }
+
+    try {
+      customers = await Customer.count({ where: whereCustomer });
+    } catch (e) {
+      console.error("Error counting customers:", e.message);
+    }
+
+    try {
+      whatsappTemplates = await Template.count({ where: { userId } });
+    } catch (e) {
+      console.error("Error counting WhatsApp templates:", e.message);
+    }
+
+    try {
+      emailTemplates = await EmailTemplate.count({ where: { deleted: false } });
+    } catch (e) {
+      console.error("Error counting email templates:", e.message);
+      emailTemplates = 0;
+    }
+
+    try {
+      campaigns = await Campaign.count({ where: { userId } });
+    } catch (e) {
+      console.error("Error counting campaigns:", e.message);
+    }
 
     return res.json({ businesses, customers, whatsappTemplates, emailTemplates, campaigns });
   } catch (err) {
     console.error("getDashboardCounts error:", err);
-    return res.status(500).json({ error: "Failed to load dashboard counts" });
+    console.error("Error stack:", err.stack);
+    return res.status(500).json({ error: "Failed to load dashboard counts", message: err.message });
   }
 };
