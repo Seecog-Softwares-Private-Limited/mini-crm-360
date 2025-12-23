@@ -51,18 +51,26 @@ const User = sequelize.define('User', {
   refreshTokenExpiresAt: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  socialId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  socialProvider: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'users',
   timestamps: true,
   hooks: {
     beforeCreate: async (user) => {
-      if (user.password) {
+      if (user.password && !user.password.startsWith('social_')) {
         user.password = await bcrypt.hash(user.password, 10);
       }
     },
     beforeUpdate: async (user) => {
-      if (user.changed('password')) {
+      if (user.changed('password') && user.password && !user.password.startsWith('social_')) {
         user.password = await bcrypt.hash(user.password, 10);
       }
     }

@@ -57,6 +57,19 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 // ---------- Middleware ----------
+// Middleware to pass environment variables to all views
+app.use((req, res, next) => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const port = process.env.PORT || 3002;
+  
+  // Make environment variables available to all views
+  res.locals.nodeEnv = nodeEnv;
+  res.locals.port = port;
+  res.locals.apiBase = (nodeEnv === 'prod' || nodeEnv === 'production') 
+    ? `http://15.206.19.156:${port}/api/v1`
+    : `http://localhost:${port}/api/v1`;
+  next();
+});
 app.use(
     cors({
         origin: [
@@ -81,6 +94,7 @@ app.use((req, res, next) => {
 
 // ---------- Route imports ----------
 import userRoutes from './routes/user.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import { waRouter } from './routes/wa.routes.js';
 import businessRouter from './routes/business.routes.js';
 import { customerRouter } from './routes/customer.routes.js';
@@ -103,10 +117,32 @@ import { renderEmailTemplatesPage } from './controllers/emailTemplate.controller
 import dashboardRoutes from "./routes/dashboard.routes.js";
 
 // ---------- Frontend pages ----------
+// Helper function to get API_BASE based on environment
+const getApiBase = () => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const port = process.env.PORT || 3002;
+  
+  if (nodeEnv === 'prod' || nodeEnv === 'production') {
+    return `http://15.206.19.156:${port}/api/v1`;
+  }
+  return `http://localhost:${port}/api/v1`;
+};
+
 app.get('/', (req, res) => res.redirect('/login'));
 
-app.get('/login', (req, res) => res.render('login', { title: 'Login' }));
-app.get('/register', (req, res) => res.render('register', { title: 'Register' }));
+app.get('/login', (req, res) => {
+  res.render('login', { 
+    title: 'Login',
+    apiBase: getApiBase()
+  });
+});
+
+app.get('/register', (req, res) => {
+  res.render('register', { 
+    title: 'Register',
+    apiBase: getApiBase()
+  });
+});
 
 app.get('/dashboard', verifyUser, renderDashboard);
 
@@ -178,6 +214,7 @@ app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // ---------- API routes ----------
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/business', businessRouter);
 
 app.get('/api/v1/health', (req, res) =>
