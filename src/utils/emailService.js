@@ -81,7 +81,7 @@ export async function sendDocumentEmail({
         to,
         cc,
         subject,
-        html,
+        html: html, // Ensure HTML is passed as-is without modification
         attachments: [],
     };
 
@@ -94,6 +94,12 @@ export async function sendDocumentEmail({
     }
 
     try {
+        // Ensure HTML is properly formatted
+        if (mailOptions.html && typeof mailOptions.html !== 'string') {
+            console.warn('[EmailService] HTML is not a string, converting...');
+            mailOptions.html = String(mailOptions.html);
+        }
+        
         const info = await transporter.sendMail(mailOptions);
         console.log('[EmailService] sendMail OK:', {
             messageId: info.messageId,

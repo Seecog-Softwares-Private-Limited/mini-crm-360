@@ -8,10 +8,16 @@ export const Campaign = sequelize.define('Campaign', {
   name: { type: DataTypes.STRING, allowNull: false },
   businessId: { type: DataTypes.INTEGER, allowNull: false },
 
-  // Either local templateId OR metaTemplate fields will be used:
+  // Channel type: 'whatsapp' or 'email'
+  channelType: { type: DataTypes.ENUM('whatsapp', 'email'), allowNull: true, defaultValue: 'whatsapp' },
+
+  // Either local templateId OR metaTemplate fields will be used (for WhatsApp):
   templateId: { type: DataTypes.INTEGER, allowNull: true },
 
-  // NEW: Meta template details saved per campaign
+  // Email template ID (for email campaigns):
+  emailTemplateId: { type: DataTypes.INTEGER, allowNull: true },
+
+  // NEW: Meta template details saved per campaign (for WhatsApp)
   metaTemplateName: { type: DataTypes.STRING, allowNull: true },
   metaTemplateLanguage: { type: DataTypes.STRING, allowNull: true, defaultValue: 'en_US' },
   metaTemplateCategory: { type: DataTypes.STRING, allowNull: true },
