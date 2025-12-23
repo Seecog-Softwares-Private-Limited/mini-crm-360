@@ -10,6 +10,7 @@ export const renderEmailTemplatesPage = async (req, res, next) => {
         const user = {
             firstName: req.user.firstName || '',
             lastName: req.user.lastName || '',
+            avatar: req.user.avatar || req.user.avatarUrl || null,
             plan: req.user.plan || null,
         };
         res.render('emailTemplates', {

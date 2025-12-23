@@ -16,6 +16,7 @@ export const renderNotesPage = async (req, res) => {
     const user = {
       firstName: req.user.firstName || '',
       lastName: req.user.lastName || '',
+      avatar: req.user.avatar || req.user.avatarUrl || null,
       plan: req.user.plan || null,
     };
 

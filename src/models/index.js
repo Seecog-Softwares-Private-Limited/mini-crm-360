@@ -20,6 +20,10 @@ import { Plan } from './Plan.js';
 import { UserPlan } from './UserPlan.js';
 import { Task } from './Task.js';
 import { Note } from './Note.js';
+import { LeadForm } from './LeadForm.js';
+import { FormSubmission } from './FormSubmission.js';
+import { UserSession } from './UserSession.js';
+import { ActivityLog } from './ActivityLog.js';
 
 import EmployeeEducation from './EmployeeEducation.js';
 import EmployeeExperience from './EmployeeExperience.js';
@@ -203,6 +207,33 @@ User.hasMany(Note, { foreignKey: 'createdBy', as: 'createdNotes' });
 Note.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
 
 /* =========================================================
+   USER ↔ LEAD FORM ↔ BUSINESS
+========================================================= */
+User.hasMany(LeadForm, { foreignKey: 'userId', as: 'leadForms' });
+LeadForm.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Business.hasMany(LeadForm, { foreignKey: 'businessId', as: 'leadForms' });
+LeadForm.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
+
+/* =========================================================
+   LEAD FORM ↔ FORM SUBMISSION ↔ CUSTOMER
+========================================================= */
+LeadForm.hasMany(FormSubmission, { foreignKey: 'formId', as: 'submissions' });
+FormSubmission.belongsTo(LeadForm, { foreignKey: 'formId', as: 'form' });
+
+Customer.hasMany(FormSubmission, { foreignKey: 'customerId', as: 'formSubmissions' });
+FormSubmission.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+/* =========================================================
+   USER ↔ USER SESSION ↔ ACTIVITY LOG
+========================================================= */
+User.hasMany(UserSession, { foreignKey: 'userId', as: 'sessions' });
+UserSession.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+User.hasMany(ActivityLog, { foreignKey: 'userId', as: 'activityLogs' });
+ActivityLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+/* =========================================================
    EXPORT MODELS
 ========================================================= */
 export {
@@ -230,4 +261,8 @@ export {
   UserPlan,
   Task,
   Note,
+  LeadForm,
+  FormSubmission,
+  UserSession,
+  ActivityLog,
 };

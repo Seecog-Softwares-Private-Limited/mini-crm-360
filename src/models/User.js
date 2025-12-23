@@ -69,6 +69,37 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: true,
     field: 'passwordResetExpires'
+  },
+  avatar: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  timezone: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    defaultValue: 'Asia/Kolkata'
+  },
+  language: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+    defaultValue: 'en'
+  },
+  notificationPreferences: {
+    type: DataTypes.JSON,
+    allowNull: true
+  },
+  twoFactorEnabled: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
+  twoFactorSecret: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   }
 }, {
   tableName: 'users',

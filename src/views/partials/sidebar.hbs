@@ -17,10 +17,16 @@
     <!-- User Profile Section -->
     <div class="sidebar-profile">
       <div class="profile-avatar">
-        <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" 
+        {{#if (or user.avatar user.avatarUrl)}}
+        <img src="{{#if user.avatar}}{{user.avatar}}{{else}}{{user.avatarUrl}}{{/if}}" 
              alt="User Avatar" 
              class="avatar-img"
              onerror="this.src='https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=128'">
+        {{else}}
+        <img src="https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=128" 
+             alt="User Avatar" 
+             class="avatar-img">
+        {{/if}}
       </div>
       <div class="profile-info">
         <div class="profile-name">{{user.firstName}} {{user.lastName}}</div>
@@ -71,6 +77,14 @@
           <a class="nav-link submenu-link {{#if (eq activePage 'notes')}}active{{/if}}" href="/notes">
             <i class="fas fa-sticky-note"></i>
             <span class="nav-text">Notes & Timeline</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'reminders')}}active{{/if}}" href="/reminders">
+            <i class="fas fa-birthday-cake"></i>
+            <span class="nav-text">Birthday & Anniversary</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'leadForms')}}active{{/if}}" href="/lead-forms">
+            <i class="fas fa-wpforms"></i>
+            <span class="nav-text">Lead Capture Forms</span>
           </a>
           {{#if user.plan}}
             {{#if user.plan.hasInvoice}}
