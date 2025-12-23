@@ -1,6 +1,7 @@
 import { Business } from "../models/Business.js";
 import { Customer } from "../models/Customer.js";
 import { Template } from "../models/Template.js";
+import EmailTemplate from "../models/EmailTemplate.js";
 import { Campaign } from "../models/Campaign.js";
 
 export const renderDashboard = async (req, res) => {
@@ -22,13 +23,15 @@ export const renderDashboard = async (req, res) => {
     // ⚠️ If templates/campaigns don't have businessId column in DB, DON'T filter by businessId
     const whereCustomer = businessId ? { businessId, userId } : { userId };
 
-    const [businessCount, customerCount, templateCount, campaignCount, recentCustomers] =
+    const [businessCount, customerCount, whatsappTemplateCount, emailTemplateCount, campaignCount, recentCustomers] =
       await Promise.all([
         Business.count({ where: { ownerId: userId } }),
         Customer.count({ where: whereCustomer }),
 
-        // ✅ safest filter (only by userId)
+        // ✅ WhatsApp templates (only by userId)
         Template.count({ where: { userId } }),
+        // ✅ Email templates (only by userId, not deleted)
+        EmailTemplate.count({ where: { deleted: false } }),
         Campaign.count({ where: { userId } }),
 
         Customer.findAll({
@@ -45,7 +48,8 @@ export const renderDashboard = async (req, res) => {
       counts: {
         businesses: businessCount,
         customers: customerCount,
-        templates: templateCount,
+        whatsappTemplates: whatsappTemplateCount,
+        emailTemplates: emailTemplateCount,
         campaigns: campaignCount,
         messages: 0,
         successRate: 0,
@@ -68,16 +72,18 @@ export const getDashboardCounts = async (req, res) => {
 
     const whereCustomer = businessId ? { businessId, userId } : { userId };
 
-    const [businesses, customers, templates, campaigns] = await Promise.all([
+    const [businesses, customers, whatsappTemplates, emailTemplates, campaigns] = await Promise.all([
       Business.count({ where: { ownerId: userId } }),
       Customer.count({ where: whereCustomer }),
 
-      // ✅ safest filter (only by userId)
+      // ✅ WhatsApp templates (only by userId)
       Template.count({ where: { userId } }),
+      // ✅ Email templates (only by userId, not deleted)
+      EmailTemplate.count({ where: { deleted: false } }),
       Campaign.count({ where: { userId } }),
     ]);
 
-    return res.json({ businesses, customers, templates, campaigns });
+    return res.json({ businesses, customers, whatsappTemplates, emailTemplates, campaigns });
   } catch (err) {
     console.error("getDashboardCounts error:", err);
     return res.status(500).json({ error: "Failed to load dashboard counts" });

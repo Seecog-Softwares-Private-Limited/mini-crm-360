@@ -65,6 +65,12 @@ Template.hasMany(Campaign, { foreignKey: 'templateId', as: 'campaigns' });
 Campaign.belongsTo(Template, { foreignKey: 'templateId', as: 'template' });
 
 /* =========================================================
+   EMAIL TEMPLATE ↔ CAMPAIGN
+========================================================= */
+EmailTemplate.hasMany(Campaign, { foreignKey: 'emailTemplateId', as: 'campaigns' });
+Campaign.belongsTo(EmailTemplate, { foreignKey: 'emailTemplateId', as: 'emailTemplate' });
+
+/* =========================================================
    MESSAGE LOG RELATIONS
 ========================================================= */
 Campaign.hasMany(MessageLog, { foreignKey: 'campaignId', as: 'messageLogs' });

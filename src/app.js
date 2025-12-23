@@ -173,6 +173,8 @@ app.get('/clear-storage', (req, res) => {
 
 // Static
 app.use(express.static('public'));
+// Serve assets from src/assets
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // ---------- API routes ----------
 app.use('/api/v1/users', userRoutes);

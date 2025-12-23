@@ -1,37 +1,600 @@
-<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-  <div class="card shadow-lg" style="width: 100%; max-width: 400px;">
-    <div class="card-body p-4">
-      <div class="text-center mb-4">
-        <h1 class="h3 mb-2">📱 WhatsApp Manager</h1>
-        <p class="text-muted">Bulk messaging made simple</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - Mini CRM 360</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+  /* ============================================
+     PREMIUM LOGIN PAGE STYLING
+     Mini CRM Professional Theme
+     ============================================ */
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  /* Subtle Background Pattern */
+  .login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.02) 0%, transparent 50%);
+    z-index: 1;
+  }
+
+  /* Cartoon CRM Icons */
+  .cartoon-icon {
+    position: absolute;
+    z-index: 2;
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: floatGentle 6s ease-in-out infinite;
+    transition: transform 0.3s ease;
+  }
+
+  .cartoon-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  /* Different colored backgrounds for each icon */
+  .cartoon-icon.customer {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    top: 8%;
+    left: 8%;
+    animation-delay: 0s;
+  }
+
+  .cartoon-icon.business {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    top: 15%;
+    right: 10%;
+    animation-delay: 1s;
+  }
+
+  .cartoon-icon.campaign {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    bottom: 12%;
+    left: 12%;
+    animation-delay: 2s;
+  }
+
+  .cartoon-icon.analytics {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    bottom: 20%;
+    right: 8%;
+    animation-delay: 3s;
+  }
+
+  .cartoon-icon.email {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    top: 45%;
+    left: 5%;
+    animation-delay: 4s;
+  }
+
+  .cartoon-icon.whatsapp {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    top: 55%;
+    right: 5%;
+    animation-delay: 5s;
+  }
+
+  .cartoon-icon.team {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    top: 30%;
+    left: 15%;
+    animation-delay: 1.5s;
+  }
+
+  .cartoon-icon.chart {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    bottom: 35%;
+    right: 18%;
+    animation-delay: 2.5s;
+  }
+
+  .cartoon-icon.document {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    top: 70%;
+    left: 20%;
+    animation-delay: 3.5s;
+  }
+
+  .cartoon-icon.notification {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    top: 25%;
+    right: 25%;
+    animation-delay: 4.5s;
+  }
+
+  @keyframes floatGentle {
+    0%, 100% { 
+      transform: translateY(0px) rotate(0deg); 
+    }
+    50% { 
+      transform: translateY(-20px) rotate(5deg); 
+    }
+  }
+
+  /* Login Card */
+  .login-card {
+    position: relative;
+    z-index: 10;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 440px;
+    padding: 3rem 2.5rem;
+    animation: cardSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  @keyframes cardSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Logo/Brand Section */
+  .login-brand {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .login-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    animation: logoPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
+  }
+
+  .login-logo i {
+    font-size: 2.5rem;
+    color: #ffffff;
+  }
+
+  .login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .login-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* Form Styling */
+  .login-form {
+    margin-top: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.75rem;
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.3px;
+    transition: color 0.3s ease;
+  }
+
+  .form-group:focus-within .form-label {
+    color: #667eea;
+  }
+
+  /* Premium Input Wrapper */
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1.125rem;
+    color: #9ca3af;
+    font-size: 1.1rem;
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .form-group:focus-within .input-icon {
+    color: #667eea;
+    transform: scale(1.1);
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    background: linear-gradient(to bottom, #ffffff 0%, #fafbfc 100%);
+    color: #1e293b;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.02),
+      inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+
+  .form-control:hover {
+    border-color: #cbd5e1;
+    box-shadow: 
+      0 4px 8px rgba(0, 0, 0, 0.04),
+      inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  }
+
+  .form-control:focus {
+    border-color: #667eea;
+    background: #ffffff;
+    box-shadow: 
+      0 0 0 4px rgba(102, 126, 234, 0.12),
+      0 8px 16px rgba(102, 126, 234, 0.15),
+      inset 0 1px 2px rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+  }
+
+  /* Animated Border Gradient on Focus */
+  .form-group::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 0 0 14px 14px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  .form-group:focus-within::after {
+    width: 100%;
+  }
+
+  .form-control::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .form-control:focus::placeholder {
+    opacity: 0.5;
+  }
+
+  /* Password field specific styling */
+  .form-control[type="password"] {
+    letter-spacing: 0.2em;
+  }
+
+  /* Login Button */
+  .btn-login {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  .btn-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-login:hover::before {
+    left: 100%;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+  }
+
+  .btn-login:active {
+    transform: translateY(0);
+  }
+
+  .btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Alert Container */
+  #alertContainer {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .alert-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+  }
+
+  .alert-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+  }
+
+  /* Footer Links */
+  .login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .login-footer p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .login-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .login-footer a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  .btn-clear-storage {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+  }
+
+  .btn-clear-storage:hover {
+    color: #64748b;
+  }
+
+  /* Loading Spinner */
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .login-card {
+      padding: 2rem 1.5rem;
+      margin: 1rem;
+      border-radius: 20px;
+    }
+
+    .login-title {
+      font-size: 1.75rem;
+    }
+
+    .login-logo {
+      width: 70px;
+      height: 70px;
+    }
+
+    .login-logo i {
+      font-size: 2rem;
+    }
+
+    .cartoon-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      border-radius: 15px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .cartoon-icon {
+      width: 70px;
+      height: 70px;
+      font-size: 1.75rem;
+    }
+  }
+
+  /* Premium Glassmorphism Effect */
+  .login-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
+  }
+</style>
+
+<div class="login-container">
+  <!-- Cartoon CRM Icons - Representing CRM Features -->
+  <div class="cartoon-icon customer" title="Manage Customers">
+    <i class="fas fa-users"></i>
+  </div>
+  <div class="cartoon-icon business" title="Business Management">
+    <i class="fas fa-building"></i>
+  </div>
+  <div class="cartoon-icon campaign" title="Marketing Campaigns">
+    <i class="fas fa-bullhorn"></i>
+  </div>
+  <div class="cartoon-icon analytics" title="Analytics & Reports">
+    <i class="fas fa-chart-line"></i>
+  </div>
+  <div class="cartoon-icon email" title="Email Marketing">
+    <i class="fas fa-envelope"></i>
+  </div>
+  <div class="cartoon-icon whatsapp" title="WhatsApp Messaging">
+    <i class="fab fa-whatsapp"></i>
+  </div>
+  <div class="cartoon-icon team" title="Team Collaboration">
+    <i class="fas fa-user-friends"></i>
+  </div>
+  <div class="cartoon-icon chart" title="Data Insights">
+    <i class="fas fa-chart-pie"></i>
+  </div>
+  <div class="cartoon-icon document" title="Document Management">
+    <i class="fas fa-file-alt"></i>
+  </div>
+  <div class="cartoon-icon notification" title="Smart Notifications">
+    <i class="fas fa-bell"></i>
+  </div>
+
+  <!-- Login Card -->
+  <div class="login-card">
+    <!-- Brand Section -->
+    <div class="login-brand">
+      <div class="login-logo">
+        <i class="fas fa-briefcase"></i>
+      </div>
+      <h1 class="login-title">Mini CRM 360</h1>
+      <p class="login-subtitle">Professional Customer Relationship Management</p>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          <input 
+            type="email" 
+            class="form-control" 
+            id="email" 
+            name="email" 
+            placeholder="Enter your email"
+            required
+            autocomplete="email"
+          >
+        </div>
       </div>
 
-      <div id="alertContainer"></div>
-
-      <form id="loginForm">
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="email" required>
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="password" 
+            name="password" 
+            placeholder="Enter your password"
+            required
+            autocomplete="current-password"
+          >
         </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100 mb-3" id="loginBtn">
-          <span id="loginText">Login</span>
-          <span id="loadingText" class="d-none">
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            Logging in...
-          </span>
-        </button>
-      </form>
-
-      <div class="text-center">
-        <p class="mb-0">Don't have an account? <a href="/register" class="text-decoration-none">Register here</a></p>
-        <button type="button" class="btn btn-link btn-sm mt-2" onclick="clearStorage()">Clear Storage & Refresh</button>
       </div>
+
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span id="loginText">Sign In</span>
+        <span id="loadingText" class="d-none">
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Signing in...
+        </span>
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p class="mb-2">Don't have an account? <a href="/register">Create Account</a></p>
+      <button type="button" class="btn-clear-storage" onclick="clearStorage()">
+        Clear Storage & Refresh
+      </button>
     </div>
   </div>
 </div>
@@ -109,7 +672,7 @@
     alertContainer.innerHTML = `
       <div class="alert alert-${type} alert-dismissible fade show" role="alert">
         ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     `;
   }
@@ -131,3 +694,86 @@
     window.location.reload();
   }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // API Configuration
+  const API_BASE = 'http://localhost:3002/api/v1';
+
+  // Helper: detect if current page is login or register
+  function isAuthPage() {
+    const p = window.location.pathname.toLowerCase();
+    return p === '/login' || p === '/register' || p.endsWith('/login') || p.endsWith('/register');
+  }
+  
+  // Helper function to make API calls
+  async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('accessToken') || null;
+
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+
+    // Attach Authorization only if we have a real token and caller didn't skip auth
+    if (token && !options.skipAuth) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const defaultOptions = {
+      credentials: 'include',
+      ...options,
+      headers
+    };
+    
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, defaultOptions);
+
+      // If unauthorized:
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
+        const isAuthError =
+          response.status === 401 ||
+          (errorData.error && (
+            String(errorData.error).includes('jwt expired') ||
+            String(errorData.error).includes('Invalid access Token') ||
+            String(errorData.error).includes('Authentication failed')
+          ));
+
+        if (isAuthError) {
+          // Only redirect to /login if we are NOT already on login/register
+          if (!isAuthPage()) {
+            console.log('Authentication failed, redirecting to login...');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            window.location.replace('/login');
+            return;
+          }
+          // If we are on an auth page, just return the error JSON to the caller
+          return errorData;
+        }
+
+        // Non-auth failure: throw with message for the caller
+        throw new Error(errorData.message || errorData.error || 'API request failed');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      // Network or other errors; don't force redirect if already on auth pages
+      const msg = String(error && error.message || '');
+      if (
+        (msg.includes('jwt expired') || msg.includes('Invalid access Token') || msg.includes('Authentication failed')) &&
+        !isAuthPage()
+      ) {
+        console.log('Authentication failed, redirecting to login...');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        window.location.replace('/login');
+        return;
+      }
+      throw error;
+    }
+  }
+</script>
+</body>
+</html>

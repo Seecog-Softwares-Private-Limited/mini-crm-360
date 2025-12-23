@@ -1,18 +1,32 @@
 // controllers/campaign.controllers.js
 import { Campaign } from "../models/Campaign.js";
 import { Template } from "../models/Template.js";
+import EmailTemplate from "../models/EmailTemplate.js";
 import { Business } from "../models/Business.js";
 import { Customer } from "../models/Customer.js";
 import { MessageLog } from "../models/MessageLog.js";
 import { scheduleCampaign } from "../controllers/job/send-campaign.job.js";
 import { sendTemplateMessage } from "../controllers/service/whatsapp.service.js";
+import { sendDocumentEmail } from "../utils/emailService.js";
 
 /**
  * Helper: validate create/update payload supports either:
  *  - local template: { templateId }
  *  - meta template:  { metaTemplate: { name, language, category } }
+ *  - email template: { emailTemplate: { emailTemplateId } }
  */
 function extractTemplateChoice(body = {}) {
+    const channelType = body.channelType || 'whatsapp';
+    
+    if (channelType === 'email') {
+        const emailTemplate = body.emailTemplate ?? null;
+        if (!emailTemplate || !emailTemplate.emailTemplateId) {
+            throw new Error("emailTemplate with emailTemplateId is required for email campaigns.");
+        }
+        return { mode: 'email', emailTemplateId: emailTemplate.emailTemplateId };
+    }
+    
+    // WhatsApp templates
     const templateId = body.templateId ?? null;
     const metaTemplate = body.metaTemplate ?? null;
 
@@ -32,7 +46,7 @@ function extractTemplateChoice(body = {}) {
 export const createCampaign = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { name, businessId, customerIds, scheduleType, scheduledAt, description } = req.body;
+        const { name, businessId, customerIds, scheduleType, scheduledAt, description, channelType } = req.body;
 
         if (!name || !businessId || !customerIds || !Array.isArray(customerIds) || customerIds.length === 0) {
             return res.status(400).json({ ok: false, message: "name, businessId, and customerIds are required" });
@@ -43,6 +57,9 @@ export const createCampaign = async (req, res) => {
         if (!business) {
             return res.status(400).json({ ok: false, message: "Business not found or not owned by user" });
         }
+
+        // Determine channel type (default to whatsapp for backward compatibility)
+        const finalChannelType = channelType || 'whatsapp';
 
         // template choice
         let tplChoice;
@@ -55,6 +72,17 @@ export const createCampaign = async (req, res) => {
             template = await Template.findOne({ where: { id: tplChoice.templateId, userId } });
             if (!template) {
                 return res.status(400).json({ ok: false, message: "Template not found or not owned by user" });
+            }
+        }
+
+        // If email template, verify it exists
+        let emailTemplate = null;
+        if (tplChoice.mode === 'email') {
+            emailTemplate = await EmailTemplate.findOne({ 
+                where: { id: tplChoice.emailTemplateId, deleted: false } 
+            });
+            if (!emailTemplate) {
+                return res.status(400).json({ ok: false, message: "Email template not found" });
             }
         }
 
@@ -89,7 +117,9 @@ export const createCampaign = async (req, res) => {
             userId,
             name,
             businessId,
+            channelType: finalChannelType,
             templateId: tplChoice.mode === 'local' ? template.id : null,
+            emailTemplateId: tplChoice.mode === 'email' ? emailTemplate.id : null,
             metaTemplateName: tplChoice.mode === 'meta' ? tplChoice.name : null,
             metaTemplateLanguage: tplChoice.mode === 'meta' ? tplChoice.language : null,
             metaTemplateCategory: tplChoice.mode === 'meta' ? tplChoice.category : null,
@@ -117,7 +147,8 @@ export const listCampaigns = async (req, res) => {
             where: { userId: req.user.id },
             include: [
                 { model: Template, as: 'template', required: false }, // may be null if using Meta
-                { model: Business, as: 'business', required: false }
+                { model: Business, as: 'business', required: false },
+                { model: EmailTemplate, as: 'emailTemplate', required: false } // for email campaigns
             ],
             order: [['createdAt', 'DESC']]
         });
@@ -135,7 +166,8 @@ export const getCampaignById = async (req, res) => {
             where: { id, userId: req.user.id },
             include: [
                 { model: Template, as: 'template', required: false },
-                { model: Business, as: 'business', required: false }
+                { model: Business, as: 'business', required: false },
+                { model: EmailTemplate, as: 'emailTemplate', required: false } // for email campaigns
             ]
         });
         if (!campaign) return res.status(404).json({ ok: false, message: "Campaign not found" });
@@ -150,7 +182,7 @@ export const updateCampaign = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
-        const { name, businessId, customerIds, scheduleType, scheduledAt, description } = req.body;
+        const { name, businessId, customerIds, scheduleType, scheduledAt, description, channelType } = req.body;
 
         const campaign = await Campaign.findOne({ where: { id, userId } });
         if (!campaign) return res.status(404).json({ ok: false, message: "Campaign not found" });
@@ -162,6 +194,9 @@ export const updateCampaign = async (req, res) => {
         const business = await Business.findOne({ where: { id: businessId, ownerId: userId } });
         if (!business) return res.status(400).json({ ok: false, message: "Business not found or not owned by user" });
 
+        // Determine channel type (default to existing or whatsapp)
+        const finalChannelType = channelType || campaign.channelType || 'whatsapp';
+
         let tplChoice;
         try { tplChoice = extractTemplateChoice(req.body); }
         catch (err) { return res.status(400).json({ ok: false, message: err.message }); }
@@ -170,6 +205,17 @@ export const updateCampaign = async (req, res) => {
         if (tplChoice.mode === 'local') {
             template = await Template.findOne({ where: { id: tplChoice.templateId, userId } });
             if (!template) return res.status(400).json({ ok: false, message: "Template not found or not owned by user" });
+        }
+
+        // If email template, verify it exists
+        let emailTemplate = null;
+        if (tplChoice.mode === 'email') {
+            emailTemplate = await EmailTemplate.findOne({ 
+                where: { id: tplChoice.emailTemplateId, deleted: false } 
+            });
+            if (!emailTemplate) {
+                return res.status(400).json({ ok: false, message: "Email template not found" });
+            }
         }
 
         const foundCustomers = await Customer.findAll({
@@ -198,7 +244,9 @@ export const updateCampaign = async (req, res) => {
         await campaign.update({
             name,
             businessId,
+            channelType: finalChannelType,
             templateId: tplChoice.mode === 'local' ? template.id : null,
+            emailTemplateId: tplChoice.mode === 'email' ? emailTemplate.id : null,
             metaTemplateName: tplChoice.mode === 'meta' ? tplChoice.name : null,
             metaTemplateLanguage: tplChoice.mode === 'meta' ? tplChoice.language : null,
             metaTemplateCategory: tplChoice.mode === 'meta' ? tplChoice.category : null,
@@ -266,41 +314,117 @@ export const sendCampaign = async (req, res) => {
         await campaign.update({ status: 'running' });
 
         let total = 0, sent = 0, failed = 0;
+        const channelType = campaign.channelType || 'whatsapp';
 
-        // Figure out which template to use
-        const isMeta = !!campaign.metaTemplateName;
-        const templateName = isMeta ? campaign.metaTemplateName : campaign.template?.waName;
-        const templateLanguage = isMeta ? campaign.metaTemplateLanguage : (campaign.template?.language || 'en_US');
-        const components = isMeta ? [] : (campaign.template?.components || []); // if needed, extend to pass params
+        if (channelType === 'email') {
+            // Email campaign
+            const emailTemplate = await EmailTemplate.findOne({
+                where: { id: campaign.emailTemplateId, deleted: false }
+            });
+            if (!emailTemplate) {
+                await campaign.update({ status: 'failed' });
+                return res.status(400).json({ ok: false, message: "Email template not found" });
+            }
 
-        for (const customer of customers) {
-            total++;
-            try {
-                const [log, created] = await MessageLog.findOrCreate({
-                    where: { campaignId: campaign.id, customerId: customer.id },
-                    defaults: { to: customer.phoneE164, status: "queued" }
-                });
-                if (!created) await log.update({ status: "queued" });
+            for (const customer of customers) {
+                total++;
+                if (!customer.email) {
+                    console.warn(`Customer ${customer.id} has no email address, skipping`);
+                    failed++;
+                    continue;
+                }
 
-                const response = await sendTemplateMessage({
-                    to: customer.phoneE164,
-                    templateName,
-                    language: templateLanguage,
-                    components
-                });
+                try {
+                    const [log, created] = await MessageLog.findOrCreate({
+                        where: { campaignId: campaign.id, customerId: customer.id },
+                        defaults: { to: customer.email, status: "queued" }
+                    });
+                    if (!created) await log.update({ status: "queued" });
 
-                const waMessageId = response?.messages?.[0]?.id;
-                await log.update({ waMessageId, status: "sent" });
-                sent++;
+                    // Replace placeholders in subject and body
+                    let subject = emailTemplate.subject || '';
+                    let bodyHtml = emailTemplate.bodyHtml || '';
+                    
+                    // Simple placeholder replacement (extend as needed)
+                    const placeholders = {
+                        '{{employeeName}}': customer.name || 'Customer',
+                        '{{customerName}}': customer.name || 'Customer',
+                        '{{name}}': customer.name || 'Customer',
+                        '{{monthYear}}': new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+                        '{{companyName}}': campaign.business?.businessName || 'Company'
+                    };
 
-                await new Promise(r => setTimeout(r, 150)); // rate-limit buffer
-            } catch (error) {
-                console.error(`Error sending message to ${customer.phoneE164}:`, error);
-                await MessageLog.update(
-                    { status: "failed", error: error.data || error.message },
-                    { where: { campaignId: campaign.id, customerId: customer.id } }
-                );
-                failed++;
+                    Object.keys(placeholders).forEach(key => {
+                        const value = placeholders[key];
+                        subject = subject.replace(new RegExp(key.replace(/[{}]/g, '\\$&'), 'g'), value);
+                        bodyHtml = bodyHtml.replace(new RegExp(key.replace(/[{}]/g, '\\$&'), 'g'), value);
+                    });
+
+                    const emailSent = await sendDocumentEmail({
+                        to: customer.email,
+                        subject: subject,
+                        html: bodyHtml
+                    });
+
+                    if (emailSent) {
+                        await log.update({ status: "sent" });
+                        sent++;
+                    } else {
+                        await log.update({ status: "failed", error: "Email service returned false" });
+                        failed++;
+                    }
+
+                    await new Promise(r => setTimeout(r, 100)); // rate-limit buffer
+                } catch (error) {
+                    console.error(`Error sending email to ${customer.email}:`, error);
+                    await MessageLog.update(
+                        { status: "failed", error: error.message || 'Unknown error' },
+                        { where: { campaignId: campaign.id, customerId: customer.id } }
+                    );
+                    failed++;
+                }
+            }
+        } else {
+            // WhatsApp campaign
+            const isMeta = !!campaign.metaTemplateName;
+            const templateName = isMeta ? campaign.metaTemplateName : campaign.template?.waName;
+            const templateLanguage = isMeta ? campaign.metaTemplateLanguage : (campaign.template?.language || 'en_US');
+            const components = isMeta ? [] : (campaign.template?.components || []);
+
+            if (!templateName) {
+                await campaign.update({ status: 'failed' });
+                return res.status(400).json({ ok: false, message: "Template not found for WhatsApp campaign" });
+            }
+
+            for (const customer of customers) {
+                total++;
+                try {
+                    const [log, created] = await MessageLog.findOrCreate({
+                        where: { campaignId: campaign.id, customerId: customer.id },
+                        defaults: { to: customer.phoneE164, status: "queued" }
+                    });
+                    if (!created) await log.update({ status: "queued" });
+
+                    const response = await sendTemplateMessage({
+                        to: customer.phoneE164,
+                        templateName,
+                        language: templateLanguage,
+                        components
+                    });
+
+                    const waMessageId = response?.messages?.[0]?.id;
+                    await log.update({ waMessageId, status: "sent" });
+                    sent++;
+
+                    await new Promise(r => setTimeout(r, 150)); // rate-limit buffer
+                } catch (error) {
+                    console.error(`Error sending message to ${customer.phoneE164}:`, error);
+                    await MessageLog.update(
+                        { status: "failed", error: error.data || error.message },
+                        { where: { campaignId: campaign.id, customerId: customer.id } }
+                    );
+                    failed++;
+                }
             }
         }
 

@@ -3,9 +3,61 @@ import { Customer } from "../models/Customer.js";
 import { Business } from "../models/Business.js";
 import { Op } from 'sequelize';
 import csv from 'csv-parser';
+import { PassThrough } from 'stream';
+import { sendDocumentEmail } from "../utils/emailService.js";
 
 const isE164 = (v) => /^\+\d{8,15}$/.test(String(v || ""));
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || ""));
+
+// Validate phone number (accepts 10 digits or E.164 format)
+const is10DigitPhone = (v) => {
+    if (!v) return false;
+    const str = String(v).trim();
+    
+    // If already in E.164 format, extract digits and check
+    if (str.startsWith('+')) {
+        const digits = str.replace(/\D/g, '');
+        // E.164 format: + followed by country code + number
+        // For India (+91), we expect 12 digits total (91 + 10 digits)
+        // Or just check if it's a valid E.164 format
+        return digits.length >= 10 && digits.length <= 15;
+    }
+    
+    // Check for 10-digit number
+    const digits = str.replace(/\D/g, '');
+    return digits.length === 10;
+};
+
+// Convert phone number to E.164 format
+// Accepts: 10-digit number, +91xxxxxxxxxx, or already formatted E.164
+const toE164 = (v) => {
+    if (!v) return null;
+    const digits = String(v).replace(/\D/g, '');
+    if (!digits) return null;
+    
+    // If already in E.164 format, return as is
+    if (String(v).startsWith('+')) {
+        return String(v);
+    }
+    
+    // If starts with 91 and has 12 digits, add +
+    if (digits.startsWith('91') && digits.length === 12) {
+        return '+' + digits;
+    }
+    
+    // If 10 digits, assume India (+91)
+    if (digits.length === 10) {
+        return '+91' + digits;
+    }
+    
+    // If 11 digits starting with 0, remove 0 and add +91
+    if (digits.length === 11 && digits.startsWith('0')) {
+        return '+91' + digits.slice(1);
+    }
+    
+    // Return as is if it doesn't match patterns (let database validation handle it)
+    return '+' + digits;
+};
 
 /* ---------------- ADD CUSTOMER ---------------- */
 export const addCustomer = async (req, res) => {
@@ -18,17 +70,21 @@ export const addCustomer = async (req, res) => {
       return res.status(400).json({ error: "Invalid email format" });
     }
 
-    if (!phoneE164 || !isE164(phoneE164)) {
+    // Validate 10-digit phone number
+    if (!phoneE164 || !is10DigitPhone(phoneE164)) {
       return res
         .status(400)
-        .json({ error: "phoneE164 must be E.164 like +91xxxxxxxxxx" });
+        .json({ error: "phoneE164 must be a 10-digit number" });
     }
 
-    const wa = whatsappE164 ? whatsappE164 : phoneE164;
-    if (wa && !isE164(wa)) {
+    // Convert to E.164 format for storage
+    const phoneE164Formatted = toE164(phoneE164);
+    const wa = whatsappE164 ? (is10DigitPhone(whatsappE164) ? toE164(whatsappE164) : whatsappE164) : phoneE164Formatted;
+    
+    if (whatsappE164 && !is10DigitPhone(whatsappE164)) {
       return res
         .status(400)
-        .json({ error: "whatsappE164 must be E.164 like +91xxxxxxxxxx" });
+        .json({ error: "whatsappE164 must be a 10-digit number" });
     }
 
     // ✅ use selected businessId if provided, else auto-pick first business
@@ -78,7 +134,15 @@ export const addCustomer = async (req, res) => {
 export const listCustomers = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { tag, businessId } = req.query;
+    const { 
+      tag, 
+      businessId, 
+      search, 
+      page = 1, 
+      pageSize = 10, 
+      sortBy = 'createdAt', 
+      sortOrder = 'DESC' 
+    } = req.query;
 
     const where = { userId };
 
@@ -95,9 +159,32 @@ export const listCustomers = async (req, res) => {
       where.tags = { [Op.like]: `%${tag}%` };
     }
 
-    const limit = Math.min(parseInt(req.query.limit || "200", 10), 200);
+    // Search functionality
+    if (search && search.trim()) {
+      const searchTerm = `%${search.trim()}%`;
+      where[Op.or] = [
+        { name: { [Op.like]: searchTerm } },
+        { email: { [Op.like]: searchTerm } },
+        { phoneE164: { [Op.like]: searchTerm } },
+        { whatsappE164: { [Op.like]: searchTerm } }
+      ];
+    }
 
-    const rows = await Customer.findAll({
+    // Pagination
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const size = Math.min(Math.max(parseInt(pageSize, 10) || 10, 1), 100); // Max 100 per page
+    const offset = (pageNum - 1) * size;
+
+    // Sorting
+    const validSortFields = ['name', 'email', 'phoneE164', 'whatsappE164', 'createdAt', 'updatedAt'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
+    const orderDirection = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+    // Get total count for pagination
+    const totalCount = await Customer.count({ where });
+
+    // Get paginated results
+    const { rows, count } = await Customer.findAndCountAll({
       where,
       include: [
         {
@@ -106,11 +193,32 @@ export const listCustomers = async (req, res) => {
           attributes: ["id", "businessName", "category"],
         },
       ],
-      order: [["createdAt", "DESC"]],
-      limit,
+      order: [[sortField, orderDirection]],
+      limit: size,
+      offset: offset,
     });
 
-    return res.json(rows);
+    const totalPages = Math.ceil(totalCount / size);
+
+    return res.json({
+      success: true,
+      data: rows,
+      pagination: {
+        page: pageNum,
+        pageSize: size,
+        totalCount,
+        totalPages,
+        hasNextPage: pageNum < totalPages,
+        hasPreviousPage: pageNum > 1
+      },
+      filters: {
+        search: search || null,
+        tag: tag || null,
+        businessId: businessId || null,
+        sortBy: sortField,
+        sortOrder: orderDirection
+      }
+    });
   } catch (e) {
     console.error("listCustomers error:", e);
     return res.status(500).json({ error: "Failed to load customers" });
@@ -128,15 +236,26 @@ export const updateCustomer = async (req, res) => {
     if (email && !isEmail(email)) {
       return res.status(400).json({ error: "Invalid email format" });
     }
-    if (phoneE164 && !isE164(phoneE164)) {
-      return res.status(400).json({ error: "phoneE164 must be E.164 like +91xxxxxxxxxx" });
-    }
-    if (whatsappE164 && !isE164(whatsappE164)) {
-      return res.status(400).json({ error: "whatsappE164 must be E.164 like +91xxxxxxxxxx" });
-    }
 
     const customer = await Customer.findOne({ where: { id: customerId, userId } });
     if (!customer) return res.status(404).json({ error: "Customer not found" });
+
+    // Validate 10-digit phone number if provided
+    let phoneE164Formatted = customer.phoneE164;
+    if (phoneE164) {
+      if (!is10DigitPhone(phoneE164)) {
+        return res.status(400).json({ error: "phoneE164 must be a 10-digit number" });
+      }
+      phoneE164Formatted = toE164(phoneE164);
+    }
+    
+    let whatsappE164Formatted = customer.whatsappE164;
+    if (whatsappE164) {
+      if (!is10DigitPhone(whatsappE164)) {
+        return res.status(400).json({ error: "whatsappE164 must be a 10-digit number" });
+      }
+      whatsappE164Formatted = toE164(whatsappE164);
+    }
 
     // verify business ownership if businessId changing
     if (businessId && String(businessId) !== String(customer.businessId)) {
@@ -178,123 +297,397 @@ export const deleteCustomer = async (req, res) => {
   }
 };
 
+export const sendEmailToCustomer = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { customerId, to, subject, html } = req.body;
+
+    if (!customerId || !to || !subject || !html) {
+      return res.status(400).json({ 
+        error: "Missing required fields", 
+        message: "customerId, to, subject, and html are required" 
+      });
+    }
+
+    // Verify customer belongs to user
+    const customer = await Customer.findOne({ 
+      where: { id: customerId, userId } 
+    });
+
+    if (!customer) {
+      return res.status(404).json({ 
+        error: "Customer not found", 
+        message: "Customer does not exist or does not belong to you" 
+      });
+    }
+
+    // Verify customer has an email address
+    if (!customer.email) {
+      return res.status(400).json({ 
+        error: "Customer has no email", 
+        message: "Customer does not have an email address" 
+      });
+    }
+
+    // Verify email matches customer email (extract email from "Name <email>" format)
+    const emailMatch = to.match(/<(.+)>/);
+    const emailAddress = emailMatch ? emailMatch[1] : to;
+    const customerEmail = customer.email;
+    
+    if (customerEmail.toLowerCase() !== emailAddress.toLowerCase()) {
+      return res.status(400).json({ 
+        error: "Email mismatch", 
+        message: "Email address does not match customer's email" 
+      });
+    }
+
+    // Ensure HTML is a string and not corrupted
+    const htmlContent = String(html || '').trim();
+    
+    if (!htmlContent) {
+      return res.status(400).json({ 
+        error: "Invalid HTML content", 
+        message: "HTML content is required and cannot be empty" 
+      });
+    }
+
+    // Send email (reuse emailAddress already extracted above)
+    const emailSent = await sendDocumentEmail({
+      to: emailAddress,
+      subject: String(subject || '').trim(),
+      html: htmlContent
+    });
+
+    if (emailSent) {
+      return res.json({ 
+        success: true, 
+        message: "Email sent successfully" 
+      });
+    } else {
+      return res.status(500).json({ 
+        error: "Failed to send email", 
+        message: "Email service returned an error" 
+      });
+    }
+  } catch (e) {
+    console.error("Error sending email to customer:", e);
+    return res.status(500).json({ 
+      error: "Failed to send email", 
+      message: e.message 
+    });
+  }
+};
+
 export const bulkUploadCustomers = async (req, res) => {
     const userId = req.user.id;
-    const { businessId } = req.body;
 
     // Validate file upload
     if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
     }
 
-    if (!businessId) {
-        return res.status(400).json({ error: "businessId is required" });
-    }
-
     try {
-        // Verify business ownership
+        // Get business associated with the user (ownerId)
         const business = await Business.findOne({
-            where: { id: businessId, ownerId: userId }
+            where: { ownerId: userId }
         });
+
         if (!business) {
-            return res.status(404).json({ error: "Business not found or not yours" });
+            return res.status(400).json({
+                error: "No business found",
+                message: "Please create a business before uploading customers"
+            });
         }
+
+        const businessId = business.id;
+        console.log('✅ Found business for user:', businessId, business.businessName);
 
         const rows = [];
         const errors = [];
+        let headerRow = null;
+        let rowIndex = 0;
 
-        // Parse CSV file
-        req.file.buffer.toString()
-            .split('\n')
-            .forEach((line, index) => {
-                if (index === 0 || !line.trim()) return; // Skip header and empty lines
-                const [name, phoneE164, tags, consentAt] = line.split(',').map(v => v.trim());
-                
-                // Validate phone format
-                if (!phoneE164 || !/^\+\d{8,15}$/.test(phoneE164)) {
-                    errors.push({
-                        row: index + 1,
-                        error: `Invalid phone format: ${phoneE164}. Must be in E.164 format like +91xxxxxxxxxx`
+        // Parse CSV file using csv-parser
+        return new Promise((resolve, reject) => {
+            const bufferStream = new PassThrough();
+            bufferStream.end(req.file.buffer);
+
+            bufferStream
+                .pipe(csv())
+                .on('headers', (headers) => {
+                    headerRow = headers.map(h => h.trim().toLowerCase());
+                    console.log('═══════════════════════════════════════');
+                    console.log('CSV HEADERS DETECTED');
+                    console.log('═══════════════════════════════════════');
+                    console.log('Raw headers:', headers);
+                    console.log('Normalized headers:', headerRow);
+                    
+                    // Validate required columns exist
+                    const requiredColumns = ['name', 'phonee164'];
+                    const missingColumns = requiredColumns.filter(col => !headerRow.includes(col));
+                    
+                    console.log('Required columns:', requiredColumns);
+                    console.log('Missing columns:', missingColumns);
+                    
+                    if (missingColumns.length > 0) {
+                        console.log('❌ Missing required columns, aborting');
+                        bufferStream.destroy();
+                        return resolve(res.status(400).json({
+                            error: "CSV validation failed",
+                            message: `Required columns missing: ${missingColumns.join(', ')}`,
+                            details: `Found columns: ${headerRow.join(', ')}. Required columns: ${requiredColumns.join(', ')}`
+                        }));
+                    }
+                    console.log('✅ All required columns found');
+                })
+                .on('data', (data) => {
+                    rowIndex++;
+                    const rowNum = rowIndex + 1; // +1 for header row
+                    
+                    // Map columns (case-insensitive)
+                    const name = data.name || data.Name || data.NAME || null;
+                    const phoneE164 = data.phonee164 || data.phoneE164 || data.PhoneE164 || data.PHONEE164 || null;
+                    const email = data.email || data.Email || data.EMAIL || null;
+                    const whatsappE164 = data.whatsappe164 || data.whatsappE164 || data.WhatsappE164 || data.WHATSAPPE164 || null;
+                    const tags = data.tags || data.Tags || data.TAGS || null;
+                    const consentAt = data.consentat || data.consentAt || data.ConsentAt || data.CONSENTAT || null;
+
+                    // Validate required fields
+                    if (!phoneE164) {
+                        errors.push({
+                            row: rowNum,
+                            error: `Missing required column: phoneE164`
+                        });
+                        return;
+                    }
+
+                    // Validate phone format (10 digits or E.164)
+                    if (!is10DigitPhone(phoneE164)) {
+                        errors.push({
+                            row: rowNum,
+                            error: `Invalid phone format: ${phoneE164}. Must be a 10-digit number or E.164 format (e.g., +919999999999)`
+                        });
+                        return;
+                    }
+
+                    // Convert to E.164 format (handles both 10-digit and already formatted)
+                    const phoneE164Formatted = toE164(phoneE164);
+                    console.log(`Row ${rowNum}: Converted ${phoneE164} -> ${phoneE164Formatted}`);
+
+                    // Validate email if provided
+                    if (email && !isEmail(email)) {
+                        errors.push({
+                            row: rowNum,
+                            error: `Invalid email format: ${email}`
+                        });
+                        return;
+                    }
+
+                    // Validate WhatsApp if provided (10 digits)
+                    let whatsappE164Formatted = null;
+                    if (whatsappE164) {
+                        if (!is10DigitPhone(whatsappE164)) {
+                            errors.push({
+                                row: rowNum,
+                                error: `Invalid WhatsApp format: ${whatsappE164}. Must be a 10-digit number`
+                            });
+                            return;
+                        }
+                        whatsappE164Formatted = toE164(whatsappE164);
+                    }
+
+                    // Prepare customer data
+                    const customerData = {
+                        userId,
+                        name: name || null,
+                        email: email || null,
+                        phoneE164: phoneE164Formatted,
+                        whatsappE164: whatsappE164Formatted || phoneE164Formatted,
+                        tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+                        consentAt: consentAt ? new Date(consentAt) : new Date()
+                    };
+                    
+                    // Only add businessId if it's a valid number (not null/undefined/empty string)
+                    if (businessId !== null && businessId !== undefined && businessId !== '') {
+                        const bizId = parseInt(businessId);
+                        if (!isNaN(bizId) && bizId > 0) {
+                            customerData.businessId = bizId;
+                        }
+                    }
+                    // If businessId is invalid/null, leave it out (will be NULL in DB)
+                    
+                    console.log(`Row ${rowNum}: Prepared customer data:`, JSON.stringify(customerData, null, 2));
+                    rows.push(customerData);
+                })
+                .on('end', () => {
+                    console.log('═══════════════════════════════════════');
+                    console.log('CSV PARSING COMPLETE');
+                    console.log('═══════════════════════════════════════');
+                    console.log('Total rows parsed:', rows.length);
+                    console.log('Validation errors:', errors.length);
+                    console.log('UserId:', userId);
+                    console.log('BusinessId:', businessId);
+                    
+                    if (rows.length > 0) {
+                        console.log('Sample row data:', JSON.stringify(rows[0], null, 2));
+                    }
+                    
+                    if (errors.length > 0) {
+                        console.log('Sample errors:', errors.slice(0, 3));
+                    }
+
+                    // If there are validation errors and no valid rows, return them
+                    if (errors.length > 0 && rows.length === 0) {
+                        console.log('❌ All rows failed validation');
+                        return resolve(res.status(400).json({
+                            error: "CSV validation failed",
+                            message: "All rows have validation errors",
+                            details: errors
+                        }));
+                    }
+
+                    // If no rows to process, return error
+                    if (rows.length === 0) {
+                        console.log('❌ No valid rows found');
+                        return resolve(res.status(400).json({
+                            error: "No valid rows found",
+                            message: "CSV file appears to be empty or all rows were skipped",
+                            validationErrors: errors.length > 0 ? errors : undefined
+                        }));
+                    }
+
+                    console.log('✅ Proceeding with bulk insert...');
+                    // Continue with bulk insert
+                    processBulkInsert(rows, errors, userId, businessId, res, resolve).catch(err => {
+                        console.error('❌ processBulkInsert error:', err);
+                        return resolve(res.status(500).json({
+                            error: "Failed to insert customers",
+                            message: err.message
+                        }));
                     });
-                    return;
-                }
-
-                rows.push({
-                    userId,
-                    businessId,
-                    name: name || null,
-                    phoneE164,
-                    tags: tags ? tags.split(';').map(t => t.trim()) : [],
-                    consentAt: consentAt ? new Date(consentAt) : new Date()
+                })
+                .on('error', (err) => {
+                    console.error('CSV parsing error:', err);
+                    return resolve(res.status(400).json({
+                        error: "Failed to parse CSV file",
+                        message: err.message
+                    }));
                 });
+        });
+    } catch (e) {
+        console.error('Bulk upload error:', e);
+        return res.status(500).json({ error: "Failed to process bulk upload", details: e.message });
+    }
+};
+
+async function processBulkInsert(rows, errors, userId, businessId, res, resolve) {
+    console.log('═══════════════════════════════════════');
+    console.log('STARTING BULK INSERT');
+    console.log('═══════════════════════════════════════');
+    console.log('Rows to process:', rows.length);
+    console.log('Existing errors:', errors.length);
+    console.log('UserId:', userId);
+    console.log('BusinessId:', businessId);
+
+    // businessId is already validated and fetched from user's business
+    // Use it directly for all customers
+    const validBusinessId = businessId;
+    console.log('✅ Using businessId for all customers:', validBusinessId);
+
+    // Bulk create customers (skip duplicates)
+    const createdCustomers = [];
+    let skipped = 0;
+
+    for (const customerData of rows) {
+        try {
+            console.log('Processing customer:', customerData.phoneE164);
+            
+            // Override businessId with the user's business (always set from ownerId)
+            const finalCustomerData = {
+                ...customerData,
+                businessId: validBusinessId
+            };
+            
+            console.log('Final customer data:', JSON.stringify(finalCustomerData, null, 2));
+            
+            // Use unique index fields (userId, phoneE164) for findOrCreate
+            // This matches the UNIQUE KEY `customers_user_id_phone_e164` (`userId`,`phoneE164`)
+            const [doc, created] = await Customer.findOrCreate({
+                where: {
+                    userId: finalCustomerData.userId,
+                    phoneE164: finalCustomerData.phoneE164
+                },
+                defaults: finalCustomerData
             });
+            
+            console.log('findOrCreate result - created:', created, 'doc.id:', doc?.id, 'doc.phoneE164:', doc?.phoneE164);
 
-        console.log('CSV parsed - rows:', rows.length, 'errors:', errors.length);
-
-        // If there are validation errors, return them
-        if (errors.length > 0 && rows.length === 0) {
-            return res.status(400).json({
-                error: "CSV validation failed",
-                details: errors
-            });
-        }
-
-        // Bulk create customers (skip duplicates)
-        const createdCustomers = [];
-        let skipped = 0;
-
-        console.log('Starting bulk insert for', rows.length, 'rows');
-
-        for (const customerData of rows) {
-            try {
-                console.log('Processing customer:', customerData.phoneE164);
-                const [doc, created] = await Customer.findOrCreate({
-                    where: {
-                        businessId: customerData.businessId,
-                        phoneE164: customerData.phoneE164,
-                        userId: customerData.userId
-                    },
-                    defaults: customerData
+            if (created) {
+                createdCustomers.push(doc);
+                console.log('✅ Created new customer:', doc.id, doc.phoneE164);
+            } else {
+                skipped++;
+                console.log('⚠️ Customer already exists:', doc.id, doc.phoneE164);
+                // Update existing customer with new data
+                await doc.update({
+                    name: customerData.name ?? doc.name,
+                    email: customerData.email ?? doc.email,
+                    whatsappE164: customerData.whatsappE164 ?? doc.whatsappE164,
+                    businessId: customerData.businessId ?? doc.businessId,
+                    tags: customerData.tags.length > 0 ? customerData.tags : doc.tags,
+                    consentAt: customerData.consentAt ?? doc.consentAt
                 });
-
-                if (created) {
-                    createdCustomers.push(doc);
-                    console.log('Created new customer:', doc.phoneE164);
-                } else {
-                    skipped++;
-                    console.log('Updated existing customer:', doc.phoneE164);
-                    // Optionally update existing customer
-                    await doc.update({
-                        name: customerData.name ?? doc.name,
-                        tags: customerData.tags.length > 0 ? customerData.tags : doc.tags,
-                        consentAt: customerData.consentAt ?? doc.consentAt
-                    });
-                }
-            } catch (e) {
-                console.error('Error processing customer:', customerData.phoneE164, '- Error:', e.message);
-                if (e.errors) {
-                    console.error('Validation errors:', e.errors.map(err => err.message).join(', '));
-                }
-                errors.push({
-                    phone: customerData.phoneE164,
-                    error: e.message
-                });
+                console.log('✅ Updated existing customer:', doc.id);
             }
+        } catch (e) {
+            console.error('❌ Error processing customer:', customerData.phoneE164);
+            console.error('Error details:', e);
+            if (e.errors) {
+                console.error('Validation errors:', e.errors.map(err => `${err.path}: ${err.message}`).join(', '));
+            }
+            errors.push({
+                phone: customerData.phoneE164,
+                name: customerData.name,
+                error: e.message,
+                details: e.errors ? e.errors.map(err => `${err.path}: ${err.message}`) : undefined
+            });
         }
+    }
 
-        console.log('Bulk insert complete - created:', createdCustomers.length, 'skipped:', skipped);
+    console.log('═══════════════════════════════════════');
+    console.log('BULK INSERT COMPLETE');
+    console.log('════════════════════════════════════════');
+    console.log('Created:', createdCustomers.length);
+    console.log('Skipped:', skipped);
+    console.log('Errors:', errors.length);
+    console.log('Total processed:', rows.length);
+    
+    // Log summary
+    if (createdCustomers.length === 0 && errors.length === 0 && rows.length > 0) {
+        console.warn('⚠️ WARNING: No customers were created and no errors reported. This might indicate an issue.');
+        console.warn('Check if all customers already exist (same userId + phoneE164 combination)');
+    }
 
-        res.status(201).json({
+    // Log created customer IDs
+    if (createdCustomers.length > 0) {
+        console.log('Created customer IDs:', createdCustomers.map(c => c.id));
+    }
+
+    try {
+        return resolve(res.status(201).json({
             success: true,
             message: "Bulk upload completed",
             created: createdCustomers.length,
             skipped,
+            totalProcessed: rows.length,
             errors: errors.length > 0 ? errors : undefined,
-            customers: createdCustomers
-        });
-
-    } catch (e) {
-        console.error('Bulk upload error:', e);
-        res.status(500).json({ error: "Failed to process bulk upload", details: e.message });
+            customers: createdCustomers.slice(0, 10) // Return first 10 for response size
+        }));
+    } catch (err) {
+        console.error('Error sending response:', err);
+        return resolve(res.status(500).json({
+            error: "Failed to send response",
+            message: err.message
+        }));
     }
-};
+}

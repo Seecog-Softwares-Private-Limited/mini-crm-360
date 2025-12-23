@@ -1,156 +1,866 @@
-<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <div class="card shadow-lg" style="width: 100%; max-width: 500px;">
-        <div class="card-body p-4">
-            <div class="text-center mb-4">
-                <h1 class="h3 mb-2">📱 WhatsApp Manager</h1>
-                <p class="text-muted">Create your account</p>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - Mini CRM 360</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+  /* ============================================
+     PREMIUM REGISTER PAGE STYLING
+     Mini CRM Professional Theme
+     ============================================ */
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-            <div id="alertContainer"></div>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    overflow-x: hidden;
+  }
 
-            <form id="registerForm">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="firstName" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="lastName" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" required>
-                    </div>
-                </div>
+  .register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+    padding: 2rem 1rem;
+  }
 
-                <div class="mb-3">
-                    <label for="phoneNo" class="form-label">Phone Number</label>
-                    <div class="input-group">
-                        <span class="input-group-text">+91</span>
-                        <input type="tel" class="form-control" id="phoneNo" name="phoneNo" placeholder="9999999999" maxlength="10" pattern="[0-9]{10}" required>
-                    </div>
-                </div>
+  /* Subtle Background Pattern */
+  .register-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.02) 0%, transparent 50%);
+    z-index: 1;
+  }
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
+  /* Cartoon CRM Icons */
+  .cartoon-icon {
+    position: absolute;
+    z-index: 2;
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: floatGentle 6s ease-in-out infinite;
+    transition: transform 0.3s ease;
+  }
 
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required>
-                </div>
+  .cartoon-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
 
-                <button type="submit" class="btn btn-primary w-100 mb-3" id="registerBtn">
-                    <span id="registerText">Register</span>
-                    <span id="loadingText" class="d-none">
-                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                        Creating account...
-                    </span>
-                </button>
-            </form>
+  /* Different colored backgrounds for each icon */
+  .cartoon-icon.customer {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    top: 8%;
+    left: 8%;
+    animation-delay: 0s;
+  }
 
-            <div class="text-center">
-                <p class="mb-0">Already have an account? <a href="/login" class="text-decoration-none">Login here</a></p>
-            </div>
-        </div>
+  .cartoon-icon.business {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    top: 15%;
+    right: 10%;
+    animation-delay: 1s;
+  }
+
+  .cartoon-icon.campaign {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    bottom: 12%;
+    left: 12%;
+    animation-delay: 2s;
+  }
+
+  .cartoon-icon.analytics {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    bottom: 20%;
+    right: 8%;
+    animation-delay: 3s;
+  }
+
+  .cartoon-icon.email {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    top: 45%;
+    left: 5%;
+    animation-delay: 4s;
+  }
+
+  .cartoon-icon.whatsapp {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    top: 55%;
+    right: 5%;
+    animation-delay: 5s;
+  }
+
+  .cartoon-icon.team {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    top: 30%;
+    left: 15%;
+    animation-delay: 1.5s;
+  }
+
+  .cartoon-icon.chart {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    bottom: 35%;
+    right: 18%;
+    animation-delay: 2.5s;
+  }
+
+  @keyframes floatGentle {
+    0%, 100% { 
+      transform: translateY(0px) rotate(0deg); 
+    }
+    50% { 
+      transform: translateY(-20px) rotate(5deg); 
+    }
+  }
+
+  /* Register Card */
+  .register-card {
+    position: relative;
+    z-index: 10;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 520px;
+    padding: 3rem 2.5rem;
+    animation: cardSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  @keyframes cardSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Logo/Brand Section */
+  .register-brand {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .register-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    animation: logoPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
+  }
+
+  .register-logo i {
+    font-size: 2.5rem;
+    color: #ffffff;
+  }
+
+  .register-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .register-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* Form Styling */
+  .register-form {
+    margin-top: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.3px;
+    transition: color 0.3s ease;
+  }
+
+  .form-group:focus-within .form-label {
+    color: #667eea;
+  }
+
+  /* Premium Input Wrapper */
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1.125rem;
+    color: #9ca3af;
+    font-size: 1.1rem;
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .form-group:focus-within .input-icon {
+    color: #667eea;
+    transform: scale(1.1);
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    background: linear-gradient(to bottom, #ffffff 0%, #fafbfc 100%);
+    color: #1e293b;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.02),
+      inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+
+  .form-control:hover {
+    border-color: #cbd5e1;
+    box-shadow: 
+      0 4px 8px rgba(0, 0, 0, 0.04),
+      inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  }
+
+  .form-control:focus {
+    border-color: #667eea;
+    background: #ffffff;
+    box-shadow: 
+      0 0 0 4px rgba(102, 126, 234, 0.12),
+      0 8px 16px rgba(102, 126, 234, 0.15),
+      inset 0 1px 2px rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+  }
+
+  /* Animated Border Gradient on Focus */
+  .form-group::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 0 0 14px 14px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  .form-group:focus-within::after {
+    width: 100%;
+  }
+
+  .form-control::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .form-control:focus::placeholder {
+    opacity: 0.5;
+  }
+
+  /* Password field specific styling */
+  .form-control[type="password"] {
+    letter-spacing: 0.2em;
+  }
+
+  /* Input Group Styling - Premium */
+  .input-group {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+  }
+
+  .input-group-text {
+    padding: 1rem 1.125rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #64748b;
+    background: linear-gradient(to bottom, #f8fafc 0%, #f1f5f9 100%);
+    border: 2px solid #e5e7eb;
+    border-right: none;
+    border-radius: 14px 0 0 14px;
+    display: flex;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+      inset 0 1px 2px rgba(255, 255, 255, 0.8),
+      0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  .input-group .form-control {
+    border-left: none;
+    border-radius: 0 14px 14px 0;
+    padding-left: 1rem;
+  }
+
+  .input-group:hover .input-group-text {
+    border-color: #cbd5e1;
+    background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+  }
+
+  .input-group:focus-within .input-group-text {
+    border-color: #667eea;
+    background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+    color: #667eea;
+    box-shadow: 
+      inset 0 1px 2px rgba(255, 255, 255, 1),
+      0 0 0 3px rgba(102, 126, 234, 0.08);
+  }
+
+  .input-group .form-control:focus {
+    border-left: 2px solid #667eea;
+  }
+
+  /* Special handling for input-group animated border */
+  .form-group:has(.input-group)::after {
+    bottom: -2px;
+    left: 0;
+  }
+
+  .form-group:has(.input-group):focus-within::after {
+    width: 100%;
+  }
+
+  /* Register Button */
+  .btn-register {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  .btn-register::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-register:hover::before {
+    left: 100%;
+  }
+
+  .btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+  }
+
+  .btn-register:active {
+    transform: translateY(0);
+  }
+
+  .btn-register:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Alert Container */
+  #alertContainer {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .alert-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+  }
+
+  .alert-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+  }
+
+  /* Footer Links */
+  .register-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .register-footer p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+
+  .register-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .register-footer a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  /* Loading Spinner */
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .register-card {
+      padding: 2rem 1.5rem;
+      margin: 0;
+      border-radius: 20px;
+    }
+
+    .register-title {
+      font-size: 1.75rem;
+    }
+
+    .register-logo {
+      width: 70px;
+      height: 70px;
+    }
+
+    .register-logo i {
+      font-size: 2rem;
+    }
+
+    .cartoon-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      border-radius: 15px;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .cartoon-icon {
+      width: 70px;
+      height: 70px;
+      font-size: 1.75rem;
+    }
+  }
+
+  /* Premium Glassmorphism Effect */
+  .register-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
+  }
+</style>
+
+<div class="register-container">
+  <!-- Cartoon CRM Icons - Representing CRM Features -->
+  <div class="cartoon-icon customer" title="Manage Customers">
+    <i class="fas fa-users"></i>
+  </div>
+  <div class="cartoon-icon business" title="Business Management">
+    <i class="fas fa-building"></i>
+  </div>
+  <div class="cartoon-icon campaign" title="Marketing Campaigns">
+    <i class="fas fa-bullhorn"></i>
+  </div>
+  <div class="cartoon-icon analytics" title="Analytics & Reports">
+    <i class="fas fa-chart-line"></i>
+  </div>
+  <div class="cartoon-icon email" title="Email Marketing">
+    <i class="fas fa-envelope"></i>
+  </div>
+  <div class="cartoon-icon whatsapp" title="WhatsApp Messaging">
+    <i class="fab fa-whatsapp"></i>
+  </div>
+  <div class="cartoon-icon team" title="Team Collaboration">
+    <i class="fas fa-user-friends"></i>
+  </div>
+  <div class="cartoon-icon chart" title="Data Insights">
+    <i class="fas fa-chart-pie"></i>
+  </div>
+
+  <!-- Register Card -->
+  <div class="register-card">
+    <!-- Brand Section -->
+    <div class="register-brand">
+      <div class="register-logo">
+        <i class="fas fa-user-plus"></i>
+      </div>
+      <h1 class="register-title">Create Account</h1>
+      <p class="register-subtitle">Join Mini CRM 360 and manage your business efficiently</p>
     </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Register Form -->
+    <form id="registerForm" class="register-form">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="firstName" class="form-label">First Name</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user input-icon"></i>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="firstName" 
+                name="firstName" 
+                placeholder="Enter first name"
+                required
+                autocomplete="given-name"
+              >
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="lastName" class="form-label">Last Name</label>
+            <div class="input-wrapper">
+              <i class="fas fa-user input-icon"></i>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="lastName" 
+                name="lastName" 
+                placeholder="Enter last name"
+                required
+                autocomplete="family-name"
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNo" class="form-label">Phone Number</label>
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="fas fa-phone me-1"></i>+91
+          </span>
+          <input 
+            type="tel" 
+            class="form-control" 
+            id="phoneNo" 
+            name="phoneNo" 
+            placeholder="9999999999" 
+            maxlength="10" 
+            pattern="[0-9]{10}" 
+            required
+            autocomplete="tel"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          <input 
+            type="email" 
+            class="form-control" 
+            id="email" 
+            name="email" 
+            placeholder="Enter your email"
+            required
+            autocomplete="email"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="password" 
+            name="password" 
+            placeholder="Create a strong password"
+            required
+            autocomplete="new-password"
+          >
+        </div>
+      </div>
+
+      <button type="submit" class="btn-register" id="registerBtn">
+        <span id="registerText">Create Account</span>
+        <span id="loadingText" class="d-none">
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Creating account...
+        </span>
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="register-footer">
+      <p>Already have an account? <a href="/login">Sign In</a></p>
+    </div>
+  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Show alert helper
-    function showAlert(message, type) {
-        const alertContainer = document.getElementById('alertContainer');
-        alertContainer.innerHTML = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
+  // API Configuration
+  const API_BASE = 'http://localhost:3002/api/v1';
+
+  // Helper: detect if current page is login or register
+  function isAuthPage() {
+    const p = window.location.pathname.toLowerCase();
+    return p === '/login' || p === '/register' || p.endsWith('/login') || p.endsWith('/register');
+  }
+  
+  // Helper function to make API calls
+  async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('accessToken') || null;
+
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+
+    // Attach Authorization only if we have a real token and caller didn't skip auth
+    if (token && !options.skipAuth) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
-    // Restrict phone number input to digits only
-    document.getElementById('phoneNo').addEventListener('input', function (e) {
-        this.value = this.value.replace(/\D/g, '');
-    });
+    const defaultOptions = {
+      credentials: 'include',
+      ...options,
+      headers
+    };
+    
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, defaultOptions);
 
-    // Handle form submit
-    document.getElementById('registerForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+      // If unauthorized:
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
 
-        const phoneNumber = document.getElementById('phoneNo').value.trim();
+        const isAuthError =
+          response.status === 401 ||
+          (errorData.error && (
+            String(errorData.error).includes('jwt expired') ||
+            String(errorData.error).includes('Invalid access Token') ||
+            String(errorData.error).includes('Authentication failed')
+          ));
 
-        // Validate phone number
-        if (!phoneNumber || phoneNumber.length !== 10 || !/^\d{10}$/.test(phoneNumber)) {
-            showAlert('Please enter a valid 10-digit phone number', 'danger');
+        if (isAuthError) {
+          // Only redirect to /login if we are NOT already on login/register
+          if (!isAuthPage()) {
+            console.log('Authentication failed, redirecting to login...');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            window.location.replace('/login');
             return;
+          }
+          // If we are on an auth page, just return the error JSON to the caller
+          return errorData;
         }
 
-        const formData = {
-            firstName: document.getElementById('firstName').value,
-            lastName: document.getElementById('lastName').value,
-            phoneNo: '+91' + phoneNumber,
-            email: document.getElementById('email').value,
-            password: document.getElementById('password').value
-        };
-
-        const registerBtn = document.getElementById('registerBtn');
-        const registerText = document.getElementById('registerText');
-        const loadingText = document.getElementById('loadingText');
-        const alertContainer = document.getElementById('alertContainer');
-
-        // Clear previous alerts
-        alertContainer.innerHTML = '';
-
-        // Show loading
-        registerBtn.disabled = true;
-        registerText.classList.add('d-none');
-        loadingText.classList.remove('d-none');
-
-        try {
-            // apiCall already returns parsed JSON, NOT a Response object
-            const data = await apiCall('/users/register', {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                skipAuth: true
-            });
-
-            // Determine success based on common patterns (adjust if needed)
-            const isSuccess =
-                data &&
-                (data.success === true ||
-                 data.status === 'success' ||
-                 data.statusCode === 200 ||
-                 data.statusCode === 201);
-
-            if (isSuccess) {
-                // Store user data if present
-                if (data.data && data.data.user) {
-                    localStorage.setItem('user', JSON.stringify(data.data.user));
-                }
-                if (data.data && data.data.tokens && data.data.tokens.accessToken) {
-                    localStorage.setItem('accessToken', data.data.tokens.accessToken);
-                }
-
-                // Show success and redirect to login
-                showAlert('Registration successful! Redirecting to login...', 'success');
-
-                setTimeout(() => {
-                    window.location.replace('/login');
-                }, 1500); // small delay so user can see the alert
-            } else {
-                showAlert(data?.message || 'Registration failed', 'danger');
-            }
-        } catch (error) {
-            console.error('Registration error:', error);
-            showAlert(`Network error. Please try again. ${error}`, 'danger');
-        } finally {
-            // Hide loading
-            registerBtn.disabled = false;
-            registerText.classList.remove('d-none');
-            loadingText.classList.add('d-none');
-        }
-    });
-
-    // If already logged in, go to dashboard
-    if (localStorage.getItem('accessToken')) {
-        window.location.href = '/dashboard';
+        // Non-auth failure: throw with message for the caller
+        throw new Error(errorData.message || errorData.error || 'API request failed');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      // Network or other errors; don't force redirect if already on auth pages
+      const msg = String(error && error.message || '');
+      if (
+        (msg.includes('jwt expired') || msg.includes('Invalid access Token') || msg.includes('Authentication failed')) &&
+        !isAuthPage()
+      ) {
+        console.log('Authentication failed, redirecting to login...');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        window.location.replace('/login');
+        return;
+      }
+      throw error;
     }
+  }
+
+  // Show alert helper
+  function showAlert(message, type) {
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+  }
+
+  // Restrict phone number input to digits only
+  document.getElementById('phoneNo').addEventListener('input', function (e) {
+    this.value = this.value.replace(/\D/g, '');
+  });
+
+  // Handle form submit
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const phoneNumber = document.getElementById('phoneNo').value.trim();
+
+    // Validate phone number
+    if (!phoneNumber || phoneNumber.length !== 10 || !/^\d{10}$/.test(phoneNumber)) {
+      showAlert('Please enter a valid 10-digit phone number', 'danger');
+      return;
+    }
+
+    const formData = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName: document.getElementById('lastName').value.trim(),
+      phoneNo: '+91' + phoneNumber,
+      email: document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value
+    };
+
+    const registerBtn = document.getElementById('registerBtn');
+    const registerText = document.getElementById('registerText');
+    const loadingText = document.getElementById('loadingText');
+    const alertContainer = document.getElementById('alertContainer');
+
+    // Clear previous alerts
+    alertContainer.innerHTML = '';
+
+    // Show loading
+    registerBtn.disabled = true;
+    registerText.classList.add('d-none');
+    loadingText.classList.remove('d-none');
+
+    try {
+      // apiCall already returns parsed JSON, NOT a Response object
+      const data = await apiCall('/users/register', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+        skipAuth: true
+      });
+
+      // Determine success based on common patterns (adjust if needed)
+      const isSuccess =
+        data &&
+        (data.success === true ||
+         data.status === 'success' ||
+         data.statusCode === 200 ||
+         data.statusCode === 201);
+
+      if (isSuccess) {
+        // Store user data if present
+        if (data.data && data.data.user) {
+          localStorage.setItem('user', JSON.stringify(data.data.user));
+        }
+        if (data.data && data.data.tokens && data.data.tokens.accessToken) {
+          localStorage.setItem('accessToken', data.data.tokens.accessToken);
+        }
+
+        // Show success and redirect to login
+        showAlert('Registration successful! Redirecting to login...', 'success');
+
+        setTimeout(() => {
+          window.location.replace('/login');
+        }, 1500); // small delay so user can see the alert
+      } else {
+        showAlert(data?.message || data?.error || 'Registration failed', 'danger');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      showAlert(`Network error. Please try again. ${error.message || error}`, 'danger');
+    } finally {
+      // Hide loading
+      registerBtn.disabled = false;
+      registerText.classList.remove('d-none');
+      loadingText.classList.add('d-none');
+    }
+  });
+
+  // If already logged in, go to dashboard
+  if (localStorage.getItem('accessToken')) {
+    window.location.href = '/dashboard';
+  }
 </script>
+</body>
+</html>
