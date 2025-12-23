@@ -60,7 +60,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(
     cors({
         origin: [
-            'http://localhost:3002',
+            'http://15.206.19.156:3002',
             'http://localhost:5173',
             'https://bulk-whatsapp-manager-backend.onrender.com',
         ],
