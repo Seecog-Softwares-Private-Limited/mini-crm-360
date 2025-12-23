@@ -37,4 +37,4 @@ coverage/
 .nyc_output/
 .tmp/
 .temp/
-property.env
+# property.env
