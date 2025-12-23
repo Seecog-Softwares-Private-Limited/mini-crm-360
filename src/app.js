@@ -115,9 +115,14 @@ app.get('/customers', verifyUser, (req, res) => {
 });
 
 
-app.get('/business', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
-    res.render('business', { title: 'Business', user, activePage: 'business' });
+// app.get('/business', verifyUser, (req, res) => {
+//     const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+//     res.render('business', { title: 'Business', user, activePage: 'business' });
+// });
+
+app.get('/profile', verifyUser, (req, res) => {
+    const user = { firstName: req.user.firstName, lastName: req.user.lastName, email: req.user.email, phone: req.user.phoneNo };
+    res.render('profile', { title: 'profile', user, activePage: 'profile' });
 });
 
 app.get('/templates', verifyUser, (req, res) => {

@@ -10,12 +10,11 @@
       </div>
     </div>
     <nav class="nav flex-column">
-      <div class="profile-toggle" onclick="toggleprofile('whatsapp-submenu')">
-        <div class="nav-link">
-          <i class="fa-solid fa-user"></i>
+      <div class="profile-toggle" onclick="toggleprofile('profile-submenu')"> 
+          <a class="nav-link {{#if (eq activePage 'profile')}}active{{/if}}" href="/profile">
+            <i class="fa-solid fa-user"></i>
           Profile
-
-        </div>
+          </a> 
       </div>
       <!-- CRM tools -->
       <div class="menu-toggle" onclick="toggleMenu('whatsapp-submenu')">

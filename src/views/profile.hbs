@@ -1,0 +1,275 @@
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    {{> sidebar}}
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10">
+      <div class="main-content p-4">
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Profile</h2>
+        </div>
+
+        <!-- Top Cards -->
+        <div class="row mb-4">
+          <!-- User Card -->
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body d-flex align-items-center gap-3">
+                <img
+                  src="{{user.avatarUrl}}"
+                  onerror="this.src='https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250'"
+                  style="width:70px;height:70px;border-radius:50%;object-fit:cover;"
+                />
+                <div>
+                  <h5 class="mb-1">{{user.firstName}} {{user.lastName}}</h5>
+                  <div class="text-muted">{{user.email}}</div>
+                  <span class="badge bg-primary mt-1">{{user.role}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Business Card -->
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body d-flex align-items-center gap-3">
+                <img
+                  src="{{business.logoUrl}}"
+                  onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkr2dJA6j3aCU8dYK3OAAsTwsLS6lbz9GFcw&s'"
+                  style="width:70px;height:70px;border-radius:8px;object-fit:contain;"
+                />
+                <div>
+                  <h5 class="mb-1">{{business.businessName}}</h5>
+                  <div class="text-muted">
+                    {{business.city}}, {{business.state}}, {{business.country}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-account">
+              <i class="fas fa-user me-1"></i> Account
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-business">
+              <i class="fas fa-building me-1"></i> Business
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-whatsapp">
+              <i class="fab fa-whatsapp me-1"></i> WhatsApp Setup
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-preferences">
+              <i class="fas fa-cog me-1"></i> Preferences
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+
+          <!-- ================= ACCOUNT TAB ================= -->
+          <div class="tab-pane fade show active" id="tab-account">
+            <div class="card">
+              <div class="card-body">
+                <form id="accountForm">
+
+                  <div class="mb-3">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-control" name="fullName"
+                      value="{{user.firstName}} {{user.lastName}}" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" value="{{user.email}}" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Mobile Number *</label>
+                    <input type="text" class="form-control" name="phone"
+                      value="{{user.phone}}" placeholder="+91XXXXXXXXXX" required />
+                  </div>
+
+                  <hr />
+
+                  <div class="mb-3">
+                    <label class="form-label">Change Password</label>
+                    <input type="password" class="form-control" name="newPassword"
+                      placeholder="Leave blank to keep current password" />
+                  </div>
+
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" onclick="saveAccount()">
+                      Save Account
+                    </button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= BUSINESS TAB ================= -->
+          <div class="tab-pane fade" id="tab-business">
+            <div class="card">
+              <div class="card-body">
+                <form id="businessForm" enctype="multipart/form-data">
+
+                  <div class="mb-3">
+                    <label class="form-label">Business Name *</label>
+                    <input type="text" class="form-control" name="businessName"
+                      value="{{business.businessName}}" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Business Logo *</label>
+                    <input type="file" class="form-control" name="logo"
+                      accept="image/png,image/jpeg" />
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">City *</label>
+                      <input type="text" class="form-control" name="city"
+                        value="{{business.city}}" required />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">State *</label>
+                      <input type="text" class="form-control" name="state"
+                        value="{{business.state}}" required />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">Country *</label>
+                      <input type="text" class="form-control" name="country"
+                        value="{{business.country}}" required />
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" onclick="saveBusiness()">
+                      Save Business
+                    </button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= WHATSAPP TAB ================= -->
+          <div class="tab-pane fade" id="tab-whatsapp">
+            <div class="card">
+              <div class="card-body">
+                <form id="whatsappForm">
+
+                  <div class="alert alert-info mb-3">
+                    <strong>Status:</strong>
+                    {{#if whatsapp.connected}}
+                      <span class="text-success">Connected ✅</span>
+                    {{else}}
+                      <span class="text-danger">Not Connected ❌</span>
+                    {{/if}}
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">WABA ID *</label>
+                    <input type="text" class="form-control" name="wabaId"
+                      value="{{whatsapp.wabaId}}" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Phone Number ID *</label>
+                    <input type="text" class="form-control" name="phoneNumberId"
+                      value="{{whatsapp.phoneNumberId}}" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">WhatsApp Number *</label>
+                    <input type="text" class="form-control" name="whatsappNumber"
+                      value="{{whatsapp.whatsappNumber}}" placeholder="+91XXXXXXXXXX" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Permanent Access Token *</label>
+                    <input type="password" class="form-control"
+                      placeholder="************abcd" />
+                    <small class="text-muted">Token is stored securely</small>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Webhook Verify Token *</label>
+                    <input type="text" class="form-control"
+                      value="{{whatsapp.verifyToken}}" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Webhook URL</label>
+                    <input type="text" class="form-control"
+                      value="{{whatsapp.webhookUrl}}" readonly />
+                  </div>
+
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-success" onclick="saveWhatsApp()">
+                      Save WhatsApp Setup
+                    </button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= PREFERENCES TAB ================= -->
+          <div class="tab-pane fade" id="tab-preferences">
+            <div class="card">
+              <div class="card-body">
+                <form id="preferencesForm">
+
+                  <div class="mb-3">
+                    <label class="form-label">Timezone *</label>
+                    <select class="form-select" name="timezone" required>
+                      <option value="Asia/Kolkata" selected>Asia/Kolkata</option>
+                      <option value="UTC">UTC</option>
+                    </select>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Default Footer</label>
+                    <input type="text" class="form-control"
+                      placeholder="Powered by Mini CRM 360" />
+                  </div>
+
+                  <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" onclick="savePreferences()">
+                      Save Preferences
+                    </button>
+                  </div>
+
+                </form>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function saveAccount() { alert('Account saved (API integration pending)'); }
+  function saveBusiness() { alert('Business saved (API integration pending)'); }
+  function saveWhatsApp() { alert('WhatsApp setup saved (API integration pending)'); }
+  function savePreferences() { alert('Preferences saved (API integration pending)'); }
+</script>
