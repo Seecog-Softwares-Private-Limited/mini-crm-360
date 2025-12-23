@@ -7,6 +7,8 @@ const Template = sequelize.define('Template', {
     primaryKey: true,
     autoIncrement: true
   },
+  businessId: { type: DataTypes.INTEGER, allowNull: true },
+
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,
