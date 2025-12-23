@@ -34,7 +34,9 @@ const Customer = sequelize.define('Customer', {
     },
 
   tags: { type: DataTypes.JSON, allowNull: true, defaultValue: [] },
-  consentAt: { type: DataTypes.DATE, allowNull: true }
+  consentAt: { type: DataTypes.DATE, allowNull: true },
+  dateOfBirth: { type: DataTypes.DATEONLY, allowNull: true },
+  anniversaryDate: { type: DataTypes.DATEONLY, allowNull: true }
 }, {
   tableName: 'customers',
   timestamps: true,

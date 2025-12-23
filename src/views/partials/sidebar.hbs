@@ -17,10 +17,16 @@
     <!-- User Profile Section -->
     <div class="sidebar-profile">
       <div class="profile-avatar">
-        <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" 
+        {{#if (or user.avatar user.avatarUrl)}}
+        <img src="{{#if user.avatar}}{{user.avatar}}{{else}}{{user.avatarUrl}}{{/if}}" 
              alt="User Avatar" 
              class="avatar-img"
              onerror="this.src='https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=128'">
+        {{else}}
+        <img src="https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=128" 
+             alt="User Avatar" 
+             class="avatar-img">
+        {{/if}}
       </div>
       <div class="profile-info">
         <div class="profile-name">{{user.firstName}} {{user.lastName}}</div>
@@ -64,10 +70,42 @@
             <i class="fas fa-bullhorn"></i>
             <span class="nav-text">Campaigns</span>
           </a>
-          <a class="nav-link submenu-link {{#if (eq activePage 'invoice')}}active{{/if}}" href="/invoice">
-            <i class="fas fa-file-invoice-dollar"></i>
-            <span class="nav-text">Invoice</span>
+          <a class="nav-link submenu-link {{#if (eq activePage 'tasks')}}active{{/if}}" href="/tasks">
+            <i class="fas fa-tasks"></i>
+            <span class="nav-text">Tasks & Follow-ups</span>
           </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'notes')}}active{{/if}}" href="/notes">
+            <i class="fas fa-sticky-note"></i>
+            <span class="nav-text">Notes & Timeline</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'reminders')}}active{{/if}}" href="/reminders">
+            <i class="fas fa-birthday-cake"></i>
+            <span class="nav-text">Birthday & Anniversary</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'leadForms')}}active{{/if}}" href="/lead-forms">
+            <i class="fas fa-wpforms"></i>
+            <span class="nav-text">Lead Capture Forms</span>
+          </a>
+          {{#if user.plan}}
+            {{#if user.plan.hasInvoice}}
+            <a class="nav-link submenu-link {{#if (eq activePage 'invoice')}}active{{/if}}" href="/invoice">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span class="nav-text">Invoice</span>
+            </a>
+            {{else}}
+            <a class="nav-link submenu-link disabled-invoice" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span class="nav-text">Invoice</span>
+              <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
+            </a>
+            {{/if}}
+          {{else}}
+            <a class="nav-link submenu-link disabled-invoice" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span class="nav-text">Invoice</span>
+              <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
+            </a>
+          {{/if}}
         </div>
       </div>
 
@@ -90,14 +128,14 @@
 
       <!-- Utilities Section -->
       <div class="nav-section">
-        <div class="menu-toggle" onclick="toggleMenu('utilities-submenu')">
+        <div class="menu-toggle collapsed" onclick="toggleMenu('utilities-submenu')">
           <div class="nav-link">
             <i class="fas fa-cog"></i>
             <span class="nav-text">Utilities</span>
             <i class="fas fa-chevron-down nav-arrow"></i>
           </div>
         </div>
-        <div class="submenu show" id="utilities-submenu">
+        <div class="submenu" id="utilities-submenu">
           <a class="nav-link submenu-link {{#if (eq activePage 'email-templates')}}active{{/if}}" href="/email-templates">
             <i class="fas fa-envelope-open-text"></i>
             <span class="nav-text">Email Templates</span>
@@ -109,6 +147,22 @@
         </div>
       </div>
 
+      <!-- Plans Section -->
+      <div class="nav-item">
+        <a class="nav-link {{#if (eq activePage 'plans')}}active{{/if}}" href="/plans">
+          <i class="fas fa-crown"></i>
+          <span class="nav-text">Plans</span>
+        </a>
+      </div>
+
+      <!-- Logout Section -->
+      <div class="nav-item" style="margin-top: 0.5rem;">
+        <hr class="sidebar-divider" />
+        <a class="nav-link logout-link" href="#" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="nav-text">Logout</span>
+        </a>
+      </div>
 
       <!-- product notification -->
       {{!-- <div class="menu-toggle mt-2" onclick="toggleMenu('notification-submenu')">
@@ -127,15 +181,6 @@
           Sub Menu 2
         </a>
       </div> --}}
-
-      <!-- Logout Section -->
-      <div class="sidebar-footer">
-        <hr class="sidebar-divider" />
-        <a class="nav-link logout-link" href="#" onclick="logout()">
-          <i class="fas fa-sign-out-alt"></i>
-          <span class="nav-text">Logout</span>
-        </a>
-      </div>
     </nav>
   </div>
 </div>

@@ -4,6 +4,7 @@ import { ApiError } from "../../utils/ApiError.js"
 import { ApiResponse } from "../../utils/ApiResponse.js"
 import { User } from '../../models/User.js';
 import { buildTokenPair, hashToken } from '../../utils/token.util.js';
+import { assignFreeTrialPlan } from '../../utils/plan.util.js';
 
 export default async function register(req, res) {
     try {
@@ -40,6 +41,14 @@ export default async function register(req, res) {
         createdUser.refreshTokens = hashToken(refreshToken);
         createdUser.refreshTokenExpiresAt = refreshExp ? new Date(refreshExp * 1000) : null;
         await createdUser.save();
+
+        // Assign Free Trial plan to new user
+        try {
+          await assignFreeTrialPlan(createdUser.id);
+        } catch (planError) {
+          console.error('Error assigning Free Trial plan:', planError);
+          // Don't fail registration if plan assignment fails
+        }
 
         const options = {
             httpOnly: true,

@@ -1,0 +1,1376 @@
+<div class="container-fluid">
+  <div class="row">
+    {{> sidebar}}
+
+<div class="col-md-9 col-lg-10 main-content">
+  <div class="container-fluid p-3">
+    <style>
+      /* ============================================
+         PREMIUM PLANS PAGE STYLING
+         ============================================ */
+      
+      .plans-container {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: calc(100vh - 2rem);
+        padding: 1.5rem 0;
+      }
+
+      .plans-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .plans-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+      }
+
+      .plans-title::before {
+        content: '';
+        width: 4px;
+        height: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+      }
+
+      .plans-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+      }
+
+      .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .plan-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 1.5rem 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .plan-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--plan-gradient);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+      }
+
+      .plan-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        border-color: var(--plan-color);
+      }
+
+      .plan-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .plan-card.featured {
+        border-color: #f59e0b;
+        box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25);
+        transform: scale(1.02);
+      }
+
+      .plan-card.featured::before {
+        transform: scaleX(1);
+        height: 6px;
+      }
+
+      /* Plan Header */
+      .plan-header {
+        text-align: center;
+        margin-bottom: 1.25rem;
+      }
+
+      .plan-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 1rem;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #ffffff;
+        background: var(--plan-gradient);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .plan-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.4rem;
+      }
+
+      .plan-description {
+        color: #64748b;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      /* Plan Pricing */
+      .plan-pricing {
+        text-align: center;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .plan-price {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: var(--plan-color);
+        line-height: 1;
+        margin-bottom: 0.4rem;
+      }
+
+      .plan-price-currency {
+        font-size: 1.25rem;
+        vertical-align: super;
+      }
+
+      .plan-period {
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      /* Plan Features */
+      .plan-features {
+        flex: 1;
+        margin-bottom: 1.25rem;
+      }
+
+      .plan-features-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.9rem;
+        text-align: center;
+      }
+
+      .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.5rem 0;
+        color: #374151;
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      .feature-item i {
+        color: var(--plan-color);
+        font-size: 0.95rem;
+        margin-top: 0.15rem;
+        flex-shrink: 0;
+      }
+
+      /* Plan Button */
+      .plan-button {
+        width: 100%;
+        padding: 0.85rem 1.5rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ffffff;
+        background: var(--plan-gradient);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .plan-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s;
+      }
+
+      .plan-button:hover::before {
+        left: 100%;
+      }
+
+      .plan-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+
+      .plan-button:active {
+        transform: translateY(0);
+      }
+
+      /* Plan Variants */
+      .plan-card.free-trial {
+        --plan-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --plan-color: #10b981;
+      }
+
+      .plan-card.silver {
+        --plan-gradient: linear-gradient(135deg, #64748b 0%, #475569 100%);
+        --plan-color: #64748b;
+      }
+
+      .plan-card.gold {
+        --plan-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        --plan-color: #f59e0b;
+      }
+
+      .plan-card.gold.featured {
+        border-color: #f59e0b;
+        box-shadow: 0 15px 40px rgba(245, 158, 11, 0.3);
+      }
+
+      /* Current/Selected Plan Styling */
+      .plan-card.current-plan {
+        border: 3px solid var(--plan-color);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        position: relative;
+        transform: scale(1.02);
+      }
+
+      .current-plan-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: var(--plan-gradient);
+        color: #ffffff;
+        padding: 0.4rem 0.8rem;
+        border-radius: 16px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+      }
+
+      /* Hide existing badge if current plan */
+      .plan-card.current-plan .plan-badge {
+        display: none;
+      }
+
+      .plan-card.current-plan .plan-button {
+        background: #6b7280;
+        cursor: default;
+        opacity: 0.8;
+      }
+
+      .plan-card.current-plan .plan-button:hover {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        opacity: 0.8;
+      }
+
+      /* Badge */
+      .plan-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--plan-gradient);
+        color: #ffffff;
+        padding: 0.4rem 0.8rem;
+        border-radius: 16px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .plans-grid {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+        }
+
+        .plan-card.featured {
+          transform: scale(1);
+        }
+
+        .plans-title {
+          font-size: 2rem;
+        }
+      }
+
+      /* ============================================
+         CHECKOUT MODAL STYLING
+         ============================================ */
+      .checkout-modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+
+      .checkout-modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #ffffff;
+        border-bottom: none;
+        border-radius: 16px 16px 0 0;
+        padding: 1.5rem;
+      }
+
+      .checkout-modal-header .modal-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+      }
+
+      .checkout-modal-header .btn-close {
+        filter: invert(1);
+        opacity: 0.9;
+      }
+
+      .checkout-modal-body {
+        padding: 2rem;
+        background: #ffffff;
+      }
+
+      .checkout-summary {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 2px solid #e9ecef;
+      }
+
+      .summary-header {
+        margin-bottom: 1rem;
+      }
+
+      .summary-title {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 1rem;
+        margin: 0;
+      }
+
+      .summary-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .summary-plan,
+      .summary-includes {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .summary-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 600;
+      }
+
+      .summary-value {
+        font-size: 1rem;
+        color: #1e293b;
+        font-weight: 600;
+      }
+
+      .checkout-section {
+        margin-bottom: 2rem;
+      }
+
+      .checkout-label {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        display: block;
+      }
+
+      .billing-cycle-selector {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .billing-cycle-option {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #ffffff;
+      }
+
+      .billing-cycle-option:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+      }
+
+      .billing-cycle-option .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+      }
+
+      .billing-cycle-option .form-check-input:checked ~ .form-check-label {
+        color: #667eea;
+      }
+
+      .billing-cycle-option .form-check-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        cursor: pointer;
+        margin-left: 0.5rem;
+      }
+
+      .cycle-name {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .cycle-price {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #667eea;
+      }
+
+      .checkout-input {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+      }
+
+      .checkout-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      }
+
+      .checkout-modal-footer {
+        border-top: 1px solid #e5e7eb;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 0 0 16px 16px;
+      }
+
+      .checkout-proceed-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .checkout-proceed-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .checkout-proceed-btn:active {
+        transform: translateY(0);
+      }
+
+      .payment-security-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+      }
+
+      .security-badges {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #10b981;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .security-badges i {
+        font-size: 1rem;
+      }
+
+      .refund-policy-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .refund-policy-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+      }
+
+      .refund-policy-link i {
+        font-size: 0.9rem;
+      }
+    </style>
+
+    <div class="plans-container">
+      <div class="plans-header">
+        <h1 class="plans-title">Choose Your Plan</h1>
+        <p class="plans-subtitle">Select the perfect plan for your business needs</p>
+      </div>
+
+      <div class="plans-grid" id="plansGrid">
+        <!-- Plans will be loaded dynamically from API -->
+        <div class="text-center" style="grid-column: 1 / -1; padding: 3rem;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading plans...</span>
+          </div>
+          <p class="mt-3 text-muted">Loading plans...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+</div>
+
+<script>
+  // Ensure toggleMenu is available (fallback if not defined in head)
+  if (typeof window.toggleMenu === 'undefined') {
+    window.toggleMenu = function(menuId) {
+      const submenu = document.getElementById(menuId);
+      if (!submenu) {
+        console.warn('Submenu not found:', menuId);
+        return;
+      }
+      
+      const toggle = document.querySelector(`[onclick="toggleMenu('${menuId}')"]`);
+      
+      if (submenu.classList.contains('show')) {
+        submenu.classList.remove('show');
+        if (toggle) toggle.classList.add('collapsed');
+      } else {
+        submenu.classList.add('show');
+        if (toggle) toggle.classList.remove('collapsed');
+      }
+    };
+  }
+
+  // API Configuration
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+  const currentPlanSlug = '{{currentPlanSlug}}' || 'free-trial';
+
+  // Plan configuration mapping
+  const planConfig = {
+    'free-trial': {
+      cssClass: 'free-trial',
+      icon: 'fas fa-gift',
+      badge: null,
+      featured: false
+    },
+    'silver': {
+      cssClass: 'silver',
+      icon: 'fas fa-star',
+      badge: 'Popular',
+      featured: false
+    },
+    'gold': {
+      cssClass: 'gold',
+      icon: 'fas fa-crown',
+      badge: 'Best Value',
+      featured: true
+    }
+  };
+
+  // Format number with commas
+  function formatNumber(num) {
+    if (num === null || num === undefined) return 'Unlimited';
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  // Generate features list from plan data
+  function generateFeaturesList(plan) {
+    const features = [];
+    
+    // Customer limit
+    if (plan.maxCustomers === null || plan.maxCustomers >= 999999) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Unlimited customers' });
+    } else {
+      features.push({ icon: 'fas fa-check-circle', text: `Up to ${formatNumber(plan.maxCustomers)} customers` });
+    }
+    
+    // Business accounts
+    if (plan.maxBusinesses === null || plan.maxBusinesses >= 999999) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Unlimited business accounts' });
+    } else {
+      features.push({ icon: 'fas fa-check-circle', text: `${formatNumber(plan.maxBusinesses)} business account${plan.maxBusinesses > 1 ? 's' : ''}` });
+    }
+    
+    // Email templates
+    if (plan.hasEmailTemplates) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Email templates' });
+    } else {
+      features.push({ icon: 'fas fa-times-circle', text: 'Email templates', disabled: true });
+    }
+    
+    // WhatsApp templates
+    if (plan.hasWhatsAppTemplates) {
+      features.push({ icon: 'fas fa-check-circle', text: 'WhatsApp templates' });
+    } else {
+      features.push({ icon: 'fas fa-times-circle', text: 'WhatsApp templates', disabled: true });
+    }
+    
+    // Emails per month
+    if (plan.maxEmailsPerMonth === null || plan.maxEmailsPerMonth >= 999999) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Unlimited emails per month' });
+    } else {
+      features.push({ icon: 'fas fa-check-circle', text: `${formatNumber(plan.maxEmailsPerMonth)} emails per month` });
+    }
+    
+    // WhatsApp messages per month
+    if (plan.maxWhatsAppMessagesPerMonth === null || plan.maxWhatsAppMessagesPerMonth >= 999999) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Unlimited WhatsApp messages per month' });
+    } else if (plan.maxWhatsAppMessagesPerMonth > 0) {
+      features.push({ icon: 'fas fa-check-circle', text: `${formatNumber(plan.maxWhatsAppMessagesPerMonth)} WhatsApp messages per month` });
+    } else {
+      features.push({ icon: 'fas fa-times-circle', text: 'WhatsApp messaging', disabled: true });
+    }
+    
+    // Invoice
+    if (plan.hasInvoice) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Invoice generation' });
+    } else {
+      features.push({ icon: 'fas fa-times-circle', text: 'Invoice generation', disabled: true });
+    }
+    
+    // Analytics
+    if (plan.hasAnalytics) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Advanced analytics & reports' });
+    } else {
+      features.push({ icon: 'fas fa-times-circle', text: 'Analytics & reports', disabled: true });
+    }
+    
+    // API Access
+    if (plan.hasApiAccess) {
+      features.push({ icon: 'fas fa-check-circle', text: 'API access' });
+    }
+    
+    // Custom Integrations
+    if (plan.hasCustomIntegrations) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Custom integrations' });
+    }
+    
+    // Priority Support
+    if (plan.hasPrioritySupport) {
+      features.push({ icon: 'fas fa-check-circle', text: 'Priority support' });
+    } else {
+      features.push({ icon: 'fas fa-check-circle', text: 'Community support' });
+    }
+    
+    return features;
+  }
+
+  // Format billing period
+  function formatBillingPeriod(period) {
+    const periodMap = {
+      'monthly': 'Per Month',
+      'yearly': 'Per Year',
+      'lifetime': 'One-time',
+      'free': 'Forever'
+    };
+    return periodMap[period] || period;
+  }
+
+  // Format price
+  function formatPrice(price, currency) {
+    const symbolMap = {
+      'INR': '₹',
+      'USD': '$',
+      'EUR': '€'
+    };
+    const symbol = symbolMap[currency] || currency;
+    return price.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  // Render plan card
+  function renderPlanCard(plan) {
+    const config = planConfig[plan.slug] || {
+      cssClass: plan.slug,
+      icon: 'fas fa-box',
+      badge: null,
+      featured: false
+    };
+    
+    const isCurrentPlan = plan.slug === currentPlanSlug;
+    const features = generateFeaturesList(plan);
+    
+    let cardClasses = `plan-card ${config.cssClass}`;
+    if (config.featured) cardClasses += ' featured';
+    if (isCurrentPlan) cardClasses += ' current-plan';
+    
+    let badgeHtml = '';
+    if (isCurrentPlan) {
+      badgeHtml = '<div class="current-plan-badge">Current Plan</div>';
+    } else if (config.badge) {
+      badgeHtml = `<div class="plan-badge">${config.badge}</div>`;
+    }
+    
+    const featuresHtml = features.map(feature => {
+      const iconColor = feature.disabled ? 'style="color: #ef4444;"' : '';
+      return `
+        <li class="feature-item">
+          <i class="${feature.icon}" ${iconColor}></i>
+          <span>${feature.text}</span>
+        </li>
+      `;
+    }).join('');
+    
+    // Determine button text
+    let buttonText;
+    if (isCurrentPlan) {
+      buttonText = 'Current Plan';
+    } else if (currentPlanSlug === 'free-trial' && plan.slug !== 'free-trial') {
+      buttonText = `Upgrade to ${plan.name}`;
+    } else if (plan.price === 0) {
+      buttonText = 'Get Started';
+    } else {
+      buttonText = `Choose ${plan.name}`;
+    }
+    
+    const buttonOnclick = isCurrentPlan ? 'void(0)' : `selectPlan('${plan.slug}')`;
+    
+    return `
+      <div class="${cardClasses}">
+        ${badgeHtml}
+        <div class="plan-header">
+          <div class="plan-icon">
+            <i class="${config.icon}"></i>
+          </div>
+          <h2 class="plan-name">${plan.name}</h2>
+          <p class="plan-description">${plan.description || 'Perfect plan for your business needs'}</p>
+        </div>
+        
+        <div class="plan-pricing">
+          <div class="plan-price">
+            <span class="plan-price-currency">${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}</span>${formatPrice(plan.price, plan.currency)}
+          </div>
+          <div class="plan-period">${formatBillingPeriod(plan.billingPeriod)}</div>
+        </div>
+        
+        <div class="plan-features">
+          <h3 class="plan-features-title">What's Included</h3>
+          <ul class="feature-list">
+            ${featuresHtml}
+          </ul>
+        </div>
+        
+        <button class="plan-button" onclick="${buttonOnclick}">
+          ${buttonText}
+        </button>
+      </div>
+    `;
+  }
+
+  // Fetch plans from API
+  async function loadPlans() {
+    try {
+      const response = await fetch(`${API_BASE}/plans`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch plans: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      const plans = result.data || result;
+
+      if (!Array.isArray(plans) || plans.length === 0) {
+        throw new Error('No plans found');
+      }
+
+      // Store plans globally for checkout
+      allPlans = plans;
+
+      // Render plans
+      const plansGrid = document.getElementById('plansGrid');
+      plansGrid.innerHTML = plans.map(plan => renderPlanCard(plan)).join('');
+
+    } catch (error) {
+      console.error('Error loading plans:', error);
+      const plansGrid = document.getElementById('plansGrid');
+      plansGrid.innerHTML = `
+        <div class="text-center" style="grid-column: 1 / -1; padding: 3rem;">
+          <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+          <p class="mt-3 text-danger">Failed to load plans. Please refresh the page.</p>
+          <button class="btn btn-primary mt-2" onclick="loadPlans()">Retry</button>
+        </div>
+      `;
+    }
+  }
+
+  // Store plans globally for checkout modal
+  let allPlans = [];
+
+  // Plan selection handler - Show checkout modal
+  function selectPlan(planSlug) {
+    const plan = allPlans.find(p => p.slug === planSlug);
+    if (!plan) {
+      console.error('Plan not found:', planSlug);
+      return;
+    }
+    
+    showCheckoutModal(plan);
+  }
+
+  // Show checkout modal
+  async function showCheckoutModal(plan) {
+    const isUpgrade = currentPlanSlug === 'free-trial' && plan.slug !== 'free-trial';
+    const features = generateFeaturesList(plan);
+    
+    // Get key features for summary
+    const keyFeatures = features
+      .filter(f => !f.disabled)
+      .slice(0, 6)
+      .map(f => f.text)
+      .join(', ');
+    
+    // Fetch user's business information for billing email
+    let businessEmail = '';
+    try {
+      const businessResponse = await fetch(`${API_BASE}/business/get-my-business`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (businessResponse.ok) {
+        const businessResult = await businessResponse.json();
+        const businesses = businessResult.data?.business || [];
+        
+        if (businesses.length > 0) {
+          // Use the first business (or primary business)
+          const primaryBusiness = businesses[0];
+          businessEmail = primaryBusiness.email || '';
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching business:', error);
+      // Continue without business email if fetch fails
+    }
+    
+    const modalHtml = `
+      <div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content checkout-modal-content">
+            <div class="modal-header checkout-modal-header">
+              <h5 class="modal-title" id="checkoutModalLabel">
+                <i class="fas fa-shopping-cart me-2"></i>
+                ${isUpgrade ? 'Upgrade to ' : 'Confirm '}${plan.name}
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body checkout-modal-body">
+              <!-- Plan Summary -->
+              <div class="checkout-summary">
+                <div class="summary-header">
+                  <h6 class="summary-title">Plan Summary</h6>
+                </div>
+                <div class="summary-content">
+                  <div class="summary-plan">
+                    <span class="summary-label">Plan:</span>
+                    <span class="summary-value">${plan.name} – ${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}${formatPrice(plan.price, plan.currency)} / ${formatBillingPeriod(plan.billingPeriod).toLowerCase()}</span>
+                  </div>
+                  <div class="summary-includes">
+                    <span class="summary-label">Includes:</span>
+                    <span class="summary-value">${keyFeatures}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Billing Cycle -->
+              <div class="checkout-section">
+                <label class="checkout-label">Billing Cycle</label>
+                <div class="billing-cycle-selector">
+                  <div class="form-check billing-cycle-option">
+                    <input class="form-check-input" type="radio" name="billingCycle" id="billingMonthly" value="monthly" checked>
+                    <label class="form-check-label" for="billingMonthly">
+                      <span class="cycle-name">Monthly</span>
+                      <span class="cycle-price">${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}${formatPrice(plan.price, plan.currency)}/month</span>
+                    </label>
+                  </div>
+                  <div class="form-check billing-cycle-option">
+                    <input class="form-check-input" type="radio" name="billingCycle" id="billingYearly" value="yearly">
+                    <label class="form-check-label" for="billingYearly">
+                      <span class="cycle-name">Yearly ${plan.yearlyPrice && plan.yearlyPrice < (plan.price * 12) ? '<span class="badge bg-success">Save ' + Math.round((1 - (plan.yearlyPrice / (plan.price * 12))) * 100) + '%</span>' : ''}</span>
+                      <span class="cycle-price">${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}${formatPrice(plan.yearlyPrice || Math.round(plan.price * 12), plan.currency)}/year</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Company Details -->
+              <div class="checkout-section">
+                <label class="checkout-label">Company Details <span class="text-muted">(Optional)</span></label>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="gstin" class="form-label">GSTIN <span class="text-muted">(Optional)</span></label>
+                    <input type="text" class="form-control checkout-input" id="gstin" placeholder="Enter GSTIN" maxlength="15">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="billingEmail" class="form-label">Billing Email</label>
+                    <input type="email" class="form-control checkout-input" id="billingEmail" placeholder="billing@example.com" value="${businessEmail || ''}">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer checkout-modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary checkout-proceed-btn" onclick="proceedToPayment('${plan.slug}')">
+                <i class="fas fa-credit-card me-2"></i>Proceed to Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.getElementById('checkoutModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+    modal.show();
+
+    // Update price when billing cycle changes
+    document.querySelectorAll('input[name="billingCycle"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        updateCheckoutPrice(plan);
+      });
+    });
+  }
+
+  // Update checkout price based on billing cycle
+  function updateCheckoutPrice(plan) {
+    const billingCycle = document.querySelector('input[name="billingCycle"]:checked').value;
+    const monthlyPrice = plan.price;
+    const yearlyPrice = plan.yearlyPrice || Math.round(monthlyPrice * 12);
+    
+    // Update discount badge if yearly price is less than monthly * 12
+    const yearlyLabel = document.querySelector('#billingYearly + label .cycle-name');
+    if (plan.yearlyPrice && plan.yearlyPrice < (plan.price * 12)) {
+      const discountPercent = Math.round((1 - (plan.yearlyPrice / (plan.price * 12))) * 100);
+      yearlyLabel.innerHTML = `Yearly <span class="badge bg-success">Save ${discountPercent}%</span>`;
+    } else {
+      yearlyLabel.innerHTML = 'Yearly';
+    }
+    
+    if (billingCycle === 'yearly') {
+      document.querySelector('#billingMonthly + label .cycle-price').textContent = `${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}${formatPrice(monthlyPrice, plan.currency)}/month`;
+      document.querySelector('#billingYearly + label .cycle-price').textContent = `${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}${formatPrice(yearlyPrice, plan.currency)}/year`;
+    }
+  }
+
+  // Proceed to payment
+  async function proceedToPayment(planSlug) {
+    const plan = allPlans.find(p => p.slug === planSlug);
+    if (!plan) {
+      console.error('Plan not found:', planSlug);
+      return;
+    }
+
+    const billingCycle = document.querySelector('input[name="billingCycle"]:checked').value;
+    const gstin = document.getElementById('gstin').value;
+    const billingEmail = document.getElementById('billingEmail').value;
+
+    // Calculate final price from database
+    let finalPrice = plan.price;
+    if (billingCycle === 'yearly') {
+      finalPrice = plan.yearlyPrice || Math.round(plan.price * 12);
+    }
+
+    try {
+      // Create payment order
+      const orderResponse = await fetch(`${API_BASE}/payment/create-order`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          planId: plan.id,
+          billingCycle: billingCycle,
+          gstin: gstin,
+          billingEmail: billingEmail
+        })
+      });
+
+      if (!orderResponse.ok) {
+        throw new Error('Failed to create payment order');
+      }
+
+      const orderResult = await orderResponse.json();
+      const orderData = orderResult.data || orderResult;
+
+      // Close checkout modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('checkoutModal'));
+      if (modal) {
+        modal.hide();
+      }
+
+      // Initialize Razorpay checkout
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Mini CRM 360',
+        description: `${plan.name} - ${billingCycle === 'monthly' ? 'Monthly' : 'Yearly'} Subscription`,
+        order_id: orderData.orderId,
+        handler: async function(response) {
+          // Verify payment on backend
+          try {
+            const verifyResponse = await fetch(`${API_BASE}/payment/verify`, {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                planId: plan.id,
+                billingCycle: billingCycle
+              })
+            });
+
+            const verifyResult = await verifyResponse.json();
+            
+            if (verifyResponse.ok && verifyResult.success) {
+              // Show success notification
+              showPlanActivationSuccess(plan, billingCycle);
+              
+              // Reload plans to update current plan badge
+              setTimeout(() => {
+                window.location.reload();
+              }, 3000);
+            } else {
+              showPaymentError(verifyResult.message || 'Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            showPaymentError('Failed to verify payment. Please contact support.');
+          }
+        },
+        prefill: {
+          email: billingEmail || '',
+          name: ''
+        },
+        theme: {
+          color: '#667eea'
+        },
+        modal: {
+          ondismiss: function() {
+            console.log('Payment cancelled');
+          }
+        }
+      };
+
+      // Check if Razorpay is loaded
+      if (typeof Razorpay === 'undefined') {
+        showPaymentError('Payment gateway not loaded. Please refresh the page.');
+        return;
+      }
+
+      const razorpayInstance = new Razorpay(options);
+      razorpayInstance.on('payment.failed', function(response) {
+        console.error('Payment failed:', response.error);
+        showPaymentError(response.error.description || 'Payment failed. Please try again.');
+      });
+      razorpayInstance.open();
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      showPaymentError('Failed to initiate payment. Please try again.');
+    }
+  }
+
+  // Show plan activation success notification
+  function showPlanActivationSuccess(plan, billingCycle) {
+    // Get unlocked features
+    const unlockedFeatures = [];
+    if (plan.hasWhatsAppTemplates) unlockedFeatures.push('WhatsApp Templates');
+    if (plan.hasInvoice) unlockedFeatures.push('Invoice');
+    if (plan.hasAnalytics) unlockedFeatures.push('Advanced Analytics');
+    if (plan.hasApiAccess) unlockedFeatures.push('API Access');
+    if (plan.hasCustomIntegrations) unlockedFeatures.push('Custom Integrations');
+    if (plan.hasPrioritySupport) unlockedFeatures.push('Priority Support');
+
+    const notification = document.createElement('div');
+    notification.className = 'plan-activation-notification';
+    notification.innerHTML = `
+      <div class="plan-activation-content">
+        <div class="plan-activation-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="plan-activation-text">
+          <h4>✅ ${plan.name} Activated!</h4>
+          <div class="activation-features">
+            <p class="feature-title">Unlocked:</p>
+            <ul class="feature-list">
+              ${unlockedFeatures.map(feature => `<li><i class="fas fa-check"></i> ${feature}</li>`).join('')}
+            </ul>
+          </div>
+          <p class="quota-message">✅ New quotas applied</p>
+        </div>
+        <button class="plan-activation-close" onclick="this.parentElement.parentElement.remove()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+
+    // Add styles if not already added
+    if (!document.getElementById('plan-activation-styles')) {
+      const style = document.createElement('style');
+      style.id = 'plan-activation-styles';
+      style.textContent = `
+        .plan-activation-notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 10001;
+          animation: slideInRight 0.4s ease-out;
+          max-width: 450px;
+        }
+        .plan-activation-content {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+          color: #ffffff;
+          position: relative;
+        }
+        .plan-activation-icon {
+          font-size: 3rem;
+          text-align: center;
+          margin-bottom: 1rem;
+          color: #ffffff;
+        }
+        .plan-activation-text h4 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin-bottom: 1rem;
+          text-align: center;
+        }
+        .activation-features {
+          margin: 1.5rem 0;
+        }
+        .feature-title {
+          font-weight: 600;
+          font-size: 1rem;
+          margin-bottom: 0.75rem;
+        }
+        .activation-features .feature-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        .activation-features .feature-list li {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.5rem;
+          font-size: 0.95rem;
+        }
+        .activation-features .feature-list li i {
+          color: #ffffff;
+          font-size: 0.85rem;
+        }
+        .quota-message {
+          text-align: center;
+          font-weight: 600;
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .plan-activation-close {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          color: #ffffff;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+        }
+        .plan-activation-close:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: rotate(90deg);
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 8 seconds
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }
+    }, 8000);
+  }
+
+  // Show payment error
+  function showPaymentError(message) {
+    const notification = document.createElement('div');
+    notification.className = 'payment-error-notification';
+    notification.innerHTML = `
+      <div class="payment-error-content">
+        <div class="payment-error-icon">
+          <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="payment-error-text">
+          <h4>Payment Failed</h4>
+          <p>${message}</p>
+        </div>
+        <button class="payment-error-close" onclick="this.parentElement.parentElement.remove()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+
+    // Add styles if not already added
+    if (!document.getElementById('payment-error-styles')) {
+      const style = document.createElement('style');
+      style.id = 'payment-error-styles';
+      style.textContent = `
+        .payment-error-notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 10001;
+          animation: slideInRight 0.4s ease-out;
+          max-width: 400px;
+        }
+        .payment-error-content {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+          border-radius: 16px;
+          padding: 1.5rem;
+          box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
+          color: #ffffff;
+          position: relative;
+        }
+        .payment-error-icon {
+          font-size: 2.5rem;
+          text-align: center;
+          margin-bottom: 1rem;
+        }
+        .payment-error-text h4 {
+          font-size: 1.25rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+          text-align: center;
+        }
+        .payment-error-text p {
+          text-align: center;
+          font-size: 0.95rem;
+        }
+        .payment-error-close {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          color: #ffffff;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+        }
+        .payment-error-close:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: rotate(90deg);
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }
+    }, 5000);
+  }
+
+  // Load plans on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadPlans();
+  });
+</script>
+

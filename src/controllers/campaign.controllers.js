@@ -8,6 +8,7 @@ import { MessageLog } from "../models/MessageLog.js";
 import { scheduleCampaign } from "../controllers/job/send-campaign.job.js";
 import { sendTemplateMessage } from "../controllers/service/whatsapp.service.js";
 import { sendDocumentEmail } from "../utils/emailService.js";
+import { autoLogEvent } from "./note.controller.js";
 
 /**
  * Helper: validate create/update payload supports either:
@@ -369,6 +370,16 @@ export const sendCampaign = async (req, res) => {
                     if (emailSent) {
                         await log.update({ status: "sent" });
                         sent++;
+                        
+                        // Auto-log email campaign event
+                        await autoLogEvent(
+                            userId,
+                            customer.id,
+                            'email_sent',
+                            'Email Campaign Sent',
+                            `Campaign "${campaign.name}" sent via email`,
+                            { campaignId: campaign.id, emailTemplateId: emailTemplate.id }
+                        );
                     } else {
                         await log.update({ status: "failed", error: "Email service returned false" });
                         failed++;
@@ -415,6 +426,16 @@ export const sendCampaign = async (req, res) => {
                     const waMessageId = response?.messages?.[0]?.id;
                     await log.update({ waMessageId, status: "sent" });
                     sent++;
+                    
+                    // Auto-log WhatsApp campaign event
+                    await autoLogEvent(
+                        userId,
+                        customer.id,
+                        'whatsapp_sent',
+                        'WhatsApp Campaign Sent',
+                        `Campaign "${campaign.name}" sent via WhatsApp`,
+                        { campaignId: campaign.id, templateName, waMessageId }
+                    );
 
                     await new Promise(r => setTimeout(r, 150)); // rate-limit buffer
                 } catch (error) {

@@ -467,6 +467,28 @@
           </div>
         </div>
 
+        <!-- Upcoming Reminders Card -->
+        <div class="premium-card mb-3">
+          <div class="premium-card-header">
+            <h5 class="premium-card-title">
+              <i class="fas fa-birthday-cake"></i>
+              Upcoming Birthdays & Anniversaries
+            </h5>
+            <a href="/reminders" class="btn-view-all">
+              View All <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="premium-card-body">
+            <div id="remindersList">
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p class="mt-2 mb-0">Loading reminders...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Recent Customers Card -->
         <div class="premium-card">
           <div class="premium-card-header">
@@ -607,6 +629,65 @@
     }
   }
 
+  // Load upcoming reminders
+  async function loadUpcomingReminders() {
+    const el = document.getElementById('remindersList');
+    try {
+      const res = await fetch('/api/v1/reminders?days=7');
+      const response = await res.json();
+
+      let reminders = [];
+      if (response.success && Array.isArray(response.data)) {
+        reminders = response.data.slice(0, 5); // Show only top 5
+      } else if (Array.isArray(response)) {
+        reminders = response.slice(0, 5);
+      } else if (response.data && Array.isArray(response.data)) {
+        reminders = response.data.slice(0, 5);
+      }
+
+      if (reminders.length === 0) {
+        el.innerHTML = `
+          <div class="text-center p-4">
+            <i class="fas fa-birthday-cake" style="font-size: 2rem; color: #cbd5e1; margin-bottom: 0.5rem;"></i>
+            <p class="text-muted mb-0">No upcoming birthdays or anniversaries in the next 7 days</p>
+          </div>
+        `;
+        return;
+      }
+
+      const remindersHTML = reminders.map(reminder => {
+        const dateStr = new Date(reminder.date).toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric'
+        });
+        const typeIcon = reminder.type === 'birthday' ? '🎂' : '💍';
+        const typeLabel = reminder.type === 'birthday' ? 'Birthday' : 'Anniversary';
+        const daysText = reminder.isToday ? 'Today!' : reminder.daysUntil === 1 ? 'Tomorrow' : `${reminder.daysUntil} days`;
+
+        return `
+          <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="border-left: 3px solid ${reminder.type === 'birthday' ? '#ec4899' : '#f59e0b'}; background: ${reminder.type === 'birthday' ? '#fdf2f8' : '#fffbeb'}; border-radius: 6px;">
+            <div>
+              <strong>${escapeHtml(reminder.customerName)}</strong>
+              <div class="text-muted" style="font-size: 0.85rem;">${typeIcon} ${typeLabel} • ${dateStr}</div>
+            </div>
+            <div class="text-end">
+              <div style="font-weight: 700; color: ${reminder.isToday ? '#10b981' : '#667eea'};">${daysText}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      el.innerHTML = remindersHTML;
+    } catch (error) {
+      console.error('Error loading reminders:', error);
+      el.innerHTML = `
+        <div class="text-center p-4">
+          <p class="text-danger mb-0">Failed to load reminders</p>
+        </div>
+      `;
+    }
+  }
+
   async function loadRecentCustomers() {
     const el = document.getElementById('customersList');
     try {
@@ -701,6 +782,7 @@
 
   // Load recent customers on page load
   document.addEventListener('DOMContentLoaded', () => {
+    loadUpcomingReminders();
     loadRecentCustomers();
   });
 </script>

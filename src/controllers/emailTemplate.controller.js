@@ -7,9 +7,16 @@ import DocumentType from '../models/DocumentType.js';
 // GET /email-templates  → render HBS page
 export const renderEmailTemplatesPage = async (req, res, next) => {
     try {
+        const user = {
+            firstName: req.user.firstName || '',
+            lastName: req.user.lastName || '',
+            avatar: req.user.avatar || req.user.avatarUrl || null,
+            plan: req.user.plan || null,
+        };
         res.render('emailTemplates', {
-            user: req.user,
+            user,
             title: 'Email Templates',
+            activePage: 'email-templates',
         });
     } catch (err) {
         next(err);

@@ -15,6 +15,8 @@ export const renderDashboard = async (req, res) => {
     const user = {
       firstName: req.user.firstName || '',
       lastName: req.user.lastName || '',
+      avatar: req.user.avatar || req.user.avatarUrl || null,
+      plan: req.user.plan || null, // Include plan information
     };
 
     const userId = req.user.id;
