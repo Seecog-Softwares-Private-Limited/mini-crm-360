@@ -120,6 +120,10 @@ import businessAddressRoutes from './routes/businessAddress.routes.js';
 import emailTemplateRoutes from './routes/emailTemplate.routes.js';
 import { renderEmailTemplatesPage } from './controllers/emailTemplate.controller.js';
 import dashboardRoutes from "./routes/dashboard.routes.js";
+import plansRoutes from "./routes/plans.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import taskRoutes from "./routes/task.routes.js";
+import noteRoutes from "./routes/note.routes.js";
 
 // ---------- Frontend pages ----------
 // Helper function to get API_BASE based on environment
@@ -150,35 +154,75 @@ app.get('/register', (req, res) => {
   });
 });
 
+app.get('/reset-password', (req, res) => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const port = process.env.PORT || 3002;
+  const productionUrl = process.env.PRODUCTION_URL || 'https://petserviceinhome.com';
+  const developmentUrl = process.env.DEVELOPMENT_URL || `http://localhost:${port}`;
+
+  res.render('resetPassword', { 
+    title: 'Reset Password',
+    nodeEnv,
+    port,
+    productionUrl,
+    developmentUrl
+  });
+});
+
 app.get('/dashboard', verifyUser, renderDashboard);
 
 app.get('/customers', verifyUser, (req, res) => {
-  res.render('customers');
+  const user = {
+    firstName: req.user.firstName || '',
+    lastName: req.user.lastName || '',
+    plan: req.user.plan || null,
+  };
+  res.render('customers', { user, activePage: 'customers' });
 });
 
 
 app.get('/business', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      plan: req.user.plan || null
+    };
     res.render('business', { title: 'Business', user, activePage: 'business' });
 });
 
 app.get('/templates', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      plan: req.user.plan || null
+    };
     res.render('templates', { title: 'Templates', user, activePage: 'templates' });
 });
 
 app.get('/campaigns', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      plan: req.user.plan || null
+    };
     res.render('campaigns', { title: 'Campaigns', user, activePage: 'campaigns' });
 });
 
 app.get('/documents', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      plan: req.user.plan || null
+    };
     res.render('documents', { title: 'documents', user, activePage: 'documents' });
 });
 
 app.get('/document-types', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      plan: req.user.plan || null
+    };
     res.render('documentTypes', { title: 'document-types', user, activePage: 'documentTypes' });
 });
 
@@ -231,7 +275,11 @@ app.get('/api/v1/hello', (req, res) => res.json({ message: 'Hello, world!' }));
 setupSwagger(app);
 
 app.use('/api/v1', waRouter);
-app.use("/", dashboardRoutes)
+app.use("/", dashboardRoutes);
+app.use("/", plansRoutes);
+app.use("/", paymentRoutes);
+app.use("/", taskRoutes);
+app.use("/", noteRoutes);
 app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/templates', templateRouter);
 app.use('/api/v1/campaigns', campaignRouter);

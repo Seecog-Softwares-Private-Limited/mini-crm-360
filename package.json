@@ -27,7 +27,12 @@
     "start": "cross-env DOTENV_CONFIG_PATH=./property.env nodemon -r dotenv/config src/index.js",
     "reset-db": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config --experimental-json-modules reset-database.js",
     "migrate:campaign-email": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/add-campaign-email-support.js",
-    "migrate:social-login": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/add-social-login-columns.js"
+    "migrate:social-login": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/add-social-login-columns.js",
+    "migrate:password-reset": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/add-password-reset-fields.js",
+        "migrate:plans": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/create-plans-tables.js",
+        "migrate:yearly-price": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/add-yearly-price-to-plans.js",
+        "migrate:tasks": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/create-tasks-table.js",
+        "migrate:notes": "cross-env DOTENV_CONFIG_PATH=./property.env node -r dotenv/config src/db/migrations/create-notes-timeline-table.js"
   },
   "dependencies": {
     "axios": "^1.12.2",
@@ -46,6 +51,7 @@
     "nodemon": "^3.1.10",
     "pdfkit": "^0.17.2",
     "puppeteer": "^24.31.0",
+    "razorpay": "^2.9.6",
     "sequelize": "^6.37.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"

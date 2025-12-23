@@ -59,6 +59,16 @@ const User = sequelize.define('User', {
   socialProvider: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  passwordResetToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'passwordResetToken'
+  },
+  passwordResetExpires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'passwordResetExpires'
   }
 }, {
   tableName: 'users',

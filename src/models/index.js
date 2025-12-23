@@ -16,6 +16,10 @@ import { LeaveRequest } from './LeaveRequest.js';
 
 import DocumentType from './DocumentType.js';
 import EmailTemplate from './EmailTemplate.js';
+import { Plan } from './Plan.js';
+import { UserPlan } from './UserPlan.js';
+import { Task } from './Task.js';
+import { Note } from './Note.js';
 
 import EmployeeEducation from './EmployeeEducation.js';
 import EmployeeExperience from './EmployeeExperience.js';
@@ -169,6 +173,36 @@ EmailTemplate.belongsTo(DocumentType, {
 });
 
 /* =========================================================
+   USER ↔ PLAN
+========================================================= */
+User.hasMany(UserPlan, { foreignKey: 'userId', as: 'userPlans' });
+UserPlan.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Plan.hasMany(UserPlan, { foreignKey: 'planId', as: 'userPlans' });
+UserPlan.belongsTo(Plan, { foreignKey: 'planId', as: 'plan' });
+
+/* =========================================================
+   USER ↔ TASK ↔ CUSTOMER
+========================================================= */
+User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
+Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Customer.hasMany(Task, { foreignKey: 'customerId', as: 'tasks' });
+Task.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+/* =========================================================
+   USER ↔ NOTE ↔ CUSTOMER (Notes & Timeline)
+========================================================= */
+User.hasMany(Note, { foreignKey: 'userId', as: 'notes' });
+Note.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Customer.hasMany(Note, { foreignKey: 'customerId', as: 'notes' });
+Note.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+User.hasMany(Note, { foreignKey: 'createdBy', as: 'createdNotes' });
+Note.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
+
+/* =========================================================
    EXPORT MODELS
 ========================================================= */
 export {
@@ -192,4 +226,8 @@ export {
 
   DocumentType,
   EmailTemplate,
+  Plan,
+  UserPlan,
+  Task,
+  Note,
 };

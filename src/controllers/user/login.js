@@ -2,6 +2,7 @@ import { User } from "../../models/User.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { buildTokenPair, hashToken } from "../../utils/token.util.js";
+import { assignFreeTrialPlan, getUserPlan } from "../../utils/plan.util.js";
 
 export const loginUser = asyncHandler(async (req, res) => {
     try {
@@ -24,6 +25,17 @@ export const loginUser = asyncHandler(async (req, res) => {
         user.refreshTokens = hashToken(refreshToken);
         user.refreshTokenExpiresAt = refreshExp ? new Date(refreshExp * 1000) : null;
         await user.save();
+
+        // Check if user has a plan, if not assign Free Trial
+        try {
+          const existingPlan = await getUserPlan(user.id);
+          if (!existingPlan) {
+            await assignFreeTrialPlan(user.id);
+          }
+        } catch (planError) {
+          console.error('Error checking/assigning plan:', planError);
+          // Don't fail login if plan check fails
+        }
 
         const options = {
             httpOnly: true,

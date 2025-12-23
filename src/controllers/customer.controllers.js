@@ -5,6 +5,7 @@ import { Op } from 'sequelize';
 import csv from 'csv-parser';
 import { PassThrough } from 'stream';
 import { sendDocumentEmail } from "../utils/emailService.js";
+import { autoLogEvent } from "./note.controller.js";
 
 const isE164 = (v) => /^\+\d{8,15}$/.test(String(v || ""));
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || ""));
@@ -121,6 +122,26 @@ export const addCustomer = async (req, res) => {
         tags: Array.isArray(tags) ? tags : customer.tags,
         consentAt: consentAt ? new Date(consentAt) : customer.consentAt,
       });
+      
+      // Auto-log customer update event
+      await autoLogEvent(
+        userId,
+        customer.id,
+        'customer_updated',
+        'Customer Updated',
+        `Customer information updated`,
+        { customerId: customer.id }
+      );
+    } else {
+      // Auto-log customer creation event
+      await autoLogEvent(
+        userId,
+        customer.id,
+        'customer_created',
+        'Customer Created',
+        `New customer "${name || 'Unnamed'}" added`,
+        { customerId: customer.id }
+      );
     }
 
     return res.status(201).json(customer);
@@ -415,6 +436,16 @@ export const sendEmailToCustomer = async (req, res) => {
     });
 
     if (emailSent) {
+      // Auto-log individual email sent event
+      await autoLogEvent(
+        userId,
+        customerId,
+        'email_sent',
+        'Email Sent',
+        `Email sent: ${subject}`,
+        { to: emailAddress, subject }
+      );
+
       return res.json({ 
         success: true, 
         message: "Email sent successfully" 

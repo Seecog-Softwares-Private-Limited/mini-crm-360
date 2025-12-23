@@ -1,15 +1,21 @@
-function toggleMenu(id) {
-  const target = document.getElementById(id);
-  if (!target) return;
-
-  // Close all other submenus
-  document.querySelectorAll(".submenu").forEach((sm) => {
-    if (sm.id !== id) sm.classList.remove("show");
-  });
-
-  // Toggle clicked submenu
-  target.classList.toggle("show");
-}
+// Menu toggle functionality - Make it globally available
+window.toggleMenu = function(menuId) {
+  const submenu = document.getElementById(menuId);
+  if (!submenu) {
+    console.warn('Submenu not found:', menuId);
+    return;
+  }
+  
+  const toggle = document.querySelector(`[onclick="toggleMenu('${menuId}')"]`);
+  
+  if (submenu.classList.contains('show')) {
+    submenu.classList.remove('show');
+    if (toggle) toggle.classList.add('collapsed');
+  } else {
+    submenu.classList.add('show');
+    if (toggle) toggle.classList.remove('collapsed');
+  }
+};
 
 // On page load: open only submenu that contains active link
 document.addEventListener("DOMContentLoaded", () => {
