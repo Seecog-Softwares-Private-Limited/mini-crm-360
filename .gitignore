@@ -24,6 +24,7 @@ pids
 .env
 .env.*
 !.env.example
+property.env
 
 # Build outputs
 dist/
@@ -36,5 +37,4 @@ coverage/
 .nyc_output/
 .tmp/
 .temp/
-
-property.env
+# property.env
