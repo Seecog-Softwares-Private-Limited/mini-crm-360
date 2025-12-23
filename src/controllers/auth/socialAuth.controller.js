@@ -76,7 +76,7 @@ const getApiBaseUrl = () => {
   const port = process.env.PORT || 3002;
   
   if (nodeEnv === 'prod' || nodeEnv === 'production') {
-    return `http://15.206.19.156:${port}`;
+    return `https://petserviceinhome.com:${port}`;
   }
   return `http://localhost:${port}`;
 };

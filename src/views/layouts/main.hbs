@@ -381,7 +381,7 @@
         const NODE_ENV = '{{nodeEnv}}' || 'development';
         const PORT = '{{port}}' || '3002';
         const API_BASE = (NODE_ENV === 'prod' || NODE_ENV === 'production') 
-            ? `http://15.206.19.156:${PORT}/api/v1`
+            ? `https://petserviceinhome.com:${PORT}/api/v1`
             : `http://localhost:${PORT}/api/v1`;
 
         // Helper: detect if current page is login or register
