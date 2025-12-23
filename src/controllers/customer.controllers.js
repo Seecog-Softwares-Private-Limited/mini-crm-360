@@ -1,7 +1,8 @@
 // src/controllers/customer.controllers.js
 import { Customer } from "../models/Customer.js";
 import { Business } from "../models/Business.js";
-import { Op } from "sequelize";
+import { Op } from 'sequelize';
+import csv from 'csv-parser';
 
 const isE164 = (v) => /^\+\d{8,15}$/.test(String(v || ""));
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || ""));
@@ -176,4 +177,112 @@ export const deleteCustomer = async (req, res) => {
     console.error("deleteCustomer error:", e);
     return res.status(500).json({ error: e.message });
   }
+};
+
+export const bulkUploadCustomers = async (req, res) => {
+    const userId = req.user.id;
+    const { businessId } = req.body;
+
+    // Validate file upload
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    if (!businessId) {
+        return res.status(400).json({ error: "businessId is required" });
+    }
+
+    try {
+        // Verify business ownership
+        const business = await Business.findOne({
+            where: { id: businessId, ownerId: userId }
+        });
+        if (!business) {
+            return res.status(404).json({ error: "Business not found or not yours" });
+        }
+
+        const rows = [];
+        const errors = [];
+
+        // Parse CSV file
+        req.file.buffer.toString()
+            .split('\n')
+            .forEach((line, index) => {
+                if (index === 0 || !line.trim()) return; // Skip header and empty lines
+                const [name, phoneE164, tags, consentAt] = line.split(',').map(v => v.trim());
+                
+                // Validate phone format
+                if (!phoneE164 || !/^\+\d{8,15}$/.test(phoneE164)) {
+                    errors.push({
+                        row: index + 1,
+                        error: `Invalid phone format: ${phoneE164}. Must be in E.164 format like +91xxxxxxxxxx`
+                    });
+                    return;
+                }
+
+                rows.push({
+                    userId,
+                    businessId,
+                    name: name || null,
+                    phoneE164,
+                    tags: tags ? tags.split(';').map(t => t.trim()) : [],
+                    consentAt: consentAt ? new Date(consentAt) : new Date()
+                });
+            });
+
+        // If there are validation errors, return them
+        if (errors.length > 0 && rows.length === 0) {
+            return res.status(400).json({
+                error: "CSV validation failed",
+                details: errors
+            });
+        }
+
+        // Bulk create customers (skip duplicates)
+        const createdCustomers = [];
+        let skipped = 0;
+
+        for (const customerData of rows) {
+            try {
+                const [doc, created] = await Customer.findOrCreate({
+                    where: {
+                        businessId: customerData.businessId,
+                        phoneE164: customerData.phoneE164,
+                        userId: customerData.userId
+                    },
+                    defaults: customerData
+                });
+
+                if (created) {
+                    createdCustomers.push(doc);
+                } else {
+                    skipped++;
+                    // Optionally update existing customer
+                    await doc.update({
+                        name: customerData.name ?? doc.name,
+                        tags: customerData.tags.length > 0 ? customerData.tags : doc.tags,
+                        consentAt: customerData.consentAt ?? doc.consentAt
+                    });
+                }
+            } catch (e) {
+                errors.push({
+                    phone: customerData.phoneE164,
+                    error: e.message
+                });
+            }
+        }
+
+        res.status(201).json({
+            success: true,
+            message: "Bulk upload completed",
+            created: createdCustomers.length,
+            skipped,
+            errors: errors.length > 0 ? errors : undefined,
+            customers: createdCustomers
+        });
+
+    } catch (e) {
+        console.error('Bulk upload error:', e);
+        res.status(500).json({ error: "Failed to process bulk upload", details: e.message });
+    }
 };
