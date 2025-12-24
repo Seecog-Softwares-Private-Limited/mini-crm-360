@@ -21,7 +21,7 @@ SET @@SESSION.SQL_LOG_BIN= 0;
 -- GTID state at the beginning of the backup 
 --
 
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ 'bbb87c08-d251-11f0-a94d-c87b0ed70aab:1-231';
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ 'bbb87c08-d251-11f0-a94d-c87b0ed70aab:1-234';
 
 --
 -- Table structure for table `business_addresses`
@@ -81,7 +81,7 @@ CREATE TABLE `businesses` (
   KEY `userId` (`userId`),
   CONSTRAINT `businesses_ibfk_1` FOREIGN KEY (`ownerId`) REFERENCES `users` (`id`),
   CONSTRAINT `businesses_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +90,7 @@ CREATE TABLE `businesses` (
 
 LOCK TABLES `businesses` WRITE;
 /*!40000 ALTER TABLE `businesses` DISABLE KEYS */;
-INSERT INTO `businesses` VALUES (3,'Pet Service','+919064784636','+919064784636','Pet Services in the home',1,'healthcare','Asia/Kolkata','IN','2025-10-12 07:10:31','2025-10-12 07:10:31',NULL),(18,'Home Service','+918974675563','+918765456789','Stella Home Services',1,'other','Asia/Kolkata','IN','2025-10-12 17:29:50','2025-10-12 17:29:50',NULL),(19,'Pet service','+916784637647','+917846376478','Grooming',3,'healthcare','Asia/Kolkata','IN','2025-10-15 08:15:58','2025-10-15 08:15:58',NULL),(20,'pavan','+919346032495','+919346032495','',7,'restaurant','Asia/Kolkata','IN','2025-12-20 11:07:02','2025-12-20 11:07:02',NULL),(23,'apple','+919505332704','+919505332704','',7,'technology','Asia/Kolkata','IN','2025-12-22 11:33:04','2025-12-22 11:33:04',NULL);
+INSERT INTO `businesses` VALUES (3,'Pet Service','+919064784636','+919064784636','Pet Services in the home',1,'healthcare','Asia/Kolkata','IN','2025-10-12 07:10:31','2025-10-12 07:10:31',NULL),(18,'Home Service','+918974675563','+918765456789','Stella Home Services',1,'other','Asia/Kolkata','IN','2025-10-12 17:29:50','2025-10-12 17:29:50',NULL),(19,'Pet service','+916784637647','+917846376478','Grooming',3,'healthcare','Asia/Kolkata','IN','2025-10-15 08:15:58','2025-10-15 08:15:58',NULL),(20,'pavan','+919346032495','+919346032495','',7,'restaurant','Asia/Kolkata','IN','2025-12-20 11:07:02','2025-12-20 11:07:02',NULL),(23,'apple','+919505332704','+919505332704','',7,'technology','Asia/Kolkata','IN','2025-12-22 11:33:04','2025-12-22 11:33:04',NULL),(24,'Seecog softwares private limited','+917857467895','+917857465789','',6,'technology','Asia/Kolkata','IN','2025-12-24 06:51:53','2025-12-24 06:51:53',NULL);
 /*!40000 ALTER TABLE `businesses` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -747,6 +747,53 @@ INSERT INTO `message_logs` VALUES (7,5,4,'+916206992612','wamid.HBgMOTE2MjA2OTky
 UNLOCK TABLES;
 
 --
+-- Table structure for table `plans`
+--
+
+DROP TABLE IF EXISTS `plans`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `plans` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `price` decimal(10,2) NOT NULL DEFAULT '0.00',
+  `yearlyPrice` decimal(10,2) DEFAULT NULL,
+  `currency` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'INR',
+  `billingPeriod` enum('monthly','yearly','lifetime','free') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'monthly',
+  `maxCustomers` int DEFAULT '50',
+  `maxBusinesses` int DEFAULT '1',
+  `maxEmailsPerMonth` int DEFAULT '100',
+  `maxWhatsAppMessagesPerMonth` int DEFAULT '0',
+  `hasEmailTemplates` tinyint(1) NOT NULL DEFAULT '1',
+  `hasWhatsAppTemplates` tinyint(1) NOT NULL DEFAULT '0',
+  `hasInvoice` tinyint(1) NOT NULL DEFAULT '0',
+  `hasAnalytics` tinyint(1) NOT NULL DEFAULT '0',
+  `hasApiAccess` tinyint(1) NOT NULL DEFAULT '0',
+  `hasCustomIntegrations` tinyint(1) NOT NULL DEFAULT '0',
+  `hasPrioritySupport` tinyint(1) NOT NULL DEFAULT '0',
+  `isActive` tinyint(1) NOT NULL DEFAULT '1',
+  `displayOrder` int NOT NULL DEFAULT '0',
+  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_plans_name` (`name`),
+  UNIQUE KEY `uq_plans_slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `plans`
+--
+
+LOCK TABLES `plans` WRITE;
+/*!40000 ALTER TABLE `plans` DISABLE KEYS */;
+INSERT INTO `plans` VALUES (1,'Free','free','For trying out the CRM basics',0.00,NULL,'INR','free',50,1,100,0,1,0,0,0,0,0,0,1,1,'2025-12-24 12:35:46','2025-12-24 12:35:46'),(2,'Starter','starter','For small shops and teams',499.00,4990.00,'INR','monthly',500,1,2000,5000,1,1,0,1,0,0,0,1,2,'2025-12-24 12:35:46','2025-12-24 12:35:46'),(3,'Pro','pro','For growing businesses with analytics',999.00,9990.00,'INR','monthly',NULL,3,10000,20000,1,1,1,1,1,0,1,1,3,'2025-12-24 12:35:46','2025-12-24 12:35:46'),(4,'Enterprise','enterprise','For large organizations with custom needs',2499.00,24990.00,'INR','monthly',NULL,NULL,NULL,NULL,1,1,1,1,1,1,1,1,4,'2025-12-24 12:35:46','2025-12-24 12:35:46');
+/*!40000 ALTER TABLE `plans` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `services`
 --
 
@@ -918,4 +965,4 @@ SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-24 12:16:58
+-- Dump completed on 2025-12-24 13:40:52
