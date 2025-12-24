@@ -970,17 +970,20 @@
       try {
         if (user) {
           localStorage.setItem('user', JSON.stringify(user));
-          console.log('User stored in localStorage');
+          console.log('✅ User stored in localStorage');
         }
         localStorage.setItem('accessToken', tokens.accessToken);
-        console.log('Access token stored in localStorage');
+        console.log('✅ Access token stored in localStorage');
         if (tokens.refreshToken) {
           localStorage.setItem('refreshToken', tokens.refreshToken);
-          console.log('Refresh token stored in localStorage');
+          console.log('✅ Refresh token stored in localStorage');
         }
       } catch (storageError) {
-        console.error('Error storing in localStorage:', storageError);
+        console.error('❌ Error storing in localStorage:', storageError);
         showAlert('Error saving login data. Please try again.', 'danger');
+        loginBtn.disabled = false;
+        loginText.classList.remove('d-none');
+        loadingText.classList.add('d-none');
         return;
       }
 
@@ -996,18 +999,19 @@
       console.log('✅ Redirect URL:', redirectUrl);
       console.log('✅ Current location:', window.location.href);
       
-      // CRITICAL: Execute redirect IMMEDIATELY - don't wait for anything
-      console.log('🚀 REDIRECTING TO:', redirectUrl);
-      console.log('🚀 Current URL:', window.location.href);
-      
-      // Store redirect flag
-      window.loginRedirectInProgress = true;
-      
-      // IMMEDIATE REDIRECT - Use href (most reliable)
-      window.location.href = redirectUrl;
-      
-      // Force stop execution - redirect should happen immediately
-      return false;
+      // IMPORTANT: Wait a tiny bit for cookies to be set by server
+      // Cookies are set via Set-Cookie header, browser needs a moment to process them
+      setTimeout(() => {
+        console.log('🚀 REDIRECTING TO:', redirectUrl);
+        console.log('🚀 Current URL:', window.location.href);
+        console.log('🚀 Cookies should be set by now');
+        
+        // Store redirect flag
+        window.loginRedirectInProgress = true;
+        
+        // Redirect using replace (prevents back button issues)
+        window.location.replace(redirectUrl);
+      }, 100);
 
     } catch (error) {
       console.error('Login error:', error);
