@@ -1,4 +1,5 @@
-<div class="container-fluid vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center"
+  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
   <div class="card shadow-lg" style="width: 100%; max-width: 400px;">
     <div class="card-body p-4">
       <div class="text-center mb-4">
@@ -28,6 +29,21 @@
         </button>
       </form>
 
+      <div class="flex">
+        <a href="/auth/google" class="btn btn-danger w-100 mb-2">
+          <i class="fab fa-google"></i> Continue with Google
+        </a>
+
+        <a href="/auth/facebook" class="btn btn-primary w-100 mb-2">
+          <i class="fab fa-facebook"></i> Continue with Facebook
+        </a>
+
+        <a href="/auth/facebook?provider=instagram" class="btn btn-dark w-100">
+          <i class="fab fa-instagram"></i> Continue with Instagram
+        </a>
+
+      </div>
+
       <div class="text-center">
         <p class="mb-0">Don't have an account? <a href="/register" class="text-decoration-none">Register here</a></p>
         <button type="button" class="btn btn-link btn-sm mt-2" onclick="clearStorage()">Clear Storage & Refresh</button>
@@ -39,7 +55,7 @@
 <script>
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const loginBtn = document.getElementById('loginBtn');
@@ -73,7 +89,7 @@
         return;
       }
 
-      const user   = payload.user || payload.data?.user || null;
+      const user = payload.user || payload.data?.user || null;
       const tokens = payload.tokens || payload.data?.tokens || {};
 
       if (!tokens || !tokens.accessToken) {
@@ -82,8 +98,8 @@
       }
 
       // Store user + token
-      if (user) localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('accessToken', tokens.accessToken);
+      //if (user) localStorage.setItem('user', JSON.stringify(user));
+      //localStorage.setItem('accessToken', tokens.accessToken);
 
       // Success + redirect
       showAlert('Login successful! Redirecting...', 'success');
@@ -115,7 +131,7 @@
   }
 
   // This log is harmless; it does not block redirects
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     window.loginRedirected = false;
     console.log('Login page loaded - auto-redirect disabled to prevent loops');
     const token = localStorage.getItem('accessToken');
@@ -123,7 +139,7 @@
       // Intentionally not auto-redirecting here
     }
   });
-  
+
   function clearStorage() {
     localStorage.clear();
     sessionStorage.clear();

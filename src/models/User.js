@@ -12,6 +12,15 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  provider: {
+    type: DataTypes.ENUM('local', 'google', 'facebook', 'instagram'),
+    allowNull: false,
+    defaultValue: 'local'
+  },
+  providerId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   firstName: {
     type: DataTypes.STRING,
     allowNull: true
@@ -34,7 +43,7 @@ const User = sequelize.define('User', {
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   role: {
     type: DataTypes.ENUM('admin', 'shop_owner', 'shop_manager', 'shop_worker'),
@@ -70,7 +79,7 @@ const User = sequelize.define('User', {
 });
 
 // Instance method
-User.prototype.isPasswordCorrect = async function(password) {
+User.prototype.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 

@@ -8,6 +8,8 @@ import { fileURLToPath } from 'url';
 import { setupSwagger } from './swagger.js';
 import { verifyUser } from './middleware/authMiddleware.js';
 import { renderDashboard } from "./controllers/dashboard.controller.js";
+import passport from "passport";
+import "./config/passport.js"; 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,6 +73,8 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+app.use(passport.initialize());
+
 
 // Debug log
 app.use((req, res, next) => {
@@ -101,11 +105,18 @@ import businessAddressRoutes from './routes/businessAddress.routes.js';
 import emailTemplateRoutes from './routes/emailTemplate.routes.js';
 import { renderEmailTemplatesPage } from './controllers/emailTemplate.controller.js';
 import dashboardRoutes from "./routes/dashboard.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 
 // ---------- Frontend pages ----------
 app.get('/', (req, res) => res.redirect('/login'));
 
-app.get('/login', (req, res) => res.render('login', { title: 'Login' }));
+app.get("/login", (req, res) => {
+  if (req.cookies?.accessToken) {
+    return res.redirect("/dashboard");
+  }
+  res.render("login");
+});
+
 app.get('/register', (req, res) => res.render('register', { title: 'Register' }));
 
 app.get('/dashboard', verifyUser, renderDashboard);
@@ -180,6 +191,7 @@ app.get('/clear-storage', (req, res) => {
 app.use(express.static('public'));
 
 // ---------- API routes ----------
+app.use("/auth", authRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/business', businessRouter);
 
