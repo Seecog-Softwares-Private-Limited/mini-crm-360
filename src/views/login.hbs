@@ -929,42 +929,96 @@
         skipAuth: true
       });
 
+      console.log('Login response:', resObj);
+      console.log('Response type:', typeof resObj);
+      console.log('Response keys:', Object.keys(resObj || {}));
+
       // resObj is already JSON (from main.hbs apiCall)
       const data = resObj || {};
+      
+      // Handle ApiResponse structure: { statusCode, data: { tokens, user }, message, success }
+      // ApiResponse format: { statusCode: 200, data: { tokens: {...}, user: {...} }, message: "...", success: true }
       const payload = data.data || data; // handle ApiResponse or plain
 
-      // If API returned an error shape
-      if (data.error || data.message && !payload.tokens) {
+      console.log('Full response data:', JSON.stringify(data, null, 2));
+      console.log('Payload:', JSON.stringify(payload, null, 2));
+
+      // Check for error - simplified condition
+      if (data.error || data.success === false) {
+        console.error('Login error detected:', data.error || data.message);
         showAlert(data.message || data.error || 'Login failed', 'danger');
         return;
       }
 
-      const user   = payload.user || payload.data?.user || null;
-      const tokens = payload.tokens || payload.data?.tokens || {};
+      // Extract user and tokens from response
+      // Response structure: data.data = { tokens: { accessToken, refreshToken }, user: {...} }
+      const user = payload?.user || null;
+      const tokens = payload?.tokens || {};
+
+      console.log('Extracted tokens:', tokens);
+      console.log('Extracted user:', user);
+      console.log('Has accessToken:', !!tokens?.accessToken);
 
       if (!tokens || !tokens.accessToken) {
-        showAlert('Login failed: no token received', 'danger');
+        console.error('Login response structure:', JSON.stringify(data, null, 2));
+        console.error('Payload structure:', JSON.stringify(payload, null, 2));
+        showAlert('Login failed: no token received. Please check console for details.', 'danger');
         return;
       }
 
-      // Store user + token
-      if (user) localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('accessToken', tokens.accessToken);
+      // Store user + token in localStorage
+      try {
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          console.log('User stored in localStorage');
+        }
+        localStorage.setItem('accessToken', tokens.accessToken);
+        console.log('Access token stored in localStorage');
+        if (tokens.refreshToken) {
+          localStorage.setItem('refreshToken', tokens.refreshToken);
+          console.log('Refresh token stored in localStorage');
+        }
+      } catch (storageError) {
+        console.error('Error storing in localStorage:', storageError);
+        showAlert('Error saving login data. Please try again.', 'danger');
+        return;
+      }
 
-      // Redirect immediately without showing alert
+      console.log('✅ Tokens stored successfully');
+      console.log('✅ Access token:', tokens.accessToken ? 'Present' : 'Missing');
+      console.log('✅ About to redirect to dashboard...');
+
+      // Force redirect - use replace to prevent back button issues
       const url = new URL(location.href);
       const next = url.searchParams.get('next');
-      window.location.replace(next || '/dashboard');
+      const redirectUrl = next || '/dashboard';
+      
+      console.log('✅ Redirect URL:', redirectUrl);
+      console.log('✅ Current location:', window.location.href);
+      
+      // CRITICAL: Execute redirect IMMEDIATELY - don't wait for anything
+      console.log('🚀 REDIRECTING TO:', redirectUrl);
+      console.log('🚀 Current URL:', window.location.href);
+      
+      // Store redirect flag
+      window.loginRedirectInProgress = true;
+      
+      // IMMEDIATE REDIRECT - Use href (most reliable)
+      window.location.href = redirectUrl;
+      
+      // Force stop execution - redirect should happen immediately
+      return false;
 
     } catch (error) {
       console.error('Login error:', error);
+      console.error('Error stack:', error.stack);
       showAlert('Network error. Please try again.', 'danger');
-    } finally {
-      // Hide loading
+      // Re-enable button on error
       loginBtn.disabled = false;
       loginText.classList.remove('d-none');
       loadingText.classList.add('d-none');
     }
+    // Note: No finally block - we don't want to re-enable the button if redirect is happening
   });
 
   function showAlert(message, type) {
@@ -977,13 +1031,15 @@
     `;
   }
 
-  // This log is harmless; it does not block redirects
+  // Prevent auto-redirect on page load to avoid redirect loops
+  // This only affects page load, not the redirect after successful login
   document.addEventListener('DOMContentLoaded', function() {
     window.loginRedirected = false;
-    console.log('Login page loaded - auto-redirect disabled to prevent loops');
+    // Removed console.log to reduce noise - this is normal behavior
     const token = localStorage.getItem('accessToken');
     if (token) {
-      // Intentionally not auto-redirecting here
+      // Intentionally not auto-redirecting here to prevent loops
+      // Redirect after successful login is handled in the form submit handler above
     }
   });
   
@@ -1038,6 +1094,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   // API Configuration - Set from backend based on environment
+  // login.hbs is standalone (layout: false), so we define API_BASE here
   const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
 
   // Helper: detect if current page is login or register

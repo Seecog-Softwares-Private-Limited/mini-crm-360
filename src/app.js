@@ -147,7 +147,8 @@ app.get('/', (req, res) => res.redirect('/login'));
 app.get('/login', (req, res) => {
   res.render('login', { 
     title: 'Login',
-    apiBase: getApiBase()
+    apiBase: getApiBase(),
+    layout: false // login.hbs is standalone, doesn't use main.hbs layout
   });
 });
 
@@ -173,7 +174,7 @@ app.get('/reset-password', (req, res) => {
   });
 });
 
-app.get('/dashboard', verifyUser, renderDashboard);
+// Dashboard route is handled by dashboardRoutes (with verifyUser middleware)
 
 app.get('/customers', verifyUser, (req, res) => {
   const user = {
@@ -273,6 +274,9 @@ app.get('/clear-storage', (req, res) => {
 
 // Static
 app.use(express.static('public'));
+// Serve static files from src/views/public (for CSS and JS files used by views)
+app.use('/css', express.static(path.join(__dirname, 'views/public/css')));
+app.use('/js', express.static(path.join(__dirname, 'views/public/js')));
 // Serve assets from src/assets
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
@@ -308,7 +312,6 @@ app.use('/api/v1/designations', designationsRoutes);
 
 app.use('/api/leave-types', leaveTypesRoutes);
 app.use('/api/leave-requests', leaveRequestsRoutes);
-app.use("/", dashboardRoutes);
 
 
 // HR & Docs

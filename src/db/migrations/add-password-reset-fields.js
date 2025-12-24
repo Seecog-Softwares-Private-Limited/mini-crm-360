@@ -9,26 +9,64 @@ const __dirname = path.dirname(__filename);
 
 export const up = async () => {
   try {
-    const sqlPath = path.join(__dirname, '../../../database/migrations/add_password_reset_fields.sql');
-    const sql = fs.readFileSync(sqlPath, 'utf8');
+    // Check if columns already exist
+    const [results] = await sequelize.query(`
+      SELECT COLUMN_NAME 
+      FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() 
+      AND TABLE_NAME = 'users' 
+      AND COLUMN_NAME IN ('passwordResetToken', 'passwordResetExpires')
+    `);
     
-    // Split SQL by semicolons and execute each statement
-    const statements = sql
-      .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0 && !s.startsWith('--'));
-
-    for (const statement of statements) {
+    const existingColumns = results.map(r => r.COLUMN_NAME);
+    
+    // Add passwordResetToken column if it doesn't exist
+    if (!existingColumns.includes('passwordResetToken')) {
       try {
-        await sequelize.query(statement);
-        console.log('✅ Executed:', statement.substring(0, 50) + '...');
+        await sequelize.query(`
+          ALTER TABLE \`users\` 
+          ADD COLUMN \`passwordResetToken\` VARCHAR(255) NULL AFTER \`refreshTokenExpiresAt\`
+        `);
+        console.log('✅ Added passwordResetToken column');
       } catch (err) {
-        // Ignore "Duplicate column" errors
-        if (err.message && err.message.includes('Duplicate column')) {
-          console.log('⚠️ Column already exists, skipping:', statement.substring(0, 50));
-        } else {
+        if (!err.message.includes('Duplicate column')) {
           throw err;
         }
+        console.log('⚠️ passwordResetToken column already exists');
+      }
+    } else {
+      console.log('⚠️ passwordResetToken column already exists');
+    }
+    
+    // Add passwordResetExpires column if it doesn't exist
+    if (!existingColumns.includes('passwordResetExpires')) {
+      try {
+        await sequelize.query(`
+          ALTER TABLE \`users\` 
+          ADD COLUMN \`passwordResetExpires\` DATETIME NULL AFTER \`passwordResetToken\`
+        `);
+        console.log('✅ Added passwordResetExpires column');
+      } catch (err) {
+        if (!err.message.includes('Duplicate column')) {
+          throw err;
+        }
+        console.log('⚠️ passwordResetExpires column already exists');
+      }
+    } else {
+      console.log('⚠️ passwordResetExpires column already exists');
+    }
+    
+    // Add index on passwordResetToken if it doesn't exist
+    try {
+      await sequelize.query(`
+        CREATE INDEX \`idx_users_password_reset_token\` ON \`users\` (\`passwordResetToken\`)
+      `);
+      console.log('✅ Added index on passwordResetToken');
+    } catch (err) {
+      if (err.message.includes('Duplicate key name') || err.message.includes('already exists')) {
+        console.log('⚠️ Index on passwordResetToken already exists');
+      } else {
+        throw err;
       }
     }
 
