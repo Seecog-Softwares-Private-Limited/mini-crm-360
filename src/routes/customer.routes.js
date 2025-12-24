@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { addCustomer, listCustomers, updateCustomer, deleteCustomer, bulkUploadCustomers } from "../controllers/customer.controllers.js";
+import { addCustomer, listCustomers, updateCustomer, deleteCustomer, bulkUploadCustomers, sendEmailToCustomer } from "../controllers/customer.controllers.js";
 import { verifyUser } from "../middleware/authMiddleware.js";
 
 // Configure multer for file upload (memory storage)
@@ -23,3 +23,4 @@ customerRouter.get("/", verifyUser, listCustomers);
 customerRouter.put("/:id", verifyUser, updateCustomer);
 customerRouter.delete("/:id", verifyUser, deleteCustomer);
 customerRouter.post("/bulk-upload", verifyUser, upload.single('file'), bulkUploadCustomers);
+customerRouter.post("/send-email", verifyUser, sendEmailToCustomer);

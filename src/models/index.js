@@ -16,6 +16,14 @@ import { LeaveRequest } from './LeaveRequest.js';
 
 import DocumentType from './DocumentType.js';
 import EmailTemplate from './EmailTemplate.js';
+import { Plan } from './Plan.js';
+import { UserPlan } from './UserPlan.js';
+import { Task } from './Task.js';
+import { Note } from './Note.js';
+import { LeadForm } from './LeadForm.js';
+import { FormSubmission } from './FormSubmission.js';
+import { UserSession } from './UserSession.js';
+import { ActivityLog } from './ActivityLog.js';
 
 import EmployeeEducation from './EmployeeEducation.js';
 import EmployeeExperience from './EmployeeExperience.js';
@@ -63,6 +71,12 @@ Campaign.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
 ========================================================= */
 Template.hasMany(Campaign, { foreignKey: 'templateId', as: 'campaigns' });
 Campaign.belongsTo(Template, { foreignKey: 'templateId', as: 'template' });
+
+/* =========================================================
+   EMAIL TEMPLATE ↔ CAMPAIGN
+========================================================= */
+EmailTemplate.hasMany(Campaign, { foreignKey: 'emailTemplateId', as: 'campaigns' });
+Campaign.belongsTo(EmailTemplate, { foreignKey: 'emailTemplateId', as: 'emailTemplate' });
 
 /* =========================================================
    MESSAGE LOG RELATIONS
@@ -163,6 +177,63 @@ EmailTemplate.belongsTo(DocumentType, {
 });
 
 /* =========================================================
+   USER ↔ PLAN
+========================================================= */
+User.hasMany(UserPlan, { foreignKey: 'userId', as: 'userPlans' });
+UserPlan.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Plan.hasMany(UserPlan, { foreignKey: 'planId', as: 'userPlans' });
+UserPlan.belongsTo(Plan, { foreignKey: 'planId', as: 'plan' });
+
+/* =========================================================
+   USER ↔ TASK ↔ CUSTOMER
+========================================================= */
+User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
+Task.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Customer.hasMany(Task, { foreignKey: 'customerId', as: 'tasks' });
+Task.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+/* =========================================================
+   USER ↔ NOTE ↔ CUSTOMER (Notes & Timeline)
+========================================================= */
+User.hasMany(Note, { foreignKey: 'userId', as: 'notes' });
+Note.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Customer.hasMany(Note, { foreignKey: 'customerId', as: 'notes' });
+Note.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+User.hasMany(Note, { foreignKey: 'createdBy', as: 'createdNotes' });
+Note.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
+
+/* =========================================================
+   USER ↔ LEAD FORM ↔ BUSINESS
+========================================================= */
+User.hasMany(LeadForm, { foreignKey: 'userId', as: 'leadForms' });
+LeadForm.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Business.hasMany(LeadForm, { foreignKey: 'businessId', as: 'leadForms' });
+LeadForm.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
+
+/* =========================================================
+   LEAD FORM ↔ FORM SUBMISSION ↔ CUSTOMER
+========================================================= */
+LeadForm.hasMany(FormSubmission, { foreignKey: 'formId', as: 'submissions' });
+FormSubmission.belongsTo(LeadForm, { foreignKey: 'formId', as: 'form' });
+
+Customer.hasMany(FormSubmission, { foreignKey: 'customerId', as: 'formSubmissions' });
+FormSubmission.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+/* =========================================================
+   USER ↔ USER SESSION ↔ ACTIVITY LOG
+========================================================= */
+User.hasMany(UserSession, { foreignKey: 'userId', as: 'sessions' });
+UserSession.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+User.hasMany(ActivityLog, { foreignKey: 'userId', as: 'activityLogs' });
+ActivityLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+/* =========================================================
    EXPORT MODELS
 ========================================================= */
 export {
@@ -186,4 +257,12 @@ export {
 
   DocumentType,
   EmailTemplate,
+  Plan,
+  UserPlan,
+  Task,
+  Note,
+  LeadForm,
+  FormSubmission,
+  UserSession,
+  ActivityLog,
 };

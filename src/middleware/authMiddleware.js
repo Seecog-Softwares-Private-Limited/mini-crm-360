@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 
 import { User } from "../models/User.js"
 import { decodeExpUnix, verifyAccessToken } from "../utils/token.util.js"
+import { getUserPlan } from "../utils/plan.util.js"
 
 export const verifyUser = asyncHandler(async (req, res, next) => {
     try {
@@ -32,6 +33,15 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
             } else {
                 throw new ApiError(401, "Invalid Access Token")
             }
+        }
+
+        // Attach user plan information
+        try {
+          const userPlan = await getUserPlan(user.id);
+          user.plan = userPlan; // Attach plan to user object
+        } catch (planError) {
+          console.error('Error fetching user plan:', planError);
+          user.plan = null; // Set to null if error
         }
 
         req.user = user;

@@ -51,18 +51,67 @@ const User = sequelize.define('User', {
   refreshTokenExpiresAt: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  socialId: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  socialProvider: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  passwordResetToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'passwordResetToken'
+  },
+  passwordResetExpires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'passwordResetExpires'
+  },
+  avatar: {
+    type: DataTypes.STRING(500),
+    allowNull: true
+  },
+  phone: {
+    type: DataTypes.STRING(20),
+    allowNull: true
+  },
+  timezone: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    defaultValue: 'Asia/Kolkata'
+  },
+  language: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+    defaultValue: 'en'
+  },
+  notificationPreferences: {
+    type: DataTypes.JSON,
+    allowNull: true
+  },
+  twoFactorEnabled: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
+  twoFactorSecret: {
+    type: DataTypes.STRING(255),
+    allowNull: true
   }
 }, {
   tableName: 'users',
   timestamps: true,
   hooks: {
     beforeCreate: async (user) => {
-      if (user.password) {
+      if (user.password && !user.password.startsWith('social_')) {
         user.password = await bcrypt.hash(user.password, 10);
       }
     },
     beforeUpdate: async (user) => {
-      if (user.changed('password')) {
+      if (user.changed('password') && user.password && !user.password.startsWith('social_')) {
         user.password = await bcrypt.hash(user.password, 10);
       }
     }

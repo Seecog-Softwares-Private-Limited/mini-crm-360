@@ -80,75 +80,544 @@
   </div>
 </div>
 
+<style>
+  /* ============================================
+     PREMIUM CREATE CAMPAIGN MODAL STYLING
+     ============================================ */
+  
+  .premium-campaign-modal .modal-dialog {
+    max-width: 800px;
+  }
+
+  .premium-campaign-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  .premium-campaign-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 1.75rem 2rem;
+    border-bottom: none;
+  }
+
+  .premium-campaign-modal .modal-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .premium-campaign-modal .modal-title i {
+    font-size: 1.25rem;
+  }
+
+  .premium-campaign-modal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+
+  .premium-campaign-modal .btn-close:hover {
+    opacity: 1;
+  }
+
+  .premium-campaign-modal .modal-body {
+    padding: 2rem;
+    background: #ffffff;
+  }
+
+  .premium-campaign-modal .form-label {
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .premium-campaign-modal .form-label i {
+    color: #667eea;
+    font-size: 0.875rem;
+  }
+
+  .premium-campaign-modal .form-label .text-danger {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .premium-campaign-modal .form-control,
+  .premium-campaign-modal .form-select {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: #ffffff;
+  }
+
+  .premium-campaign-modal .form-control:focus,
+  .premium-campaign-modal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .premium-campaign-modal .form-control::placeholder {
+    color: #94a3b8;
+  }
+
+  .premium-campaign-modal textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .premium-campaign-modal .form-text {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .premium-campaign-modal .form-text i {
+    font-size: 0.75rem;
+  }
+
+  .premium-campaign-modal .modal-footer {
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+  }
+
+  .premium-campaign-modal .btn-secondary {
+    background: #e2e8f0;
+    border: none;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .premium-campaign-modal .btn-secondary:hover {
+    background: #cbd5e1;
+    transform: translateY(-1px);
+  }
+
+  .premium-campaign-modal .btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+  }
+
+  .premium-campaign-modal .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
+    color: white;
+  }
+
+  .premium-campaign-modal .btn-success:active {
+    transform: translateY(0);
+  }
+
+  /* Form Section Divider */
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(226, 232, 240, 0.8);
+  }
+
+  /* Customer Selection Area */
+  .customers-selection-area {
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    padding: 1rem;
+    background: #f8fafc;
+    max-height: 280px;
+    overflow-y: auto;
+    transition: all 0.2s ease;
+  }
+
+  .customers-selection-area:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  }
+
+  .customers-selection-area::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .customers-selection-area::-webkit-scrollbar-track {
+    background: rgba(226, 232, 240, 0.5);
+    border-radius: 3px;
+  }
+
+  .customers-selection-area::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 3px;
+  }
+
+  .customers-selection-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 126, 234, 0.5);
+  }
+
+  .select-all-checkbox {
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .select-all-checkbox .form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 4px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    cursor: pointer;
+  }
+
+  .select-all-checkbox .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+
+  .select-all-checkbox .form-check-label {
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    margin-left: 0.5rem;
+  }
+
+  .customer-checkbox-item {
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .customer-checkbox-item:hover {
+    background: rgba(102, 126, 234, 0.05);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateX(4px);
+  }
+
+  .customer-checkbox-item .form-check-input {
+    width: 1.125rem;
+    height: 1.125rem;
+    border-radius: 4px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    cursor: pointer;
+    margin-top: 0.125rem;
+  }
+
+  .customer-checkbox-item .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+
+  .customer-checkbox-item .form-check-label {
+    flex: 1;
+    cursor: pointer;
+    color: #334155;
+    font-size: 0.9rem;
+  }
+
+  .customer-checkbox-item .customer-phone {
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  /* Meta Template Badge */
+  .meta-template-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #475569;
+    margin-top: 0.5rem;
+  }
+
+  .meta-template-badge i {
+    color: #667eea;
+  }
+
+  /* Schedule Type Indicator */
+  .schedule-type-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #059669;
+    margin-top: 0.5rem;
+  }
+
+  .schedule-type-indicator.scheduled {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+  }
+
+  /* Channel Type Indicator */
+  .channel-type-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(37, 211, 102, 0.1);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #059669;
+    margin-top: 0.5rem;
+  }
+
+  .channel-type-indicator.email {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .premium-campaign-modal .modal-body {
+      padding: 1.5rem;
+    }
+
+    .premium-campaign-modal .modal-header {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .premium-campaign-modal .modal-footer {
+      padding: 1rem 1.5rem;
+      flex-direction: column-reverse;
+    }
+
+    .premium-campaign-modal .btn-secondary,
+    .premium-campaign-modal .btn-success {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+  }
+</style>
+
 <!-- Create Campaign Modal -->
-<div class="modal fade" id="createCampaignModal" tabindex="-1" aria-labelledby="createCampaignModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+<div class="modal fade premium-campaign-modal" id="createCampaignModal" tabindex="-1" aria-labelledby="createCampaignModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="createCampaignModalLabel">Create New Campaign</h5>
+        <h5 class="modal-title" id="createCampaignModalLabel">
+          <i class="fas fa-bullhorn"></i>
+          Create New Campaign
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="createCampaignForm">
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="campaignName" class="form-label">Campaign Name *</label>
-              <input type="text" class="form-control" id="campaignName" required />
+          <!-- Basic Information Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-info-circle me-2"></i>Basic Information
             </div>
-            <div class="col-md-6 mb-3">
-              <label for="campaignBusiness" class="form-label">Business *</label>
-              <select class="form-select" id="campaignBusiness" required>
-                <option value="">Select Business</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- META templates only -->
-          <div class="mb-3">
-            <label for="campaignTemplate" class="form-label">Template (Meta) *</label>
-            <select class="form-select" id="campaignTemplate" required title="Loaded from Meta">
-              <option value="">Select Template from Meta</option>
-            </select>
-            <small class="text-muted">Templates are fetched from your Meta account (Graph API).</small>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Select Customers *</label>
-            <div class="border rounded p-3" style="max-height: 220px; overflow-y: auto;">
-              <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="selectAllCustomers" />
-                <label class="form-check-label fw-bold" for="selectAllCustomers">Select All Customers</label>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="campaignName" class="form-label">
+                  <i class="fas fa-tag"></i>
+                  Campaign Name <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="campaignName" placeholder="Summer Sale Campaign" required />
               </div>
-              <div id="customersList">
-                <p class="text-muted">Please select a business first</p>
+              <div class="col-md-6 mb-3">
+                <label for="campaignBusiness" class="form-label">
+                  <i class="fas fa-building"></i>
+                  Business <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" id="campaignBusiness" required>
+                  <option value="">Select Business</option>
+                </select>
+                <small class="form-text">
+                  <i class="fas fa-info-circle"></i>
+                  Select the business for this campaign
+                </small>
               </div>
             </div>
           </div>
 
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="scheduleType" class="form-label">Schedule Type *</label>
-              <select class="form-select" id="scheduleType" onchange="onScheduleTypeChange(this.value)" required>
-                <option value="immediate">Send Immediately</option>
-                <option value="scheduled">Schedule for Later</option>
-              </select>
+          <!-- Channel Selection Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-paper-plane me-2"></i>Channel Selection
             </div>
-            <div class="col-md-6 mb-3" id="scheduleDateTimeGroup" style="display:none;">
-              <label for="scheduleDateTime" class="form-label">Schedule Date & Time *</label>
-              <input type="datetime-local" class="form-control" id="scheduleDateTime" />
+            <div class="mb-3">
+              <label for="campaignChannel" class="form-label">
+                <i class="fas fa-broadcast-tower"></i>
+                Send Via <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="campaignChannel" required onchange="onChannelTypeChange(this.value)">
+                <option value="whatsapp">📱 WhatsApp</option>
+                <option value="email">📧 Email</option>
+              </select>
+              <div class="channel-type-indicator" id="channelIndicator">
+                <i class="fab fa-whatsapp"></i>
+                <span>Campaign will be sent via WhatsApp</span>
+              </div>
             </div>
           </div>
 
-          <div class="mb-3">
-            <label for="campaignDescription" class="form-label">Description</label>
-            <textarea class="form-control" id="campaignDescription" rows="3" placeholder="Optional description for this campaign"></textarea>
+          <!-- Template Selection Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-file-alt me-2"></i>Template Selection
+            </div>
+            <div class="mb-3" id="whatsappTemplateGroup">
+              <label for="campaignTemplate" class="form-label">
+                <i class="fab fa-meta"></i>
+                Meta Template (WhatsApp) <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="campaignTemplate" required title="Loaded from Meta">
+                <option value="">Select Template from Meta</option>
+              </select>
+              <div class="meta-template-badge">
+                <i class="fas fa-cloud-download-alt"></i>
+                <span>Templates are fetched from your Meta account (Graph API)</span>
+              </div>
+            </div>
+            <div class="mb-3" id="emailTemplateGroup" style="display:none;">
+              <label for="campaignEmailTemplate" class="form-label">
+                <i class="fas fa-envelope"></i>
+                Email Template <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="campaignEmailTemplate" title="Select Email Template">
+                <option value="">Select Email Template</option>
+              </select>
+              <div class="meta-template-badge">
+                <i class="fas fa-info-circle"></i>
+                <span>Select an email template for this campaign</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customer Selection Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-users me-2"></i>Customer Selection
+            </div>
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="fas fa-user-check"></i>
+                Select Customers <span class="text-danger">*</span>
+              </label>
+              <div class="customers-selection-area">
+                <div class="select-all-checkbox">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="selectAllCustomers" />
+                    <label class="form-check-label" for="selectAllCustomers">Select All Customers</label>
+                  </div>
+                </div>
+                <div id="customersList">
+                  <p class="text-muted text-center py-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Please select a business first to load customers
+                  </p>
+                </div>
+              </div>
+              <small class="form-text">
+                <i class="fas fa-lightbulb"></i>
+                Select at least one customer to send the campaign to
+              </small>
+            </div>
+          </div>
+
+          <!-- Scheduling Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-clock me-2"></i>Scheduling
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="scheduleType" class="form-label">
+                  <i class="fas fa-calendar-alt"></i>
+                  Schedule Type <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" id="scheduleType" onchange="onScheduleTypeChange(this.value)" required>
+                  <option value="immediate">⚡ Send Immediately</option>
+                  <option value="scheduled">📅 Schedule for Later</option>
+                </select>
+                <div class="schedule-type-indicator" id="scheduleIndicator">
+                  <i class="fas fa-bolt"></i>
+                  <span>Campaign will be sent immediately</span>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3" id="scheduleDateTimeGroup" style="display:none;">
+                <label for="scheduleDateTime" class="form-label">
+                  <i class="fas fa-calendar-check"></i>
+                  Schedule Date & Time <span class="text-danger">*</span>
+                </label>
+                <input type="datetime-local" class="form-control" id="scheduleDateTime" />
+                <small class="form-text">
+                  <i class="fas fa-info-circle"></i>
+                  Select when to send this campaign
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Information Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-align-left me-2"></i>Additional Information
+            </div>
+            <div class="mb-3">
+              <label for="campaignDescription" class="form-label">
+                <i class="fas fa-file-alt"></i>
+                Campaign Description
+              </label>
+              <textarea class="form-control" id="campaignDescription" rows="3" placeholder="Optional description for this campaign (e.g., goals, target audience, etc.)"></textarea>
+              <small class="form-text">
+                <i class="fas fa-lightbulb"></i>
+                Add notes or details about this campaign (optional)
+              </small>
+            </div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-success" id="actionCampaignBtn" onclick="createAndSendCampaign()"><i class="fas fa-paper-plane me-1"></i> Send Now</button>
-        
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-success" id="actionCampaignBtn" onclick="createAndSendCampaign()">
+          <i class="fas fa-paper-plane me-2"></i>Send Now
+        </button>
       </div>
     </div>
   </div>
@@ -241,7 +710,82 @@
   </div>
 </div>
 
+<!-- Premium Notification Container -->
+<div class="premium-notification-container" id="notificationContainer"></div>
+
 <script>
+  // ---- Premium Notification System ----
+  function showPremiumNotification({ type = 'info', title, message, stats = null, duration = 5000 }) {
+    const container = document.getElementById('notificationContainer');
+    if (!container) {
+      // Fallback to alert if container doesn't exist
+      alert(title + ': ' + message);
+      return;
+    }
+
+    const notification = document.createElement('div');
+    notification.className = `premium-notification ${type}${stats ? ' campaign-success-notification' : ''}`;
+    
+    const icons = {
+      success: 'fa-check-circle',
+      error: 'fa-exclamation-circle',
+      warning: 'fa-exclamation-triangle',
+      info: 'fa-info-circle'
+    };
+
+    let statsHTML = '';
+    if (stats) {
+      statsHTML = `
+        <div class="notification-stats">
+          <div class="notification-stat-item">
+            <span class="notification-stat-label">Sent</span>
+            <span class="notification-stat-value success">${stats.sent || 0}</span>
+          </div>
+          <div class="notification-stat-item">
+            <span class="notification-stat-label">Failed</span>
+            <span class="notification-stat-value ${stats.failed > 0 ? 'error' : ''}">${stats.failed || 0}</span>
+          </div>
+          ${stats.total ? `
+          <div class="notification-stat-item">
+            <span class="notification-stat-label">Total</span>
+            <span class="notification-stat-value">${stats.total}</span>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    notification.innerHTML = `
+      <div class="notification-icon-wrapper">
+        <i class="fas ${icons[type] || icons.info}"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-title">${escapeHtml(title || 'Notification')}</div>
+        <div class="notification-message">${escapeHtml(message || '')}</div>
+        ${statsHTML}
+      </div>
+      <button class="notification-close" onclick="this.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="notification-progress-bar"></div>
+    `;
+
+    container.appendChild(notification);
+
+    // Auto remove after duration
+    setTimeout(() => {
+      notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+      setTimeout(() => notification.remove(), 300);
+    }, duration);
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
   // ---- state ----
   let campaigns = [];
   let businesses = [];
@@ -261,7 +805,12 @@
     return respOrJson;
   }
 
-  function getBusinessName(businessId) {
+  function getBusinessName(businessId, campaignBusiness = null) {
+    // First try to use the included business object from the campaign
+    if (campaignBusiness && campaignBusiness.businessName) {
+      return campaignBusiness.businessName;
+    }
+    // Fallback to businesses array
     const b = (businesses || []).find((x) => String(getId(x)) === String(businessId));
     return b ? (b.businessName || 'Business') : 'Unknown';
   }
@@ -273,14 +822,29 @@
 
   // display name of template for a campaign row
   function getCampaignTemplateDisplay(c) {
-    if (c.metaTemplateName) {
-      return `${c.metaTemplateName} (${c.metaTemplateLanguage || 'en_US'})`;
+    // Check channel type
+    const channelType = c.channelType || 'whatsapp';
+    
+    if (channelType === 'email') {
+      // Email template
+      if (c.emailTemplate && c.emailTemplate.templateName) {
+        return `${c.emailTemplate.templateName} (Email)`;
+      }
+      if (c.emailTemplateId) {
+        return `Email Template #${c.emailTemplateId}`;
+      }
+      return '—';
+    } else {
+      // WhatsApp template
+      if (c.metaTemplateName) {
+        return `${c.metaTemplateName} (${c.metaTemplateLanguage || 'en_US'})`;
+      }
+      // local fallback (shouldn't happen now, but safe)
+      if (c.template && (c.template.displayName || c.template.waName)) {
+        return `${c.template.displayName || c.template.waName} (${c.template.category || '—'})`;
+      }
+      return '—';
     }
-    // local fallback (shouldn’t happen now, but safe)
-    if (c.template && (c.template.displayName || c.template.waName)) {
-      return `${c.template.displayName || c.template.waName} (${c.template.category || '—'})`;
-    }
-    return '—';
   }
 
   // ---- data loading ----
@@ -313,6 +877,32 @@
       metaTemplates = [];
       populateMetaTemplateDropdowns();
     }
+  }
+
+  // Load Email Templates
+  async function loadEmailTemplates() {
+    try {
+      const resp = await unwrap(await apiCall('/email-templates'));
+      const templates = Array.isArray(resp) ? resp : (resp?.data || []);
+      const select = document.getElementById('campaignEmailTemplate');
+      if (select) {
+        select.innerHTML = '<option value="">Select Email Template</option>' +
+          templates.map(t => `<option value="${getId(t)}">${escapeHtml(t.templateName || t.name || 'Untitled')}</option>`).join('');
+      }
+    } catch (e) {
+      console.error('loadEmailTemplates', e);
+      const select = document.getElementById('campaignEmailTemplate');
+      if (select) {
+        select.innerHTML = '<option value="">Error loading email templates</option>';
+      }
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
   }
 
   function normalizeMetaTemplates(rows) {
@@ -366,11 +956,23 @@
       return;
     }
     try {
-      customers = await unwrap(await apiCall(`/customers?businessId=${businessId}`)) || [];
+      const response = await unwrap(await apiCall(`/customers?businessId=${businessId}&pageSize=1000`));
+      
+      // Handle paginated response format
+      let customerList = [];
+      if (response && response.success && response.data) {
+        customerList = response.data;
+      } else if (Array.isArray(response)) {
+        customerList = response;
+      } else if (response && (response.data || response.items || response.customers)) {
+        customerList = response.data || response.items || response.customers || [];
+      }
+      
+      customers = customerList;
       displayCustomersForSelection(customers, containerId);
     } catch (e) {
       console.error('loadCustomersForBusiness', e);
-      container.innerHTML = '<p class="text-muted">Error loading customers</p>';
+      container.innerHTML = '<p class="text-muted text-danger"><i class="fas fa-exclamation-circle me-2"></i>Error loading customers. Please try again.</p>';
     }
   }
 
@@ -404,7 +1006,7 @@
       return `
         <tr>
           <td><div><strong>${c.name || 'Untitled'}</strong>${c.description ? `<br><small class="text-muted">${c.description}</small>` : ''}</div></td>
-          <td>${getBusinessName(c.businessId)}</td>
+          <td>${getBusinessName(c.businessId, c.business)}</td>
           <td>${getCampaignTemplateDisplay(c)}</td>
           <td><span class="badge bg-info">${c.recipientCount || 0} recipients</span></td>
           <td><span class="badge bg-${getStatusColor(c.status)}">${c.status || 'draft'}</span></td>
@@ -467,21 +1069,53 @@
     if (!form.checkValidity()) { form.reportValidity(); return; }
 
     const selected = collectSelected('customersList', 'selectAllCustomers');
-    if (selected.length === 0) { alert('Please select at least one customer'); return; }
+    if (selected.length === 0) { 
+      showPremiumNotification({
+        type: 'warning',
+        title: 'No Customers Selected',
+        message: 'Please select at least one customer to send the campaign to.'
+      });
+      return; 
+    }
 
-    const metaTemplate = readSelectedMetaTemplate('campaignTemplate');
-    if (!metaTemplate) { alert('Please select a Meta template'); return; }
+    const channelType = document.getElementById('campaignChannel').value;
+    let template = null;
+
+    if (channelType === 'whatsapp') {
+      template = readSelectedMetaTemplate('campaignTemplate');
+      if (!template) { 
+        showPremiumNotification({
+          type: 'warning',
+          title: 'Template Required',
+          message: 'Please select a Meta template for WhatsApp campaigns.'
+        });
+        return; 
+      }
+    } else if (channelType === 'email') {
+      const emailTemplateId = document.getElementById('campaignEmailTemplate').value;
+      if (!emailTemplateId) { 
+        showPremiumNotification({
+          type: 'warning',
+          title: 'Email Template Required',
+          message: 'Please select an email template for email campaigns.'
+        });
+        return; 
+      }
+      template = { emailTemplateId: coerceId(emailTemplateId) };
+    }
 
     const payload = {
       name: document.getElementById('campaignName').value,
       businessId: coerceId(document.getElementById('campaignBusiness').value),
       customerIds: selected,
+      channelType: channelType,
       scheduleType: document.getElementById('scheduleType').value,
       scheduledAt: document.getElementById('scheduleType').value === 'scheduled'
         ? new Date(document.getElementById('scheduleDateTime').value).toISOString()
         : null,
       description: document.getElementById('campaignDescription').value,
-      metaTemplate // <-- send meta template info
+      metaTemplate: channelType === 'whatsapp' ? template : null,
+      emailTemplate: channelType === 'email' ? template : null
     };
 
     try {
@@ -490,10 +1124,18 @@
       displayCampaigns(campaigns);
       bootstrap.Modal.getInstance(document.getElementById('createCampaignModal'))?.hide();
       form.reset();
-      alert('Campaign created successfully!');
+      showPremiumNotification({
+        type: 'success',
+        title: 'Campaign Created!',
+        message: 'Your campaign has been successfully created.'
+      });
       loadCampaigns();
     } catch (e) {
-      alert('Error creating campaign: ' + e.message);
+      showPremiumNotification({
+        type: 'error',
+        title: 'Campaign Error',
+        message: 'Failed to create campaign: ' + e.message
+      });
     }
   }
 
@@ -501,19 +1143,51 @@
     const form = document.getElementById('createCampaignForm');
     if (!form.checkValidity()) { form.reportValidity(); return; }
     const selected = collectSelected('customersList', 'selectAllCustomers');
-    if (selected.length === 0) { alert('Please select at least one customer'); return; }
+    if (selected.length === 0) { 
+      showPremiumNotification({
+        type: 'warning',
+        title: 'No Customers Selected',
+        message: 'Please select at least one customer to send the campaign to.'
+      });
+      return; 
+    }
     if (!confirm('Send this campaign to all selected customers now?')) return;
 
-    const metaTemplate = readSelectedMetaTemplate('campaignTemplate');
-    if (!metaTemplate) { alert('Please select a Meta template'); return; }
+    const channelType = document.getElementById('campaignChannel').value;
+    let template = null;
+
+    if (channelType === 'whatsapp') {
+      template = readSelectedMetaTemplate('campaignTemplate');
+      if (!template) { 
+        showPremiumNotification({
+          type: 'warning',
+          title: 'Template Required',
+          message: 'Please select a Meta template for WhatsApp campaigns.'
+        });
+        return; 
+      }
+    } else if (channelType === 'email') {
+      const emailTemplateId = document.getElementById('campaignEmailTemplate').value;
+      if (!emailTemplateId) { 
+        showPremiumNotification({
+          type: 'warning',
+          title: 'Email Template Required',
+          message: 'Please select an email template for email campaigns.'
+        });
+        return; 
+      }
+      template = { emailTemplateId: coerceId(emailTemplateId) };
+    }
 
     const payload = {
       name: document.getElementById('campaignName').value,
       businessId: coerceId(document.getElementById('campaignBusiness').value),
       customerIds: selected,
+      channelType: channelType,
       scheduleType: 'immediate',
       description: document.getElementById('campaignDescription').value,
-      metaTemplate
+      metaTemplate: channelType === 'whatsapp' ? template : null,
+      emailTemplate: channelType === 'email' ? template : null
     };
 
     try {
@@ -524,10 +1198,23 @@
       displayCampaigns(campaigns);
       bootstrap.Modal.getInstance(document.getElementById('createCampaignModal'))?.hide();
       form.reset();
-      alert(`Campaign created and sent! Sent: ${result?.stats?.sent ?? 0}, Failed: ${result?.stats?.failed ?? 0}`);
+      showPremiumNotification({
+        type: 'success',
+        title: 'Campaign Created & Sent!',
+        message: 'Your campaign has been successfully created and sent to all selected customers.',
+        stats: {
+          sent: result?.stats?.sent ?? 0,
+          failed: result?.stats?.failed ?? 0,
+          total: (result?.stats?.sent ?? 0) + (result?.stats?.failed ?? 0)
+        }
+      });
       loadCampaigns();
     } catch (e) {
-      alert('Error creating/sending campaign: ' + e.message);
+      showPremiumNotification({
+        type: 'error',
+        title: 'Campaign Error',
+        message: 'Failed to create or send campaign: ' + e.message
+      });
     }
   }
 
@@ -537,7 +1224,13 @@
       const c = await unwrap(await apiCall(`/campaigns/${id}`));
       displayCampaignDetails(c);
       new bootstrap.Modal(document.getElementById('campaignDetailsModal')).show();
-    } catch { alert('Error loading campaign details'); }
+    } catch { 
+      showPremiumNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to load campaign details.'
+      });
+    }
   }
 
   function displayCampaignDetails(c) {
@@ -548,7 +1241,7 @@
           <p><strong>Name:</strong> ${c.name}</p>
           <p><strong>Description:</strong> ${c.description || 'N/A'}</p>
           <p><strong>Status:</strong> <span class="badge bg-${getStatusColor(c.status)}">${c.status}</span></p>
-          <p><strong>Business:</strong> ${getBusinessName(c.businessId)}</p>
+          <p><strong>Business:</strong> ${getBusinessName(c.businessId, c.business)}</p>
           <p><strong>Template:</strong> ${getCampaignTemplateDisplay(c)}</p>
         </div>
         <div class="col-md-6">
@@ -566,7 +1259,13 @@
       const c = await unwrap(await apiCall(`/campaigns/${id}`));
       populateEditForm(c);
       new bootstrap.Modal(document.getElementById('editCampaignModal')).show();
-    } catch { alert('Error loading campaign for editing'); }
+    } catch { 
+      showPremiumNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to load campaign for editing.'
+      });
+    }
   }
 
   function populateEditForm(c) {
@@ -605,11 +1304,25 @@
     if (!form.checkValidity()) { form.reportValidity(); return; }
 
     const selected = collectSelected('editCustomersList', 'editSelectAllCustomers');
-    if (selected.length === 0) { alert('Please select at least one customer'); return; }
+    if (selected.length === 0) { 
+      showPremiumNotification({
+        type: 'warning',
+        title: 'No Customers Selected',
+        message: 'Please select at least one customer to send the campaign to.'
+      });
+      return; 
+    }
 
     const id = document.getElementById('editCampaignId').value;
     const metaTemplate = readSelectedMetaTemplate('editCampaignTemplate');
-    if (!metaTemplate) { alert('Please select a Meta template'); return; }
+    if (!metaTemplate) { 
+      showPremiumNotification({
+        type: 'warning',
+        title: 'Template Required',
+        message: 'Please select a Meta template.'
+      });
+      return; 
+    }
 
     const payload = {
       name: document.getElementById('editCampaignName').value,
@@ -628,10 +1341,18 @@
       campaigns = (campaigns || []).map(c => String(getId(c)) === String(id) ? data : c);
       displayCampaigns(campaigns);
       bootstrap.Modal.getInstance(document.getElementById('editCampaignModal'))?.hide();
-      alert('Campaign updated successfully!');
+      showPremiumNotification({
+        type: 'success',
+        title: 'Campaign Updated!',
+        message: 'Your campaign has been successfully updated.'
+      });
       loadCampaigns();
     } catch (e) {
-      alert('Error updating campaign: ' + e.message);
+      showPremiumNotification({
+        type: 'error',
+        title: 'Update Error',
+        message: 'Failed to update campaign: ' + e.message
+      });
     }
   }
 
@@ -643,9 +1364,17 @@
       if (!ok) throw new Error(await resp.text());
       campaigns = (campaigns || []).filter(c => String(getId(c)) !== String(id));
       displayCampaigns(campaigns);
-      alert('Campaign deleted successfully!');
+      showPremiumNotification({
+        type: 'success',
+        title: 'Campaign Deleted!',
+        message: 'The campaign has been successfully deleted.'
+      });
     } catch (e) {
-      alert('Error deleting campaign: ' + e.message);
+      showPremiumNotification({
+        type: 'error',
+        title: 'Delete Error',
+        message: 'Failed to delete campaign: ' + e.message
+      });
     }
   }
 
@@ -653,10 +1382,23 @@
     if (!confirm('Send this campaign now?')) return;
     try {
       const result = await unwrap(await apiCall(`/campaigns/${id}/send`, { method: 'POST' }));
-      alert(`Campaign sent! Sent: ${result?.stats?.sent ?? 0}, Failed: ${result?.stats?.failed ?? 0}`);
+      showPremiumNotification({
+        type: 'success',
+        title: 'Campaign Sent!',
+        message: 'Your campaign has been successfully sent to all selected customers.',
+        stats: {
+          sent: result?.stats?.sent ?? 0,
+          failed: result?.stats?.failed ?? 0,
+          total: (result?.stats?.sent ?? 0) + (result?.stats?.failed ?? 0)
+        }
+      });
       loadCampaigns();
     } catch (e) {
-      alert('Error sending campaign: ' + e.message);
+      showPremiumNotification({
+        type: 'error',
+        title: 'Send Error',
+        message: 'Failed to send campaign: ' + e.message
+      });
     }
   }
 
@@ -669,6 +1411,10 @@
     document.getElementById('campaignBusiness').addEventListener('change', function () {
       document.getElementById('selectAllCustomers').checked = false;
       loadCustomersForBusiness(this.value, 'customersList');
+    });
+
+    document.getElementById('campaignChannel')?.addEventListener('change', function () {
+      onChannelTypeChange(this.value);
     });
     document.getElementById('editCampaignBusiness').addEventListener('change', function () {
       document.getElementById('editSelectAllCustomers').checked = false;
@@ -696,6 +1442,9 @@
     document.getElementById('createCampaignModal').addEventListener('shown.bs.modal', () => {
       const val = document.getElementById('campaignBusiness').value;
       if (val) loadCustomersForBusiness(val, 'customersList');
+      // Initialize channel type
+      const channelType = document.getElementById('campaignChannel').value || 'whatsapp';
+      onChannelTypeChange(channelType);
     });
     document.getElementById('editCampaignModal').addEventListener('shown.bs.modal', () => {
       const val = document.getElementById('editCampaignBusiness').value;
@@ -708,18 +1457,60 @@
     loadCampaigns();
     loadBusinesses();
     loadMetaTemplates();  // <- Meta templates!
+    loadEmailTemplates(); // <- Email templates!
     setupEventListeners();
   });
+
+  function onChannelTypeChange(value) {
+    const whatsappGroup = document.getElementById('whatsappTemplateGroup');
+    const emailGroup = document.getElementById('emailTemplateGroup');
+    const whatsappTemplate = document.getElementById('campaignTemplate');
+    const emailTemplate = document.getElementById('campaignEmailTemplate');
+    const channelIndicator = document.getElementById('channelIndicator');
+
+    if (value === 'whatsapp') {
+      // Show WhatsApp template, hide email template
+      if (whatsappGroup) whatsappGroup.style.display = 'block';
+      if (emailGroup) emailGroup.style.display = 'none';
+      if (whatsappTemplate) whatsappTemplate.required = true;
+      if (emailTemplate) emailTemplate.required = false;
+
+      // Update channel indicator
+      if (channelIndicator) {
+        channelIndicator.className = 'channel-type-indicator';
+        channelIndicator.innerHTML = '<i class="fab fa-whatsapp"></i><span>Campaign will be sent via WhatsApp</span>';
+      }
+    } else if (value === 'email') {
+      // Show email template, hide WhatsApp template
+      if (whatsappGroup) whatsappGroup.style.display = 'none';
+      if (emailGroup) emailGroup.style.display = 'block';
+      if (whatsappTemplate) whatsappTemplate.required = false;
+      if (emailTemplate) emailTemplate.required = true;
+
+      // Update channel indicator
+      if (channelIndicator) {
+        channelIndicator.className = 'channel-type-indicator email';
+        channelIndicator.innerHTML = '<i class="fas fa-envelope"></i><span>Campaign will be sent via Email</span>';
+      }
+    }
+  }
 
   function onScheduleTypeChange(value) {
   const dateGroup = document.getElementById('scheduleDateTimeGroup');
   const dateInput = document.getElementById('scheduleDateTime');
   const actionBtn = document.getElementById('actionCampaignBtn');
+  const scheduleIndicator = document.getElementById('scheduleIndicator');
 
   if (value === 'scheduled') {
     // show date & time
     dateGroup.style.display = 'block';
     dateInput.required = true;
+
+    // Update schedule indicator
+    if (scheduleIndicator) {
+      scheduleIndicator.className = 'schedule-type-indicator scheduled';
+      scheduleIndicator.innerHTML = '<i class="fas fa-calendar-check"></i><span>Campaign will be scheduled for later</span>';
+    }
 
     // switch to Schedule
     actionBtn.innerHTML = '<i class="fas fa-clock me-1"></i>Schedule Now';
@@ -728,9 +1519,16 @@
     // hide date & time
     dateGroup.style.display = 'none';
     dateInput.required = false;
+    dateInput.value = '';
+
+    // Update schedule indicator
+    if (scheduleIndicator) {
+      scheduleIndicator.className = 'schedule-type-indicator';
+      scheduleIndicator.innerHTML = '<i class="fas fa-bolt"></i><span>Campaign will be sent immediately</span>';
+    }
 
     // switch to Send
-    actionBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Send Now';
+    actionBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Send Now';
     actionBtn.onclick = createAndSendCampaign;
   }
 }

@@ -1,0 +1,598 @@
+<div class="container-fluid">
+  <div class="row">
+    {{> sidebar}}
+
+    <div class="col-md-9 col-lg-10 main-content">
+      <div class="container-fluid p-4">
+        <style>
+          .main-content {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            position: relative;
+          }
+
+          .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+              radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+          }
+
+          .container-fluid.p-4 {
+            position: relative;
+          }
+
+          .forms-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+          }
+
+          .forms-header h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 2.5rem;
+          }
+
+          .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+          }
+
+          .form-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+          }
+
+          .form-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+          }
+
+          .form-card-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #1f2937;
+          }
+
+          .form-card-actions {
+            display: flex;
+            gap: 0.5rem;
+          }
+
+          .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+
+          .btn-action.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+          }
+
+          .btn-action.secondary {
+            background: #f3f4f6;
+            color: #64748b;
+          }
+
+          .btn-action.danger {
+            background: #fee2e2;
+            color: #dc2626;
+          }
+
+          .form-meta {
+            display: flex;
+            gap: 1.5rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+          }
+
+          .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+
+          .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+          }
+
+          .status-badge.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+          }
+
+          .premium-modal .modal-content {
+            border-radius: 24px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+          }
+
+          .premium-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+          }
+
+          .premium-modal .modal-body {
+            padding: 2rem;
+          }
+
+          .premium-modal .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+          }
+
+          .premium-modal .form-control {
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+          }
+
+          .premium-modal .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+          }
+
+          .field-builder {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+          }
+
+          .field-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .field-item:hover {
+            border-color: #667eea;
+          }
+
+          .embed-code-box {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin-top: 0.5rem;
+          }
+        </style>
+
+        <!-- Header -->
+        <div class="forms-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2><i class="fas fa-wpforms me-2"></i>Lead Capture Forms</h2>
+              <p class="mb-0 mt-2 opacity-90">Create forms to capture leads from your website</p>
+            </div>
+            <button class="btn btn-light btn-lg" onclick="showCreateFormModal()">
+              <i class="fas fa-plus me-2"></i>Create Form
+            </button>
+          </div>
+        </div>
+
+        <!-- Forms List -->
+        <div id="formsList">
+          <div class="text-center p-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 text-muted">Loading forms...</p>
+          </div>
+        </div>
+
+        <!-- Create/Edit Form Modal -->
+        <div class="modal fade premium-modal" id="formModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="formModalTitle">
+                  <i class="fas fa-wpforms me-2"></i>Create Lead Form
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <form id="formForm">
+                  <input type="hidden" id="formId" name="id">
+                  
+                  <div class="mb-3">
+                    <label class="form-label">Form Name *</label>
+                    <input type="text" class="form-control" id="formName" name="name" required>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="formDescription" name="description" rows="2"></textarea>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Success Message</label>
+                    <input type="text" class="form-control" id="formSuccessMessage" name="successMessage" value="Thank you! We will contact you soon.">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Redirect URL (Optional)</label>
+                    <input type="url" class="form-control" id="formRedirectUrl" name="redirectUrl" placeholder="https://example.com/thank-you">
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Form Fields</label>
+                    <div class="field-builder" id="fieldsBuilder">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong>Default Fields:</strong>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addField()">
+                          <i class="fas fa-plus"></i> Add Field
+                        </button>
+                      </div>
+                      <div id="fieldsList">
+                        <!-- Fields will be added here -->
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveForm()">
+                  <i class="fas fa-save me-2"></i>Save Form
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Embed Code Modal -->
+        <div class="modal fade premium-modal" id="embedModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  <i class="fas fa-code me-2"></i>Embed Code
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label">Hosted Link</label>
+                  <input type="text" class="form-control" id="hostedUrl" readonly>
+                  <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyToClipboard('hostedUrl')">
+                    <i class="fas fa-copy"></i> Copy Link
+                  </button>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Embed Code (iframe)</label>
+                  <div class="embed-code-box" id="embedCode"></div>
+                  <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyToClipboard('embedCode')">
+                    <i class="fas fa-copy"></i> Copy Code
+                  </button>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+  let allForms = [];
+  let fieldCounter = 0;
+
+  // Default fields
+  const defaultFields = [
+    { type: 'name', name: 'name', label: 'Full Name', required: true },
+    { type: 'email', name: 'email', label: 'Email', required: true },
+    { type: 'phone', name: 'phone', label: 'Phone', required: true },
+    { type: 'message', name: 'message', label: 'Message', required: false }
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadForms();
+    initializeFieldsBuilder();
+  });
+
+  function initializeFieldsBuilder() {
+    defaultFields.forEach(field => {
+      addFieldToBuilder(field);
+    });
+  }
+
+  function addField() {
+    addFieldToBuilder({ type: 'text', name: `field_${fieldCounter++}`, label: 'New Field', required: false });
+  }
+
+  function addFieldToBuilder(field) {
+    const fieldsList = document.getElementById('fieldsList');
+    const fieldDiv = document.createElement('div');
+    fieldDiv.className = 'field-item';
+    fieldDiv.dataset.fieldId = field.name;
+    
+    fieldDiv.innerHTML = `
+      <div style="flex: 1;">
+        <select class="form-select form-select-sm mb-2" onchange="updateFieldType(this, '${field.name}')">
+          <option value="name" ${field.type === 'name' ? 'selected' : ''}>Name</option>
+          <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
+          <option value="phone" ${field.type === 'phone' ? 'selected' : ''}>Phone</option>
+          <option value="message" ${field.type === 'message' ? 'selected' : ''}>Message</option>
+          <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
+        </select>
+        <input type="text" class="form-control form-control-sm" value="${field.label}" placeholder="Field Label" onchange="updateFieldLabel(this, '${field.name}')">
+      </div>
+      <div class="ms-2">
+        <button class="btn btn-sm btn-danger" onclick="removeField('${field.name}')">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    `;
+    
+    fieldsList.appendChild(fieldDiv);
+  }
+
+  function updateFieldType(select, fieldName) {
+    const fieldItem = select.closest('.field-item');
+    fieldItem.dataset.fieldType = select.value;
+  }
+
+  function updateFieldLabel(input, fieldName) {
+    const fieldItem = input.closest('.field-item');
+    fieldItem.dataset.fieldLabel = input.value;
+  }
+
+  function removeField(fieldName) {
+    const fieldItem = document.querySelector(`[data-field-id="${fieldName}"]`);
+    if (fieldItem) {
+      fieldItem.remove();
+    }
+  }
+
+  function getFieldsFromBuilder() {
+    const fields = [];
+    document.querySelectorAll('.field-item').forEach(item => {
+      const type = item.querySelector('select').value;
+      const label = item.querySelector('input').value || 'Field';
+      const name = item.dataset.fieldId || type;
+      fields.push({
+        type,
+        name,
+        label,
+        required: type === 'phone' || type === 'email' || type === 'name'
+      });
+    });
+    return fields;
+  }
+
+  async function loadForms() {
+    try {
+      const response = await fetch(`${API_BASE}/lead-forms`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        allForms = result.data || [];
+        displayForms(allForms);
+      }
+    } catch (error) {
+      console.error('Error loading forms:', error);
+    }
+  }
+
+  function displayForms(forms) {
+    const container = document.getElementById('formsList');
+    
+    if (forms.length === 0) {
+      container.innerHTML = `
+        <div class="text-center p-5">
+          <i class="fas fa-wpforms" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+          <h4>No forms yet</h4>
+          <p class="text-muted">Create your first lead capture form to start collecting leads</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = forms.map(form => {
+      const nodeEnv = '{{nodeEnv}}' || 'development';
+      const productionUrl = '{{productionUrl}}' || 'https://petserviceinhome.com';
+      const developmentUrl = '{{developmentUrl}}' || 'http://localhost:3002';
+      const baseUrl = (nodeEnv === 'prod' || nodeEnv === 'production') ? productionUrl : developmentUrl;
+      const formUrl = `${baseUrl}/forms/${form.slug}`;
+
+      return `
+        <div class="form-card">
+          <div class="form-card-header">
+            <div>
+              <div class="form-card-title">${escapeHtml(form.name)}</div>
+              <div class="form-meta mt-2">
+                <span><i class="fas fa-link"></i> ${formUrl}</span>
+                <span class="status-badge ${form.isActive ? 'active' : 'inactive'}">
+                  ${form.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+            </div>
+            <div class="form-card-actions">
+              <button class="btn-action primary" onclick="showEmbedModal(${form.id})">
+                <i class="fas fa-code"></i> Embed
+              </button>
+              <button class="btn-action secondary" onclick="editForm(${form.id})">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn-action danger" onclick="deleteForm(${form.id})">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+          ${form.description ? `<p class="text-muted mb-0">${escapeHtml(form.description)}</p>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function showCreateFormModal() {
+    document.getElementById('formForm').reset();
+    document.getElementById('formId').value = '';
+    document.getElementById('formModalTitle').innerHTML = '<i class="fas fa-wpforms me-2"></i>Create Lead Form';
+    document.getElementById('fieldsList').innerHTML = '';
+    initializeFieldsBuilder();
+    new bootstrap.Modal(document.getElementById('formModal')).show();
+  }
+
+  async function editForm(id) {
+    const form = allForms.find(f => f.id === id);
+    if (!form) return;
+
+    document.getElementById('formId').value = form.id;
+    document.getElementById('formName').value = form.name;
+    document.getElementById('formDescription').value = form.description || '';
+    document.getElementById('formSuccessMessage').value = form.successMessage || 'Thank you! We will contact you soon.';
+    document.getElementById('formRedirectUrl').value = form.redirectUrl || '';
+    document.getElementById('formModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Lead Form';
+    
+    document.getElementById('fieldsList').innerHTML = '';
+    (form.fields || defaultFields).forEach(field => {
+      addFieldToBuilder(field);
+    });
+    
+    new bootstrap.Modal(document.getElementById('formModal')).show();
+  }
+
+  async function saveForm() {
+    const form = document.getElementById('formForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const formId = document.getElementById('formId').value;
+    const formData = {
+      name: document.getElementById('formName').value,
+      description: document.getElementById('formDescription').value,
+      successMessage: document.getElementById('formSuccessMessage').value,
+      redirectUrl: document.getElementById('formRedirectUrl').value,
+      fields: getFieldsFromBuilder()
+    };
+
+    const method = formId ? 'PUT' : 'POST';
+    const url = formId ? `${API_BASE}/lead-forms/${formId}` : `${API_BASE}/lead-forms`;
+
+    try {
+      const response = await fetch(url, {
+        method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('formModal')).hide();
+        loadForms();
+      } else {
+        alert(result.message || 'Failed to save form');
+      }
+    } catch (error) {
+      console.error('Error saving form:', error);
+      alert('Failed to save form. Please try again.');
+    }
+  }
+
+  async function deleteForm(id) {
+    if (!confirm('Are you sure you want to delete this form?')) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/lead-forms/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        loadForms();
+      } else {
+        alert(result.message || 'Failed to delete form');
+      }
+    } catch (error) {
+      console.error('Error deleting form:', error);
+      alert('Failed to delete form. Please try again.');
+    }
+  }
+
+  async function showEmbedModal(id) {
+    try {
+      const response = await fetch(`${API_BASE}/lead-forms/${id}/embed?type=iframe`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        document.getElementById('hostedUrl').value = result.hostedUrl;
+        document.getElementById('embedCode').textContent = result.embedCode;
+        new bootstrap.Modal(document.getElementById('embedModal')).show();
+      }
+    } catch (error) {
+      console.error('Error loading embed code:', error);
+    }
+  }
+
+  function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    const text = elementId === 'embedCode' ? element.textContent : element.value;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copied to clipboard!');
+    });
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>
+
