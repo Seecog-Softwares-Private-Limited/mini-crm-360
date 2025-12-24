@@ -7,12 +7,20 @@ import { getUserPlan } from "../utils/plan.util.js"
 
 export const verifyUser = asyncHandler(async (req, res, next) => {
     try {
-        const token = req.cookies?.accessToken || req.header
-            ("Authorization")?.replace(/^Bearer\s+/i, "").trim();
+        // Check for token in cookies first, then Authorization header
+        const cookieToken = req.cookies?.accessToken;
+        const headerToken = req.headers["authorization"] || req.headers["Authorization"];
+        const bearerToken = headerToken?.replace(/^Bearer\s+/i, "").trim();
+        const token = cookieToken || bearerToken;
+
+        console.log('Auth check - Cookies:', req.cookies);
+        console.log('Auth check - Token found:', !!token);
+        console.log('Auth check - Token source:', cookieToken ? 'cookie' : (bearerToken ? 'header' : 'none'));
 
         if (!token) {
             // Check if this is a frontend request (HTML) or API request (JSON)
             if (req.accepts('html')) {
+                console.log('No token found, redirecting to login');
                 return res.redirect('/login');
             } else {
                 throw new ApiError(401, "Unauthorized request")
@@ -68,8 +76,11 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
 
 export const verifyOwner = asyncHandler(async (req, res, next) => {
     try {
-        const token = req.cookies?.accessToken || req.header
-            ("Authorization")?.replace(/^Bearer\s+/i, "").trim();
+        // Check for token in cookies first, then Authorization header
+        const cookieToken = req.cookies?.accessToken;
+        const headerToken = req.headers["authorization"] || req.headers["Authorization"];
+        const bearerToken = headerToken?.replace(/^Bearer\s+/i, "").trim();
+        const token = cookieToken || bearerToken;
 
         if (!token) {
             // Check if this is a frontend request (HTML) or API request (JSON)

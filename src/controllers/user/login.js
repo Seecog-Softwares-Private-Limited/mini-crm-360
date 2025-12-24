@@ -64,35 +64,66 @@ export const loginUser = asyncHandler(async (req, res) => {
           else if (userAgent.includes('Edge')) browserInfo = 'Edge';
         }
 
-        await UserSession.create({
-          userId: user.id,
-          sessionToken: hashToken(sessionToken),
-          deviceInfo,
-          browserInfo,
-          ipAddress,
-          isActive: true
-        });
+        try {
+          await UserSession.create({
+            userId: user.id,
+            sessionToken: hashToken(sessionToken),
+            deviceInfo,
+            browserInfo,
+            ipAddress,
+            isActive: true
+          });
+        } catch (sessionError) {
+          console.error('Error creating session:', sessionError);
+          // Don't fail login if session creation fails
+        }
 
         // Log activity
-        await ActivityLog.create({
-          userId: user.id,
-          action: 'login',
-          description: 'User logged in',
-          ipAddress,
-          userAgent
-        });
+        try {
+          await ActivityLog.create({
+            userId: user.id,
+            action: 'login',
+            description: 'User logged in',
+            ipAddress,
+            userAgent
+          });
+        } catch (logError) {
+          console.error('Error logging activity:', logError);
+          // Don't fail login if activity logging fails
+        }
 
+        // Prepare user data for response (exclude sensitive fields)
+        const userData = {
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar || user.avatarUrl || null,
+          plan: null // Will be fetched on dashboard if needed
+        };
+
+        // Cookie options - for production, use secure and sameSite: 'lax' (same-origin)
+        // For cross-origin, use 'none', but since API and frontend are same domain, 'lax' is fine
+        const isProduction = process.env.NODE_ENV === "production" || process.env.NODE_ENV === "prod";
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production"
+            secure: isProduction,
+            sameSite: "lax", // Same domain, so 'lax' is fine
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            path: '/', // Ensure cookies are available for all paths
+            domain: undefined // Don't set domain - let browser use current domain
         }
+        
+        console.log('🍪 Setting cookies with options:', JSON.stringify(options, null, 2));
+        console.log('🍪 Cookie domain will be:', req.headers.host);
 
         return res
             .status(200)
             .cookie("accessToken", accessToken, options)
             .cookie("refreshToken", refreshToken, options)
             .cookie("sessionToken", sessionToken, options)
-            .json(new ApiResponse(200, { tokens: { accessToken, refreshToken }, user }, "Login Successful"))
+            .json(new ApiResponse(200, { tokens: { accessToken, refreshToken }, user: userData }, "Login Successful"))
 
     } catch (err) {
         res.status(500).json({ message: "Server error", error: err.message });
