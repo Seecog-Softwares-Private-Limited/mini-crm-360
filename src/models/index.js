@@ -25,6 +25,21 @@ import { FormSubmission } from './FormSubmission.js';
 import { UserSession } from './UserSession.js';
 import { ActivityLog } from './ActivityLog.js';
 
+// Billing models - define locally to avoid circular dependency
+// The actual models are in src/billing/store/SequelizeStore.js
+// We re-export them here for convenience
+let PaymentLog, Invoice, WebhookLog, Subscription, RazorpayPlanMapping;
+try {
+  const billingModels = await import('../billing/store/SequelizeStore.js');
+  PaymentLog = billingModels.PaymentLog;
+  Invoice = billingModels.Invoice;
+  WebhookLog = billingModels.WebhookLog;
+  Subscription = billingModels.Subscription;
+  RazorpayPlanMapping = billingModels.RazorpayPlanMapping;
+} catch (e) {
+  console.warn('Billing models not available:', e.message);
+}
+
 import EmployeeEducation from './EmployeeEducation.js';
 import EmployeeExperience from './EmployeeExperience.js';
 import EmployeeDocument from './EmployeeDocument.js';
@@ -234,6 +249,30 @@ User.hasMany(ActivityLog, { foreignKey: 'userId', as: 'activityLogs' });
 ActivityLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 /* =========================================================
+   BILLING: USER ↔ INVOICE, PAYMENT LOG, SUBSCRIPTION
+   (Only set up if billing models are available)
+========================================================= */
+if (Invoice && PaymentLog && Subscription && RazorpayPlanMapping) {
+  User.hasMany(Invoice, { foreignKey: 'userId', as: 'invoices' });
+  Invoice.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+  Plan.hasMany(Invoice, { foreignKey: 'planId', as: 'invoices' });
+  Invoice.belongsTo(Plan, { foreignKey: 'planId', as: 'plan' });
+
+  User.hasMany(PaymentLog, { foreignKey: 'userId', as: 'paymentLogs' });
+  PaymentLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+  User.hasMany(Subscription, { foreignKey: 'userId', as: 'subscriptions' });
+  Subscription.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+  Plan.hasMany(Subscription, { foreignKey: 'planId', as: 'subscriptions' });
+  Subscription.belongsTo(Plan, { foreignKey: 'planId', as: 'plan' });
+
+  Plan.hasOne(RazorpayPlanMapping, { foreignKey: 'planId', as: 'razorpayMapping' });
+  RazorpayPlanMapping.belongsTo(Plan, { foreignKey: 'planId', as: 'plan' });
+}
+
+/* =========================================================
    EXPORT MODELS
 ========================================================= */
 export {
@@ -265,4 +304,11 @@ export {
   FormSubmission,
   UserSession,
   ActivityLog,
+  
+  // Billing models
+  PaymentLog,
+  Invoice,
+  WebhookLog,
+  Subscription,
+  RazorpayPlanMapping,
 };

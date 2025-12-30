@@ -57,7 +57,11 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   },
   dialectOptions: {
     charset: "utf8mb4",
+    // Use local timezone for date/time
+    timezone: '+05:30',
   },
+  // Use local timezone
+  timezone: '+05:30',
   define: {
     charset: "utf8mb4",
     collate: "utf8mb4_unicode_ci",
@@ -73,6 +77,10 @@ const connectDB = async () => {
     // connect
     await sequelize.authenticate();
     console.log("✅ Database connected");
+
+    // Set session timezone to IST
+    await sequelize.query("SET time_zone = '+05:30'");
+    console.log("✅ Timezone set to IST (+05:30)");
 
     // ✅ confirm which DB you are actually using
     const [rows] = await sequelize.query("SELECT DATABASE() as db");
