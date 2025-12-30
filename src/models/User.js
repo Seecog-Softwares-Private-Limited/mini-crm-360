@@ -11,7 +11,7 @@ const User = sequelize.define(
       autoIncrement: true,
     },
     avatarUrl: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(2048),
       allowNull: true,
     },
     provider: {
@@ -75,7 +75,7 @@ const User = sequelize.define(
       field: "passwordResetExpires",
     },
     avatar: {
-      type: DataTypes.STRING(500),
+      type: DataTypes.STRING(2048),
       allowNull: true,
     },
     phone: {
