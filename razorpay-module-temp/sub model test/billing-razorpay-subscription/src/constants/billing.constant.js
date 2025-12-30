@@ -1,7 +1,0 @@
-export const BILLING_STATUS = Object.freeze({
-  PENDING: "PENDING",
-  ACTIVE: "ACTIVE",
-  PAST_DUE: "PAST_DUE",
-  CANCELLED: "CANCELLED",
-  EXPIRED: "EXPIRED"
-});
