@@ -1,4 +1,381 @@
-<div class="container-fluid">
+<style>
+  /* ============================================
+     PREMIUM MY BUSINESSES PAGE STYLING
+     ============================================ */
+  
+  .businesses-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  .main-content {
+    background: transparent;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-title::before {
+    content: '';
+    width: 4px;
+    height: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+  }
+
+  .page-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Premium Button */
+  .btn-premium {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  /* Search and Filter Section */
+  .search-filter-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .search-filter-section .form-control,
+  .search-filter-section .form-select {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .search-filter-section .form-control:focus,
+  .search-filter-section .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .search-filter-section .input-group-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .search-filter-section .btn-outline-secondary {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .search-filter-section .btn-outline-secondary:hover {
+    background: #f1f5f9;
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  /* Premium Business Cards */
+  .business-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .business-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .business-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+
+  .business-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .business-card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .business-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .business-title-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .business-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.5rem 0;
+    word-wrap: break-word;
+  }
+
+  .business-category-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .business-card-body {
+    padding: 1.5rem;
+    flex: 1;
+  }
+
+  .business-description {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    min-height: 3rem;
+  }
+
+  .business-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .business-info-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .business-info-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+
+  .business-info-value {
+    font-size: 0.9rem;
+    color: #334155;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .business-info-value i {
+    color: #667eea;
+    font-size: 0.875rem;
+  }
+
+  .business-location {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  .business-location i {
+    color: #667eea;
+  }
+
+  .business-card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    background: rgba(248, 250, 252, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .business-date {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .business-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-business-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn-business-action.more {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+  }
+
+  .btn-business-action.more:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.1);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed rgba(226, 232, 240, 0.8);
+  }
+
+  .empty-state-icon {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state-text {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .empty-state-subtext {
+    color: #94a3b8;
+    font-size: 0.9rem;
+  }
+
+  /* Loading State */
+  .loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid rgba(102, 126, 234, 0.2);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Dropdown Menu */
+  .dropdown-menu {
+    border-radius: 10px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+  }
+
+  .dropdown-item {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .dropdown-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .business-info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="container-fluid businesses-container">
     <div class="row">
         <!-- Sidebar -->
         {{> sidebar}}
@@ -6,46 +383,55 @@
         <!-- Main Content -->
         <div class="col-md-9 col-lg-10">
             <div class="main-content p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2>My Businesses</h2>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBusinessModal">
-                        <i class="fas fa-plus me-2"></i>Add Business
-                    </button>
-                </div>
-
-                <!-- Search and Filter -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="searchInput" placeholder="Search businesses...">
-                            <button class="btn btn-outline-secondary" type="button" onclick="searchBusinesses()">
-                                <i class="fas fa-search"></i>
-                            </button>
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <h1 class="page-title">My Businesses</h1>
+                            <p class="page-subtitle">Manage and organize all your business profiles in one place</p>
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <select class="form-select" id="categoryFilter" onchange="filterByCategory()">
-                            <option value="">All Categories</option>
-                            <option value="restaurant">Restaurant</option>
-                            <option value="retail">Retail</option>
-                            <option value="healthcare">Healthcare</option>
-                            <option value="education">Education</option>
-                            <option value="technology">Technology</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                            <i class="fas fa-times me-2"></i>Clear Filters
+                        <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#addBusinessModal">
+                            <i class="fas fa-plus me-2"></i>Add Business
                         </button>
                     </div>
                 </div>
 
+                <!-- Search and Filter Section -->
+                <div class="search-filter-section">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="searchInput" placeholder="Search businesses by name, category, or description...">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="categoryFilter" onchange="filterByCategory()">
+                                <option value="">All Categories</option>
+                                <option value="restaurant">🍽️ Restaurant</option>
+                                <option value="retail">🛍️ Retail</option>
+                                <option value="healthcare">🏥 Healthcare</option>
+                                <option value="education">🎓 Education</option>
+                                <option value="technology">💻 Technology</option>
+                                <option value="other">📦 Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="fas fa-times me-2"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Businesses Grid -->
-                <div class="row" id="businessesGrid">
-                    <div class="col-12 text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                <div class="row g-4" id="businessesGrid">
+                    <div class="col-12">
+                        <div class="loading-state">
+                            <div class="loading-spinner"></div>
+                            <p class="mt-3 mb-0 text-muted">Loading businesses...</p>
                         </div>
                     </div>
                 </div>
@@ -55,82 +441,380 @@
 </div>
 
 <!-- Add Business Modal -->
-<div class="modal fade" id="addBusinessModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+<style>
+  /* ============================================
+     PREMIUM ADD BUSINESS MODAL STYLING
+     ============================================ */
+  
+  .premium-business-modal .modal-dialog {
+    max-width: 700px;
+  }
+
+  .premium-business-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  .premium-business-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 1.75rem 2rem;
+    border-bottom: none;
+  }
+
+  .premium-business-modal .modal-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .premium-business-modal .modal-title i {
+    font-size: 1.25rem;
+  }
+
+  .premium-business-modal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+
+  .premium-business-modal .btn-close:hover {
+    opacity: 1;
+  }
+
+  .premium-business-modal .modal-body {
+    padding: 2rem;
+    background: #ffffff;
+  }
+
+  .premium-business-modal .form-label {
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .premium-business-modal .form-label i {
+    color: #667eea;
+    font-size: 0.875rem;
+  }
+
+  .premium-business-modal .form-label .text-danger {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .premium-business-modal .form-control,
+  .premium-business-modal .form-select {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: #ffffff;
+  }
+
+  .premium-business-modal .form-control:focus,
+  .premium-business-modal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .premium-business-modal .form-control::placeholder {
+    color: #94a3b8;
+  }
+
+  .premium-business-modal textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .premium-business-modal .input-group-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    font-weight: 600;
+    padding: 0.875rem 1rem;
+  }
+
+  .premium-business-modal .input-group .form-control {
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+  }
+
+  .premium-business-modal .input-group .form-control:focus {
+    border-left: 2px solid #667eea;
+  }
+
+  .premium-business-modal .form-text {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .premium-business-modal .form-text i {
+    font-size: 0.75rem;
+  }
+
+  .premium-business-modal .modal-footer {
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+  }
+
+  .premium-business-modal .btn-secondary {
+    background: #e2e8f0;
+    border: none;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .premium-business-modal .btn-secondary:hover {
+    background: #cbd5e1;
+    transform: translateY(-1px);
+  }
+
+  .premium-business-modal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .premium-business-modal .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .premium-business-modal .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Form Section Divider */
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(226, 232, 240, 0.8);
+  }
+
+  /* Category Badge Preview */
+  .category-preview {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #475569;
+    margin-top: 0.5rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .premium-business-modal .modal-body {
+      padding: 1.5rem;
+    }
+
+    .premium-business-modal .modal-header {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .premium-business-modal .modal-footer {
+      padding: 1rem 1.5rem;
+      flex-direction: column-reverse;
+    }
+
+    .premium-business-modal .btn-secondary,
+    .premium-business-modal .btn-primary {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+  }
+</style>
+
+<div class="modal fade premium-business-modal" id="addBusinessModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Business</h5>
+                <h5 class="modal-title">
+                    <i class="fas fa-building"></i>
+                    Add New Business
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="addBusinessForm">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="businessName" class="form-label">Business Name *</label>
-                            <input type="text" class="form-control" id="businessName" name="businessName" required>
+                    <!-- Basic Information Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-info-circle me-2"></i>Basic Information
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="category" class="form-label">Category *</label>
-                            <select class="form-select" id="category" name="category" required>
-                                <option value="">Select Category</option>
-                                <option value="restaurant">Restaurant</option>
-                                <option value="retail">Retail</option>
-                                <option value="healthcare">Healthcare</option>
-                                <option value="education">Education</option>
-                                <option value="technology">Technology</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="phoneNo" class="form-label">Phone Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text">+91</span>
-                                <input type="tel" class="form-control" id="phoneNo" name="phoneNo" placeholder="9999999999">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="businessName" class="form-label">
+                                    <i class="fas fa-store"></i>
+                                    Business Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="businessName" name="businessName" placeholder="My Business Name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">
+                                    <i class="fas fa-tags"></i>
+                                    Category <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="restaurant">🍽️ Restaurant</option>
+                                    <option value="retail">🛍️ Retail</option>
+                                    <option value="healthcare">🏥 Healthcare</option>
+                                    <option value="education">🎓 Education</option>
+                                    <option value="technology">💻 Technology</option>
+                                    <option value="other">📦 Other</option>
+                                </select>
+                                <small class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Choose the category that best describes your business
+                                </small>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="whatsappNo" class="form-label">WhatsApp Number</label>
-                            <div class="input-group">
-                                <span class="input-group-text">+91</span>
-                                <input type="tel" class="form-control" id="whatsappNo" name="whatsappNo" placeholder="9999999999">
+                    </div>
+
+                    <!-- Contact Information Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-phone me-2"></i>Contact Information
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phoneNo" class="form-label">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    Phone Number
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">+91</span>
+                                    <input type="tel" class="form-control" id="phoneNo" name="phoneNo" placeholder="9999999999" maxlength="10">
+                                </div>
+                                <small class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Enter 10-digit mobile number (optional)
+                                </small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="whatsappNo" class="form-label">
+                                    <i class="fab fa-whatsapp"></i>
+                                    WhatsApp Number
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">+91</span>
+                                    <input type="tel" class="form-control" id="whatsappNo" name="whatsappNo" placeholder="9999999999" maxlength="10">
+                                </div>
+                                <small class="form-text">
+                                    <i class="fas fa-lightbulb"></i>
+                                    Leave blank to use the same as Phone
+                                </small>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="country" class="form-label">Country *</label>
-                            <select class="form-select" id="country" name="country" required>
-                                <option value="">Select Country</option>
-                                <option value="IN">India</option>
-                                <option value="US">United States</option>
-                                <option value="UK">United Kingdom</option>
-                                <option value="CA">Canada</option>
-                                <option value="AU">Australia</option>
-                                <option value="other">Other</option>
-                            </select>
+
+                    <!-- Location & Settings Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-globe me-2"></i>Location & Settings
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="timezone" class="form-label">Timezone</label>
-                            <select class="form-select" id="timezone" name="timezone">
-                                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                                <option value="America/New_York">America/New_York (EST)</option>
-                                <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
-                                <option value="Europe/London">Europe/London (GMT)</option>
-                                <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="country" class="form-label">
+                                    <i class="fas fa-flag"></i>
+                                    Country <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="IN">🇮🇳 India</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="other">🌍 Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="timezone" class="form-label">
+                                    <i class="fas fa-clock"></i>
+                                    Timezone
+                                </label>
+                                <select class="form-select" id="timezone" name="timezone">
+                                    <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                                    <option value="America/New_York">America/New_York (EST)</option>
+                                    <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
+                                    <option value="Europe/London">Europe/London (GMT)</option>
+                                    <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+                                </select>
+                                <small class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Used for scheduling and time-based operations
+                                </small>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of your business"></textarea>
+
+                    <!-- Additional Information Section -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="fas fa-align-left me-2"></i>Additional Information
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-file-alt"></i>
+                                Business Description
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Brief description of your business, services, or products..."></textarea>
+                            <small class="form-text">
+                                <i class="fas fa-lightbulb"></i>
+                                Provide a brief overview of your business (optional)
+                            </small>
+                        </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="addBusiness()">Add Business</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="addBusiness()">
+                    <i class="fas fa-building me-2"></i>Add Business
+                </button>
             </div>
         </div>
     </div>
@@ -254,8 +938,17 @@
             displayBusinesses(businesses);
         } catch (error) {
             console.error('Error loading businesses:', error);
-            document.getElementById('businessesGrid').innerHTML = 
-                '<div class="col-12 text-center text-danger py-4">Error loading businesses</div>';
+            document.getElementById('businessesGrid').innerHTML = `
+                <div class="col-12">
+                    <div class="empty-state">
+                        <div class="empty-state-icon text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="empty-state-text text-danger">Error loading businesses</div>
+                        <div class="empty-state-subtext">Please try refreshing the page</div>
+                    </div>
+                </div>
+            `;
         }
     }
 
@@ -264,59 +957,106 @@
         const grid = document.getElementById('businessesGrid');
         
         if (!Array.isArray(businessesToShow) || businessesToShow.length === 0) {
-            grid.innerHTML = '<div class="col-12 text-center text-muted py-4">No businesses found</div>';
+            grid.innerHTML = `
+                <div class="col-12">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="empty-state-text">No businesses found</div>
+                        <div class="empty-state-subtext">Click "Add Business" to create your first business profile</div>
+                    </div>
+                </div>
+            `;
             return;
         }
 
-        grid.innerHTML = businessesToShow.map(business => `
-            <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="card-title">${business.businessName || 'Untitled'}</h5>
+        const categoryEmojis = {
+            'restaurant': '🍽️',
+            'retail': '🛍️',
+            'healthcare': '🏥',
+            'education': '🎓',
+            'technology': '💻',
+            'other': '📦'
+        };
+
+        const getCategoryEmoji = (category) => categoryEmojis[category] || '📦';
+
+        grid.innerHTML = businessesToShow.map(business => {
+            const categoryEmoji = getCategoryEmoji(business.category);
+            const phoneDisplay = business.phoneNo ? business.phoneNo.replace('+91', '') : 'Not provided';
+            const whatsappDisplay = business.whatsappNo ? business.whatsappNo.replace('+91', '') : 'Not provided';
+            const createdDate = business.createdAt ? new Date(business.createdAt).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            }) : '—';
+
+            return `
+                <div class="col-md-6 col-lg-4">
+                    <div class="business-card">
+                        <div class="business-card-header">
+                            <div class="business-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="business-title-wrapper">
+                                <h5 class="business-title">${escapeHtml(business.businessName || 'Untitled')}</h5>
+                                <span class="business-category-badge">${categoryEmoji} ${escapeHtml(business.category || 'No Category')}</span>
+                            </div>
                             <div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                <button class="btn-business-action more" type="button" data-bs-toggle="dropdown">
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" href="#" onclick="editBusiness(${business.id})">
                                         <i class="fas fa-edit me-2"></i>Edit
                                     </a></li>
-                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteBusiness(${business.id}, '${business.businessName || ''}', '${business.category || ''}')">
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="deleteBusiness(${business.id}, '${escapeHtml(business.businessName || '')}', '${escapeHtml(business.category || '')}')">
                                         <i class="fas fa-trash me-2"></i>Delete
                                     </a></li>
                                 </ul>
                             </div>
                         </div>
-                        <div class="mb-2">
-                            <span class="badge bg-primary">${business.category || 'No Category'}</span>
-                        </div>
-                        <p class="card-text text-muted small">${business.description || 'No description provided'}</p>
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <small class="text-muted">Phone</small><br>
-                                <small>${business.phoneNo || 'Not provided'}</small>
+                        <div class="business-card-body">
+                            <p class="business-description">${escapeHtml(business.description || 'No description provided')}</p>
+                            <div class="business-info-grid">
+                                <div class="business-info-item">
+                                    <span class="business-info-label">Phone</span>
+                                    <span class="business-info-value">
+                                        <i class="fas fa-phone"></i>
+                                        ${escapeHtml(phoneDisplay)}
+                                    </span>
+                                </div>
+                                <div class="business-info-item">
+                                    <span class="business-info-label">WhatsApp</span>
+                                    <span class="business-info-value">
+                                        <i class="fab fa-whatsapp"></i>
+                                        ${escapeHtml(whatsappDisplay)}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <small class="text-muted">WhatsApp</small><br>
-                                <small>${business.whatsappNo || 'Not provided'}</small>
+                            <div class="business-location">
+                                <i class="fas fa-globe"></i>
+                                <span>${escapeHtml(business.country || 'No country')} • ${escapeHtml(business.timezone || 'No timezone')}</span>
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                <i class="fas fa-map-marker-alt me-1"></i>
-                                ${business.country || 'No country'} • ${business.timezone || 'No timezone'}
-                            </small>
+                        <div class="business-card-footer">
+                            <div class="business-date">
+                                <i class="fas fa-calendar"></i>
+                                <span>Created ${createdDate}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <small class="text-muted">
-                            Created: ${business.createdAt ? new Date(business.createdAt).toLocaleDateString() : '—'}
-                        </small>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
     }
 
     // Search businesses

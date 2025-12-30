@@ -1,0 +1,1358 @@
+<div class="container-fluid">
+  <div class="row">
+    {{> sidebar}}
+
+    <div class="col-md-9 col-lg-10 main-content">
+      <div class="container-fluid p-4">
+        <style>
+          .main-content {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            position: relative;
+          }
+
+          .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+              radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+          }
+
+          .container-fluid.p-4 {
+            position: relative;
+          }
+
+          .forms-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+          }
+
+          .forms-header h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 2.5rem;
+          }
+
+          .form-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+          }
+
+          .form-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+          }
+
+          .form-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+          }
+
+          .form-card-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #1f2937;
+          }
+
+          .form-card-actions {
+            display: flex;
+            gap: 0.5rem;
+          }
+
+          .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+
+          .btn-action.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+          }
+
+          .btn-action.secondary {
+            background: #f3f4f6;
+            color: #64748b;
+          }
+
+          .btn-action.danger {
+            background: #fee2e2;
+            color: #dc2626;
+          }
+
+          .form-meta {
+            display: flex;
+            gap: 1.5rem;
+            color: #6b7280;
+            font-size: 0.875rem;
+          }
+
+          .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+
+          .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+          }
+
+          .status-badge.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+          }
+
+          .status-badge.draft {
+            background: #fef3c7;
+            color: #92400e;
+          }
+
+          .status-badge.published {
+            background: #d1fae5;
+            color: #065f46;
+          }
+
+          /* Enhanced Form Builder Styles */
+          .form-builder-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-top: 2rem;
+          }
+
+          .form-builder-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          }
+
+          .preview-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+          }
+
+          .preview-device-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background: #f3f4f6;
+            border-radius: 8px;
+          }
+
+          .preview-device-toggle button {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+          }
+
+          .preview-device-toggle button.active {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+
+          .preview-container {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+          }
+
+          .preview-container.desktop {
+            max-width: 100%;
+          }
+
+          .preview-container.mobile {
+            max-width: 375px;
+            margin: 0 auto;
+          }
+
+          .field-item {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 2px solid #e5e7eb;
+            cursor: move;
+            transition: all 0.3s ease;
+            position: relative;
+          }
+
+          .field-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+          }
+
+          .field-item.sortable-ghost {
+            opacity: 0.4;
+            background: #f3f4f6;
+          }
+
+          .field-item.sortable-drag {
+            opacity: 0.8;
+            transform: rotate(2deg);
+          }
+
+          .field-drag-handle {
+            position: absolute;
+            left: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: grab;
+            font-size: 1.2rem;
+          }
+
+          .field-drag-handle:active {
+            cursor: grabbing;
+          }
+
+          .field-content {
+            margin-left: 2rem;
+          }
+
+          .field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+          }
+
+          .field-type-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #e0e7ff;
+            color: #4338ca;
+          }
+
+          .field-actions {
+            display: flex;
+            gap: 0.5rem;
+          }
+
+          .field-settings {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+          }
+
+          .field-settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+          }
+
+          .section-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+          }
+
+          .form-section {
+            margin-bottom: 2rem;
+          }
+
+          .premium-modal {
+            z-index: 1055 !important;
+          }
+
+          .premium-modal .modal-dialog {
+            max-width: 90vw;
+            margin: 1.75rem auto;
+          }
+
+          .premium-modal .modal-content {
+            border-radius: 24px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+          }
+
+          .premium-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+          }
+
+          .premium-modal .modal-body {
+            padding: 2rem;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+          }
+
+          .premium-modal .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+          }
+
+          .premium-modal .form-control,
+          .premium-modal .form-select {
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+          }
+
+          .premium-modal .form-control:focus,
+          .premium-modal .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+          }
+
+          .embed-code-box {
+            background: #1f2937;
+            color: #f9fafb;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin-top: 0.5rem;
+          }
+
+          .qr-code-container {
+            text-align: center;
+            padding: 1rem;
+          }
+
+          .qr-code-container canvas {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            background: white;
+          }
+        </style>
+
+        <!-- Header -->
+        <div class="forms-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2><i class="fas fa-wpforms me-2"></i>Lead Capture Forms</h2>
+              <p class="mb-0 mt-2 opacity-90">Create professional forms to capture leads from your website</p>
+            </div>
+            <button class="btn btn-light btn-lg" onclick="showCreateFormModal()">
+              <i class="fas fa-plus me-2"></i>Create Form
+            </button>
+          </div>
+        </div>
+
+        <!-- Forms List -->
+        <div id="formsList">
+          <div class="text-center p-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-3 text-muted">Loading forms...</p>
+          </div>
+        </div>
+
+        <!-- Enhanced Create/Edit Form Modal -->
+        <div class="modal fade premium-modal" id="formModal" tabindex="-1">
+          <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="formModalTitle">
+                  <i class="fas fa-wpforms me-2"></i>Create Lead Form
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="form-builder-container">
+                  <!-- Left Panel: Form Builder -->
+                  <div class="form-builder-panel">
+                    <form id="formForm">
+                      <input type="hidden" id="formId" name="id">
+                      
+                      <!-- Section A: Basic Info -->
+                      <div class="form-section">
+                        <div class="section-header">Basic Information</div>
+                        <div class="mb-3">
+                          <label class="form-label">Form Name *</label>
+                          <input type="text" class="form-control" id="formName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Description</label>
+                          <textarea class="form-control" id="formDescription" name="description" rows="2" placeholder="Brief description of what this form is for"></textarea>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Status</label>
+                          <select class="form-select" id="formStatus" name="status">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Section B: Form Fields Builder -->
+                      <div class="form-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <div class="section-header mb-0">Form Fields</div>
+                          <button type="button" class="btn btn-sm btn-primary" onclick="showAddFieldModal()">
+                            <i class="fas fa-plus"></i> Add Field
+                          </button>
+                        </div>
+                        <div id="fieldsList" class="sortable-fields">
+                          <!-- Fields will be added here with drag & drop -->
+                        </div>
+                      </div>
+
+                      <!-- Section C: Lead Actions (CRM behavior) -->
+                      <div class="form-section">
+                        <div class="section-header">Lead Settings</div>
+                        <div class="mb-3">
+                          <label class="form-label">Default Tags</label>
+                          <input type="text" class="form-control" id="leadTags" placeholder="Website Lead, Campaign-X (comma separated)">
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Lead Source</label>
+                          <select class="form-select" id="leadSource">
+                            <option value="">Select Source</option>
+                            <option value="website">Website</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="google">Google</option>
+                            <option value="referral">Referral</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Duplicate Handling</label>
+                          <select class="form-select" id="duplicateHandling">
+                            <option value="update">Update existing + append note</option>
+                            <option value="create">Create new lead anyway</option>
+                            <option value="block">Block duplicates</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Section D: After Submit -->
+                      <div class="form-section">
+                        <div class="section-header">Success Behavior</div>
+                        <div class="mb-3">
+                          <label class="form-label">On Submit</label>
+                          <select class="form-select" id="successBehavior" onchange="toggleSuccessOptions()">
+                            <option value="message">Show message</option>
+                            <option value="redirect">Redirect to URL</option>
+                            <option value="download">Download brochure</option>
+                          </select>
+                        </div>
+                        <div class="mb-3" id="successMessageGroup">
+                          <label class="form-label">Success Message</label>
+                          <input type="text" class="form-control" id="formSuccessMessage" value="Thank you! We will contact you soon.">
+                        </div>
+                        <div class="mb-3" id="redirectUrlGroup" style="display: none;">
+                          <label class="form-label">Redirect URL</label>
+                          <input type="url" class="form-control" id="formRedirectUrl" placeholder="https://example.com/thank-you">
+                        </div>
+                      </div>
+
+                      <!-- Section E: Notifications -->
+                      <div class="form-section">
+                        <div class="section-header">Notifications</div>
+                        <div class="mb-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="notifyOnSubmission">
+                            <label class="form-check-label" for="notifyOnSubmission">
+                              Notify me on submission (email + in-app)
+                            </label>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="autoReplyEmail">
+                            <label class="form-check-label" for="autoReplyEmail">
+                              Auto-reply email to lead
+                            </label>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="autoReplyWhatsApp">
+                            <label class="form-check-label" for="autoReplyWhatsApp">
+                              Auto WhatsApp acknowledgment (if enabled)
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Section F: Anti-Spam -->
+                      <div class="form-section">
+                        <div class="section-header">Anti-Spam Protection</div>
+                        <div class="mb-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="honeypotEnabled" checked>
+                            <label class="form-check-label" for="honeypotEnabled">
+                              Enable honeypot field (hidden field to catch bots)
+                            </label>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rateLimitEnabled">
+                            <label class="form-check-label" for="rateLimitEnabled">
+                              Rate limiting by IP (max 3 submissions per hour)
+                            </label>
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="captchaEnabled">
+                            <label class="form-check-label" for="captchaEnabled">
+                              Enable CAPTCHA (optional)
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Section G: Consent & Compliance -->
+                      <div class="form-section">
+                        <div class="section-header">Consent & Compliance</div>
+                        <div class="mb-3">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="consentRequired" onchange="toggleConsentText()">
+                            <label class="form-check-label" for="consentRequired">
+                              Require consent checkbox
+                            </label>
+                          </div>
+                        </div>
+                        <div class="mb-3" id="consentTextGroup" style="display: none;">
+                          <label class="form-label">Consent Text</label>
+                          <input type="text" class="form-control" id="consentText" value="I agree to be contacted via WhatsApp/Email">
+                        </div>
+                      </div>
+
+                      <!-- Section H: Form Branding -->
+                      <div class="form-section">
+                        <div class="section-header">Form Branding</div>
+                        <div class="mb-3">
+                          <label class="form-label">Primary Color</label>
+                          <input type="color" class="form-control form-control-color" id="primaryColor" value="#667eea">
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">Button Text</label>
+                          <input type="text" class="form-control" id="buttonText" value="Submit">
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+
+                  <!-- Right Panel: Live Preview -->
+                  <div class="preview-panel">
+                    <div class="section-header">Live Preview</div>
+                    <div class="preview-device-toggle">
+                      <button class="active" onclick="switchPreview('desktop')">
+                        <i class="fas fa-desktop"></i> Desktop
+                      </button>
+                      <button onclick="switchPreview('mobile')">
+                        <i class="fas fa-mobile-alt"></i> Mobile
+                      </button>
+                    </div>
+                    <div class="preview-container desktop" id="previewContainer">
+                      <div id="formPreview">
+                        <div class="text-center text-muted p-4">
+                          <i class="fas fa-eye fa-2x mb-2"></i>
+                          <p>Form preview will appear here</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveForm()">
+                  <i class="fas fa-save me-2"></i>Save Form
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Field Modal -->
+        <div class="modal fade" id="addFieldModal" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Field</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label">Field Type</label>
+                  <select class="form-select" id="newFieldType">
+                    <option value="name">Name</option>
+                    <option value="email">Email</option>
+                    <option value="phone">Phone</option>
+                    <option value="text">Text</option>
+                    <option value="textarea">Long Text</option>
+                    <option value="dropdown">Dropdown</option>
+                    <option value="radio">Radio Buttons</option>
+                    <option value="checkbox">Checkbox</option>
+                    <option value="date">Date</option>
+                    <option value="datetime">Date & Time</option>
+                    <option value="number">Number</option>
+                    <option value="file">File Upload</option>
+                    <option value="address">Address</option>
+                  </select>
+                </div>
+                <button type="button" class="btn btn-primary w-100" onclick="addFieldFromModal()">
+                  Add Field
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Field Settings Modal -->
+        <div class="modal fade" id="fieldSettingsModal" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Field Settings</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" id="editingFieldId">
+                <div class="mb-3">
+                  <label class="form-label">Field Label *</label>
+                  <input type="text" class="form-control" id="fieldLabel" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Placeholder Text</label>
+                  <input type="text" class="form-control" id="fieldPlaceholder" placeholder="Example: Enter your name">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Help Text</label>
+                  <input type="text" class="form-control" id="fieldHelpText" placeholder="Additional instructions">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Internal Field Key</label>
+                  <input type="text" class="form-control" id="fieldKey" placeholder="Used for mapping">
+                </div>
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="fieldRequired">
+                    <label class="form-check-label" for="fieldRequired">
+                      Required field
+                    </label>
+                  </div>
+                </div>
+                <div class="mb-3" id="validationGroup">
+                  <label class="form-label">Validation</label>
+                  <select class="form-select" id="fieldValidation">
+                    <option value="">None</option>
+                    <option value="email">Email format</option>
+                    <option value="phone">Phone format</option>
+                    <option value="numeric">Numeric only</option>
+                    <option value="minLength">Minimum length</option>
+                    <option value="maxLength">Maximum length</option>
+                  </select>
+                </div>
+                <div class="mb-3" id="optionsGroup" style="display: none;">
+                  <label class="form-label">Options (one per line)</label>
+                  <textarea class="form-control" id="fieldOptions" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveFieldSettings()">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Publish Modal -->
+        <div class="modal fade premium-modal" id="publishModal" tabindex="-1">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">
+                  <i class="fas fa-rocket me-2"></i>Publish Form
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                  <label class="form-label">Hosted Link</label>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="hostedUrl" readonly>
+                    <button class="btn btn-outline-primary" onclick="copyToClipboard('hostedUrl')">
+                      <i class="fas fa-copy"></i> Copy
+                    </button>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Embed Code (iframe)</label>
+                  <div class="embed-code-box" id="embedCode"></div>
+                  <button class="btn btn-sm btn-outline-primary mt-2" onclick="copyToClipboard('embedCode')">
+                    <i class="fas fa-copy"></i> Copy Code
+                  </button>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">QR Code</label>
+                  <div class="qr-code-container" id="qrCodeContainer">
+                    <!-- QR code will be generated here -->
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button class="btn btn-primary" onclick="testFormSubmission()">
+                    <i class="fas fa-vial me-2"></i>Test Submission
+                  </button>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SortableJS for drag and drop -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<!-- QR Code library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+
+<script>
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+  let allForms = [];
+  let fieldCounter = 0;
+  let currentFields = [];
+  let sortableInstance = null;
+  let currentPreviewMode = 'desktop';
+
+  // Field type definitions
+  const fieldTypes = {
+    name: { label: 'Name', icon: 'user', inputType: 'text' },
+    email: { label: 'Email', icon: 'envelope', inputType: 'email' },
+    phone: { label: 'Phone', icon: 'phone', inputType: 'tel' },
+    text: { label: 'Text', icon: 'font', inputType: 'text' },
+    textarea: { label: 'Long Text', icon: 'align-left', inputType: 'textarea' },
+    dropdown: { label: 'Dropdown', icon: 'list', inputType: 'select' },
+    radio: { label: 'Radio', icon: 'dot-circle', inputType: 'radio' },
+    checkbox: { label: 'Checkbox', icon: 'check-square', inputType: 'checkbox' },
+    date: { label: 'Date', icon: 'calendar', inputType: 'date' },
+    datetime: { label: 'Date & Time', icon: 'calendar-alt', inputType: 'datetime-local' },
+    number: { label: 'Number', icon: 'hashtag', inputType: 'number' },
+    file: { label: 'File Upload', icon: 'file-upload', inputType: 'file' },
+    address: { label: 'Address', icon: 'map-marker-alt', inputType: 'textarea' }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadForms();
+  });
+
+  function initializeFieldsBuilder() {
+    const defaultFields = [
+      { type: 'name', name: 'name', label: 'Full Name', required: true, placeholder: 'Enter your full name' },
+      { type: 'email', name: 'email', label: 'Email', required: true, placeholder: 'your@email.com' },
+      { type: 'phone', name: 'phone', label: 'Phone', required: true, placeholder: '10-digit phone number' },
+      { type: 'textarea', name: 'message', label: 'Message', required: false, placeholder: 'Tell us about your requirements' }
+    ];
+    
+    currentFields = defaultFields;
+    renderFields();
+    updatePreview();
+  }
+
+  function renderFields() {
+    const fieldsList = document.getElementById('fieldsList');
+    fieldsList.innerHTML = '';
+    
+    currentFields.forEach((field, index) => {
+      const fieldDiv = createFieldElement(field, index);
+      fieldsList.appendChild(fieldDiv);
+    });
+
+    // Initialize SortableJS
+    if (sortableInstance) {
+      sortableInstance.destroy();
+    }
+    
+    sortableInstance = new Sortable(fieldsList, {
+      handle: '.field-drag-handle',
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      dragClass: 'sortable-drag',
+      onEnd: function(evt) {
+        const item = currentFields.splice(evt.oldIndex, 1)[0];
+        currentFields.splice(evt.newIndex, 0, item);
+        updatePreview();
+      }
+    });
+  }
+
+  function createFieldElement(field, index) {
+    const div = document.createElement('div');
+    div.className = 'field-item';
+    div.dataset.fieldIndex = index;
+    div.dataset.fieldId = field.name;
+    
+    const fieldTypeInfo = fieldTypes[field.type] || fieldTypes.text;
+    
+    div.innerHTML = `
+      <i class="fas fa-grip-vertical field-drag-handle"></i>
+      <div class="field-content">
+        <div class="field-header">
+          <div>
+            <span class="field-type-badge">${fieldTypeInfo.label}</span>
+            <strong class="ms-2">${escapeHtml(field.label || 'Unnamed Field')}</strong>
+            ${field.required ? '<span class="badge bg-danger ms-2">Required</span>' : ''}
+          </div>
+          <div class="field-actions">
+            <button class="btn btn-sm btn-outline-primary" onclick="editFieldSettings(${index})">
+              <i class="fas fa-cog"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="removeField(${index})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <div class="field-settings">
+          <small class="text-muted">
+            ${field.placeholder ? `Placeholder: "${escapeHtml(field.placeholder)}"` : ''}
+            ${field.helpText ? ` • Help: "${escapeHtml(field.helpText)}"` : ''}
+          </small>
+        </div>
+      </div>
+    `;
+    
+    return div;
+  }
+
+  function showAddFieldModal() {
+    new bootstrap.Modal(document.getElementById('addFieldModal')).show();
+  }
+
+  function addFieldFromModal() {
+    const type = document.getElementById('newFieldType').value;
+    const fieldTypeInfo = fieldTypes[type];
+    
+    const newField = {
+      type: type,
+      name: `field_${fieldCounter++}`,
+      label: fieldTypeInfo.label,
+      required: false,
+      placeholder: '',
+      helpText: '',
+      key: `field_${fieldCounter - 1}`,
+      validation: '',
+      options: type === 'dropdown' || type === 'radio' ? [] : undefined
+    };
+    
+    currentFields.push(newField);
+    renderFields();
+    updatePreview();
+    bootstrap.Modal.getInstance(document.getElementById('addFieldModal')).hide();
+    
+    // Open settings modal for the new field
+    setTimeout(() => editFieldSettings(currentFields.length - 1), 300);
+  }
+
+  function editFieldSettings(index) {
+    const field = currentFields[index];
+    if (!field) return;
+    
+    document.getElementById('editingFieldId').value = index;
+    document.getElementById('fieldLabel').value = field.label || '';
+    document.getElementById('fieldPlaceholder').value = field.placeholder || '';
+    document.getElementById('fieldHelpText').value = field.helpText || '';
+    document.getElementById('fieldKey').value = field.key || field.name;
+    document.getElementById('fieldRequired').checked = field.required || false;
+    document.getElementById('fieldValidation').value = field.validation || '';
+    
+    const needsOptions = field.type === 'dropdown' || field.type === 'radio';
+    document.getElementById('optionsGroup').style.display = needsOptions ? 'block' : 'none';
+    if (needsOptions && field.options) {
+      document.getElementById('fieldOptions').value = field.options.join('\n');
+    }
+    
+    new bootstrap.Modal(document.getElementById('fieldSettingsModal')).show();
+  }
+
+  function saveFieldSettings() {
+    const index = parseInt(document.getElementById('editingFieldId').value);
+    const field = currentFields[index];
+    if (!field) return;
+    
+    field.label = document.getElementById('fieldLabel').value;
+    field.placeholder = document.getElementById('fieldPlaceholder').value;
+    field.helpText = document.getElementById('fieldHelpText').value;
+    field.key = document.getElementById('fieldKey').value || field.name;
+    field.required = document.getElementById('fieldRequired').checked;
+    field.validation = document.getElementById('fieldValidation').value;
+    
+    const needsOptions = field.type === 'dropdown' || field.type === 'radio';
+    if (needsOptions) {
+      const optionsText = document.getElementById('fieldOptions').value;
+      field.options = optionsText.split('\n').filter(o => o.trim()).map(o => o.trim());
+    }
+    
+    renderFields();
+    updatePreview();
+    bootstrap.Modal.getInstance(document.getElementById('fieldSettingsModal')).hide();
+  }
+
+  function removeField(index) {
+    if (confirm('Are you sure you want to remove this field?')) {
+      currentFields.splice(index, 1);
+      renderFields();
+      updatePreview();
+    }
+  }
+
+  function switchPreview(mode) {
+    currentPreviewMode = mode;
+    const container = document.getElementById('previewContainer');
+    container.className = `preview-container ${mode}`;
+    
+    document.querySelectorAll('.preview-device-toggle button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    event.target.closest('button').classList.add('active');
+    
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const preview = document.getElementById('formPreview');
+    const primaryColor = document.getElementById('primaryColor')?.value || '#667eea';
+    const buttonText = document.getElementById('buttonText')?.value || 'Submit';
+    
+    let previewHTML = `
+      <div style="background: white; padding: 2rem; border-radius: 12px;">
+        <h4 style="margin-bottom: 1rem; color: #1f2937;">Form Preview</h4>
+    `;
+    
+    currentFields.forEach(field => {
+      const fieldTypeInfo = fieldTypes[field.type] || fieldTypes.text;
+      previewHTML += renderPreviewField(field, fieldTypeInfo, primaryColor);
+    });
+    
+    // Consent checkbox if enabled
+    if (document.getElementById('consentRequired')?.checked) {
+      const consentText = document.getElementById('consentText')?.value || 'I agree to be contacted';
+      previewHTML += `
+        <div class="mb-3">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="previewConsent" required>
+            <label class="form-check-label" for="previewConsent">${escapeHtml(consentText)}</label>
+          </div>
+        </div>
+      `;
+    }
+    
+    previewHTML += `
+        <button type="submit" class="btn w-100" style="background: ${primaryColor}; color: white; border: none; padding: 0.875rem; border-radius: 8px; font-weight: 600;">
+          ${escapeHtml(buttonText)}
+        </button>
+      </div>
+    `;
+    
+    preview.innerHTML = previewHTML;
+  }
+
+  function renderPreviewField(field, fieldTypeInfo, primaryColor) {
+    let html = '<div class="mb-3">';
+    
+    // Label
+    html += `<label class="form-label" style="font-weight: 600; color: #374151; margin-bottom: 0.5rem;">${escapeHtml(field.label)}${field.required ? ' *' : ''}</label>`;
+    
+    // Help text
+    if (field.helpText) {
+      html += `<small class="text-muted d-block mb-2">${escapeHtml(field.helpText)}</small>`;
+    }
+    
+    // Input based on type
+    const inputStyle = `border: 2px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; width: 100%; transition: all 0.3s ease;`;
+    const focusStyle = `border-color: ${primaryColor}; box-shadow: 0 0 0 3px ${primaryColor}20;`;
+    
+    switch (field.type) {
+      case 'textarea':
+      case 'address':
+        html += `<textarea class="form-control" placeholder="${escapeHtml(field.placeholder || '')}" style="${inputStyle}" ${field.required ? 'required' : ''}></textarea>`;
+        break;
+      case 'dropdown':
+        html += `<select class="form-select" style="${inputStyle}" ${field.required ? 'required' : ''}>`;
+        html += '<option value="">Select...</option>';
+        (field.options || []).forEach(opt => {
+          html += `<option>${escapeHtml(opt)}</option>`;
+        });
+        html += '</select>';
+        break;
+      case 'radio':
+        (field.options || []).forEach((opt, idx) => {
+          html += `<div class="form-check"><input class="form-check-input" type="radio" name="preview_${field.name}" id="preview_${field.name}_${idx}" ${field.required && idx === 0 ? 'required' : ''}><label class="form-check-label" for="preview_${field.name}_${idx}">${escapeHtml(opt)}</label></div>`;
+        });
+        break;
+      case 'checkbox':
+        html += `<div class="form-check"><input class="form-check-input" type="checkbox" id="preview_${field.name}" ${field.required ? 'required' : ''}><label class="form-check-label" for="preview_${field.name}">${escapeHtml(field.placeholder || field.label)}</label></div>`;
+        break;
+      case 'file':
+        html += `<input type="file" class="form-control" style="${inputStyle}" ${field.required ? 'required' : ''}>`;
+        break;
+      default:
+        html += `<input type="${fieldTypeInfo.inputType}" class="form-control" placeholder="${escapeHtml(field.placeholder || '')}" style="${inputStyle}" ${field.required ? 'required' : ''}>`;
+    }
+    
+    html += '</div>';
+    return html;
+  }
+
+  function toggleSuccessOptions() {
+    const behavior = document.getElementById('successBehavior').value;
+    document.getElementById('successMessageGroup').style.display = behavior === 'message' ? 'block' : 'none';
+    document.getElementById('redirectUrlGroup').style.display = behavior === 'redirect' ? 'block' : 'none';
+  }
+
+  function toggleConsentText() {
+    const required = document.getElementById('consentRequired').checked;
+    document.getElementById('consentTextGroup').style.display = required ? 'block' : 'none';
+  }
+
+  async function loadForms() {
+    try {
+      const response = await fetch(`${API_BASE}/lead-forms`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        allForms = result.data || [];
+        displayForms(allForms);
+      }
+    } catch (error) {
+      console.error('Error loading forms:', error);
+    }
+  }
+
+  function displayForms(forms) {
+    const container = document.getElementById('formsList');
+    
+    if (forms.length === 0) {
+      container.innerHTML = `
+        <div class="text-center p-5">
+          <i class="fas fa-wpforms" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+          <h4>No forms yet</h4>
+          <p class="text-muted">Create your first lead capture form to start collecting leads</p>
+        </div>
+      `;
+      return;
+    }
+
+    const nodeEnv = '{{nodeEnv}}' || 'development';
+    const productionUrl = '{{productionUrl}}' || 'https://petserviceinhome.com';
+    const developmentUrl = '{{developmentUrl}}' || 'http://localhost:3002';
+    const baseUrl = (nodeEnv === 'prod' || nodeEnv === 'production') ? productionUrl : developmentUrl;
+
+    container.innerHTML = forms.map(form => {
+      const formUrl = `${baseUrl}/forms/${form.slug}`;
+      const status = form.status || (form.isActive ? 'published' : 'draft');
+      
+      return `
+        <div class="form-card">
+          <div class="form-card-header">
+            <div>
+              <div class="form-card-title">${escapeHtml(form.name)}</div>
+              <div class="form-meta mt-2">
+                <span><i class="fas fa-link"></i> ${formUrl}</span>
+                <span class="status-badge ${status}">${status === 'published' ? 'Published' : 'Draft'}</span>
+                ${form.analytics ? `<span><i class="fas fa-chart-line"></i> ${form.analytics.submissions || 0} submissions</span>` : ''}
+              </div>
+            </div>
+            <div class="form-card-actions">
+              <button class="btn-action primary" onclick="showPublishModal(${form.id})">
+                <i class="fas fa-rocket"></i> Publish
+              </button>
+              <button class="btn-action secondary" onclick="editForm(${form.id})">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <button class="btn-action danger" onclick="deleteForm(${form.id})">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+          ${form.description ? `<p class="text-muted mb-0">${escapeHtml(form.description)}</p>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function showCreateFormModal() {
+    document.getElementById('formForm').reset();
+    document.getElementById('formId').value = '';
+    document.getElementById('formModalTitle').innerHTML = '<i class="fas fa-wpforms me-2"></i>Create Lead Form';
+    document.getElementById('formStatus').value = 'draft';
+    initializeFieldsBuilder();
+    new bootstrap.Modal(document.getElementById('formModal')).show();
+  }
+
+  async function editForm(id) {
+    const form = allForms.find(f => f.id === id);
+    if (!form) return;
+
+    document.getElementById('formId').value = form.id;
+    document.getElementById('formName').value = form.name;
+    document.getElementById('formDescription').value = form.description || '';
+    document.getElementById('formStatus').value = form.status || 'draft';
+    document.getElementById('formSuccessMessage').value = form.successMessage || 'Thank you! We will contact you soon.';
+    document.getElementById('formRedirectUrl').value = form.redirectUrl || '';
+    document.getElementById('formModalTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Lead Form';
+    
+    // Load fields
+    currentFields = form.fields || [];
+    renderFields();
+    updatePreview();
+    
+    // Load other settings
+    if (form.leadSettings) {
+      document.getElementById('leadTags').value = (form.leadSettings.tags || []).join(', ');
+      document.getElementById('leadSource').value = form.leadSettings.source || '';
+      document.getElementById('duplicateHandling').value = form.leadSettings.duplicateHandling || 'update';
+    }
+    
+    if (form.successBehavior) {
+      document.getElementById('successBehavior').value = form.successBehavior.type || 'message';
+      toggleSuccessOptions();
+    }
+    
+    if (form.notifications) {
+      document.getElementById('notifyOnSubmission').checked = form.notifications.onSubmission || false;
+      document.getElementById('autoReplyEmail').checked = form.notifications.autoReplyEmail || false;
+      document.getElementById('autoReplyWhatsApp').checked = form.notifications.autoReplyWhatsApp || false;
+    }
+    
+    if (form.antiSpam) {
+      document.getElementById('honeypotEnabled').checked = form.antiSpam.honeypot !== false;
+      document.getElementById('rateLimitEnabled').checked = form.antiSpam.rateLimit || false;
+      document.getElementById('captchaEnabled').checked = form.antiSpam.captcha || false;
+    }
+    
+    if (form.consentRequired) {
+      document.getElementById('consentRequired').checked = true;
+      document.getElementById('consentText').value = form.consentText || 'I agree to be contacted';
+      toggleConsentText();
+    }
+    
+    if (form.theme) {
+      document.getElementById('primaryColor').value = form.theme.primaryColor || '#667eea';
+      document.getElementById('buttonText').value = form.theme.buttonText || 'Submit';
+    }
+    
+    new bootstrap.Modal(document.getElementById('formModal')).show();
+  }
+
+  async function saveForm() {
+    const form = document.getElementById('formForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const formId = document.getElementById('formId').value;
+    
+    // Parse tags
+    const tagsText = document.getElementById('leadTags').value;
+    const tags = tagsText.split(',').map(t => t.trim()).filter(t => t);
+    
+    const formData = {
+      name: document.getElementById('formName').value,
+      description: document.getElementById('formDescription').value,
+      status: document.getElementById('formStatus').value,
+      fields: currentFields,
+      successMessage: document.getElementById('formSuccessMessage').value,
+      redirectUrl: document.getElementById('formRedirectUrl').value,
+      leadSettings: {
+        tags: tags,
+        source: document.getElementById('leadSource').value,
+        duplicateHandling: document.getElementById('duplicateHandling').value
+      },
+      successBehavior: {
+        type: document.getElementById('successBehavior').value,
+        message: document.getElementById('formSuccessMessage').value,
+        redirectUrl: document.getElementById('formRedirectUrl').value
+      },
+      notifications: {
+        onSubmission: document.getElementById('notifyOnSubmission').checked,
+        autoReplyEmail: document.getElementById('autoReplyEmail').checked,
+        autoReplyWhatsApp: document.getElementById('autoReplyWhatsApp').checked
+      },
+      antiSpam: {
+        honeypot: document.getElementById('honeypotEnabled').checked,
+        rateLimit: document.getElementById('rateLimitEnabled').checked,
+        captcha: document.getElementById('captchaEnabled').checked
+      },
+      consentRequired: document.getElementById('consentRequired').checked,
+      consentText: document.getElementById('consentText').value,
+      theme: {
+        primaryColor: document.getElementById('primaryColor').value,
+        buttonText: document.getElementById('buttonText').value
+      }
+    };
+
+    const method = formId ? 'PUT' : 'POST';
+    const url = formId ? `${API_BASE}/lead-forms/${formId}` : `${API_BASE}/lead-forms`;
+
+    try {
+      const response = await fetch(url, {
+        method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('formModal')).hide();
+        loadForms();
+      } else {
+        alert(result.message || 'Failed to save form');
+      }
+    } catch (error) {
+      console.error('Error saving form:', error);
+      alert('Failed to save form. Please try again.');
+    }
+  }
+
+  async function deleteForm(id) {
+    if (!confirm('Are you sure you want to delete this form?')) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/lead-forms/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        loadForms();
+      } else {
+        alert(result.message || 'Failed to delete form');
+      }
+    } catch (error) {
+      console.error('Error deleting form:', error);
+      alert('Failed to delete form. Please try again.');
+    }
+  }
+
+  async function showPublishModal(id) {
+    const form = allForms.find(f => f.id === id);
+    if (!form) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/lead-forms/${id}/embed?type=iframe`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        const nodeEnv = '{{nodeEnv}}' || 'development';
+        const productionUrl = '{{productionUrl}}' || 'https://petserviceinhome.com';
+        const developmentUrl = '{{developmentUrl}}' || 'http://localhost:3002';
+        const baseUrl = (nodeEnv === 'prod' || nodeEnv === 'production') ? productionUrl : developmentUrl;
+        const formUrl = `${baseUrl}/forms/${form.slug}`;
+        
+        document.getElementById('hostedUrl').value = formUrl;
+        document.getElementById('embedCode').textContent = result.embedCode;
+        
+        // Generate QR code
+        const qrContainer = document.getElementById('qrCodeContainer');
+        qrContainer.innerHTML = '';
+        QRCode.toCanvas(qrContainer, formUrl, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        }, function (error) {
+          if (error) {
+            qrContainer.innerHTML = '<p class="text-muted">QR code generation failed</p>';
+          }
+        });
+        
+        new bootstrap.Modal(document.getElementById('publishModal')).show();
+      }
+    } catch (error) {
+      console.error('Error loading publish info:', error);
+    }
+  }
+
+  function testFormSubmission() {
+    const formUrl = document.getElementById('hostedUrl').value;
+    window.open(formUrl, '_blank');
+  }
+
+  function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    const text = elementId === 'embedCode' ? element.textContent : element.value;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copied to clipboard!');
+    });
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Update preview on input changes
+  document.addEventListener('input', (e) => {
+    if (e.target.id === 'primaryColor' || e.target.id === 'buttonText' || e.target.id === 'consentRequired' || e.target.id === 'consentText') {
+      updatePreview();
+    }
+  });
+</script>
+

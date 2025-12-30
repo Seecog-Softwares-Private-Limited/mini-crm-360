@@ -16,6 +16,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.set("trust proxy", 1);
+
+
 // Avoid favicon spam
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
@@ -47,6 +50,7 @@ app.engine(
                     .replace(/\u2029/g, '\\u2029');
             },
             eq: (a, b) => a === b,
+            or: (a, b) => a || b,
         },
         runtimeOptions: {
             allowProtoPropertiesByDefault: true,
@@ -59,10 +63,28 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
 // ---------- Middleware ----------
+// Middleware to pass environment variables to all views
+app.use((req, res, next) => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const port = process.env.PORT || 3002;
+  const productionUrl = process.env.PRODUCTION_URL || 'https://petserviceinhome.com';
+  const developmentUrl = process.env.DEVELOPMENT_URL || `http://localhost:${port}`;
+  
+  // Make environment variables available to all views
+  res.locals.nodeEnv = nodeEnv;
+  res.locals.port = port;
+  res.locals.productionUrl = productionUrl;
+  res.locals.developmentUrl = developmentUrl;
+  res.locals.apiBase = (nodeEnv === 'prod' || nodeEnv === 'production') 
+    ? `${productionUrl}/api/v1`
+    : `${developmentUrl}/api/v1`;
+  next();
+});
 app.use(
     cors({
         origin: [
-            'http://localhost:3002',
+            process.env.PRODUCTION_URL || 'https://petserviceinhome.com',
+            process.env.DEVELOPMENT_URL || 'http://localhost:3002',
             'http://localhost:5173',
             'https://bulk-whatsapp-manager-backend.onrender.com',
         ],
@@ -85,6 +107,7 @@ app.use((req, res, next) => {
 
 // ---------- Route imports ----------
 import userRoutes from './routes/user.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import { waRouter } from './routes/wa.routes.js';
 import businessRouter from './routes/business.routes.js';
 import { customerRouter } from './routes/customer.routes.js';
@@ -105,24 +128,76 @@ import businessAddressRoutes from './routes/businessAddress.routes.js';
 import emailTemplateRoutes from './routes/emailTemplate.routes.js';
 import { renderEmailTemplatesPage } from './controllers/emailTemplate.controller.js';
 import dashboardRoutes from "./routes/dashboard.routes.js";
-import authRoutes from "./routes/auth.routes.js";
+import plansRoutes from "./routes/plans.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import taskRoutes from "./routes/task.routes.js";
+import noteRoutes from "./routes/note.routes.js";
+import reminderRoutes from "./routes/reminder.routes.js";
+import leadFormRoutes from "./routes/leadForm.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
 
 // ---------- Frontend pages ----------
+// Helper function to get API_BASE based on environment
+const getApiBase = () => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const productionUrl = process.env.PRODUCTION_URL || 'https://petserviceinhome.com';
+  const developmentUrl = process.env.DEVELOPMENT_URL || `http://localhost:${process.env.PORT || 3002}`;
+  
+  if (nodeEnv === 'prod' || nodeEnv === 'production') {
+    return `${productionUrl}/api/v1`;
+  }
+  return `${developmentUrl}/api/v1`;
+};
+
 app.get('/', (req, res) => res.redirect('/login'));
 
 app.get("/login", (req, res) => {
-  if (req.cookies?.accessToken) {
-    return res.redirect("/dashboard");
-  }
-  res.render("login");
+  if (req.cookies?.accessToken) return res.redirect("/dashboard");
+  return res.render("login", { layout: false });
 });
 
-app.get('/register', (req, res) => res.render('register', { title: 'Register' }));
 
-app.get('/dashboard', verifyUser, renderDashboard);
+// app.get('/register', (req, res) => res.render('register', { title: 'Register' }));
+app.get('/social-login', (req, res) => {
+  res.render('login', { 
+    title: 'Login',
+    apiBase: getApiBase(),
+    layout: false // login.hbs is standalone, doesn't use main.hbs layout
+  });
+});
+
+app.get('/register', (req, res) => {
+  res.render('register', { 
+    title: 'Register',
+    apiBase: getApiBase()
+  });
+});
+
+app.get('/reset-password', (req, res) => {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  const port = process.env.PORT || 3002;
+  const productionUrl = process.env.PRODUCTION_URL || 'https://petserviceinhome.com';
+  const developmentUrl = process.env.DEVELOPMENT_URL || `http://localhost:${port}`;
+
+  res.render('resetPassword', { 
+    title: 'Reset Password',
+    nodeEnv,
+    port,
+    productionUrl,
+    developmentUrl
+  });
+});
+
+// Dashboard route is handled by dashboardRoutes (with verifyUser middleware)
 
 app.get('/customers', verifyUser, (req, res) => {
-  res.render('customers');
+  const user = {
+    firstName: req.user.firstName || '',
+    lastName: req.user.lastName || '',
+    avatar: req.user.avatar || req.user.avatarUrl || null,
+    plan: req.user.plan || null,
+  };
+  res.render('customers', { user, activePage: 'customers' });
 });
 
 
@@ -136,28 +211,62 @@ app.get('/profile', verifyUser, (req, res) => {
     res.render('profile', { title: 'profile', user, activePage: 'profile' });
 });
 
+app.get('/business', verifyUser, (req, res) => {
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      avatar: req.user.avatar || req.user.avatarUrl || null,
+      plan: req.user.plan || null
+    };
+    res.render('business', { title: 'Business', user, activePage: 'business' });
+});
+
 app.get('/templates', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      avatar: req.user.avatar || req.user.avatarUrl || null,
+      plan: req.user.plan || null
+    };
     res.render('templates', { title: 'Templates', user, activePage: 'templates' });
 });
 
 app.get('/campaigns', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      avatar: req.user.avatar || req.user.avatarUrl || null,
+      plan: req.user.plan || null
+    };
     res.render('campaigns', { title: 'Campaigns', user, activePage: 'campaigns' });
 });
 
 app.get('/documents', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      avatar: req.user.avatar || req.user.avatarUrl || null,
+      plan: req.user.plan || null
+    };
     res.render('documents', { title: 'documents', user, activePage: 'documents' });
 });
 
 app.get('/document-types', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      avatar: req.user.avatar || req.user.avatarUrl || null,
+      plan: req.user.plan || null
+    };
     res.render('documentTypes', { title: 'document-types', user, activePage: 'documentTypes' });
 });
 
 app.get('/employees', verifyUser, (req, res) => {
-    const user = { firstName: req.user.firstName, lastName: req.user.lastName };
+    const user = { 
+      firstName: req.user.firstName, 
+      lastName: req.user.lastName,
+      avatar: req.user.avatar || req.user.avatarUrl || null
+    };
     res.render('employees', { title: 'employees', user, activePage: 'employees' });
 });
 
@@ -189,10 +298,16 @@ app.get('/clear-storage', (req, res) => {
 
 // Static
 app.use(express.static('public'));
+// Serve static files from src/views/public (for CSS and JS files used by views)
+app.use('/css', express.static(path.join(__dirname, 'views/public/css')));
+app.use('/js', express.static(path.join(__dirname, 'views/public/js')));
+// Serve assets from src/assets
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 // ---------- API routes ----------
 app.use("/auth", authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/business', businessRouter);
 
 app.get('/api/v1/health', (req, res) =>
@@ -203,7 +318,14 @@ app.get('/api/v1/hello', (req, res) => res.json({ message: 'Hello, world!' }));
 setupSwagger(app);
 
 app.use('/api/v1', waRouter);
-app.use("/", dashboardRoutes)
+app.use("/", dashboardRoutes);
+app.use("/", plansRoutes);
+app.use("/", paymentRoutes);
+app.use("/", taskRoutes);
+app.use("/", noteRoutes);
+app.use("/", reminderRoutes);
+app.use("/", leadFormRoutes);
+app.use("/", profileRoutes);
 app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/templates', templateRouter);
 app.use('/api/v1/campaigns', campaignRouter);
@@ -215,7 +337,8 @@ app.use('/api/v1/designations', designationsRoutes);
 
 app.use('/api/leave-types', leaveTypesRoutes);
 app.use('/api/leave-requests', leaveRequestsRoutes);
-app.use("/", dashboardRoutes);
+
+
 
 
 // HR & Docs

@@ -19,53 +19,87 @@
           </div>
         </div>
 
-        <!-- Search and Filter -->
-        <div class="row mb-4">
-          <div class="col-md-4">
-            <div class="input-group">
-              <input type="text" class="form-control" id="searchInput" placeholder="Search customers..." />
-              <button class="btn btn-outline-secondary" type="button" onclick="searchCustomers()">
-                <i class="fas fa-search"></i>
-              </button>
+        <!-- Enhanced Search and Filter -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body p-3">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label small text-muted mb-1">Search</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white">
+                    <i class="fas fa-search text-muted"></i>
+                  </span>
+                  <input type="text" class="form-control" id="searchInput" placeholder="Search by name, email, phone..." />
+                </div>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Business</label>
+                <select class="form-select" id="businessFilter" onchange="applyFilters()">
+                  <option value="">All Businesses</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Tags</label>
+                <select class="form-select" id="tagFilter" onchange="applyFilters()">
+                  <option value="">All Tags</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small text-muted mb-1">Page Size</label>
+                <select class="form-select" id="pageSizeSelect" onchange="changePageSize()">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                  <i class="fas fa-times me-2"></i>Clear
+                </button>
+              </div>
             </div>
-          </div>
-          <div class="col-md-3">
-            <select class="form-select" id="businessFilter" onchange="filterByBusiness()">
-              <option value="">All Businesses</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <select class="form-select" id="tagFilter" onchange="filterByTag()">
-              <option value="">All Tags</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-              <i class="fas fa-times me-2"></i>Clear
-            </button>
           </div>
         </div>
 
         <!-- Customers Table -->
-        <div class="card">
-          <div class="card-body">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-semibold">Customer List</h5>
+              <span class="badge bg-primary" id="customerCount">0</span>
+            </div>
+          </div>
+          <div class="card-body p-0">
             <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
                   <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
+                    <th class="sortable" data-sort="name">
+                      Name
+                      <i class="fas fa-sort ms-1 text-muted"></i>
+                    </th>
+                    <th class="sortable" data-sort="email">
+                      Email
+                      <i class="fas fa-sort ms-1 text-muted"></i>
+                    </th>
+                    <th class="sortable" data-sort="phoneE164">
+                      Phone
+                      <i class="fas fa-sort ms-1 text-muted"></i>
+                    </th>
                     <th>WhatsApp</th>
                     <th>Business</th>
                     <th>Tags</th>
-                    <th>Added</th>
-                    <th>Actions</th>
+                    <th class="sortable" data-sort="createdAt">
+                      Added
+                      <i class="fas fa-sort ms-1 text-muted"></i>
+                    </th>
+                    <th class="text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="customersTableBody">
                   <tr>
-                    <td colspan="8" class="text-center py-4">
+                    <td colspan="8" class="text-center py-5">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                       </div>
@@ -75,6 +109,19 @@
               </table>
             </div>
           </div>
+          <!-- Pagination -->
+          <div class="card-footer bg-white border-top">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="text-muted small">
+                Showing <span id="showingFrom">0</span> to <span id="showingTo">0</span> of <span id="totalRecords">0</span> customers
+              </div>
+              <nav>
+                <ul class="pagination mb-0" id="pagination">
+                  <!-- Pagination will be generated here -->
+                </ul>
+              </nav>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -83,124 +130,610 @@
 </div>
 
 
-<!--Add Bulk upload File  -->
-
 <!-- CSV Bulk Upload Modal -->
-<div
-  class="modal fade"
-  id="csvUploadModal"
-  tabindex="-1"
-  aria-labelledby="csvUploadModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog modal-md modal-dialog-centered">
-    <div class="modal-content">
-
-      <!-- Header -->
-      <div class="modal-header">
-        <h5 class="modal-title" id="csvUploadModalLabel">
-          Bulk Upload Customers
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+<div class="modal fade" id="csvUploadModal" tabindex="-1" aria-labelledby="csvUploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <!-- Enhanced Header -->
+      <div class="modal-header border-bottom bg-gradient-primary text-white">
+        <div>
+          <h5 class="modal-title fw-bold mb-1" id="csvUploadModalLabel">
+            <i class="fas fa-cloud-upload-alt me-2"></i>Bulk Upload Customers
+          </h5>
+          <small class="text-white-50">Upload CSV file to import multiple customers at once</small>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
       <!-- Body -->
-      <div class="modal-body">
-        <form
-          method="POST"
-          action="/customers/bulk-upload"
-          enctype="multipart/form-data"
-        >
+      <div class="modal-body p-4">
+        <!-- Upload Progress Container (Hidden by default) -->
+        <div id="uploadProgressContainer" class="d-none mb-4">
+          <div class="card border-0 bg-light">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-center mb-3">
+                <div class="spinner-border text-primary me-3" role="status" style="width: 2.5rem; height: 2.5rem;">
+                  <span class="visually-hidden">Uploading...</span>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1 fw-semibold">Uploading file...</h6>
+                  <p class="text-muted small mb-0" id="uploadStatusText">Processing your CSV file</p>
+                </div>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="progress" style="height: 10px; border-radius: 10px;">
+                <div id="uploadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                     role="progressbar" style="width: 0%; border-radius: 10px;"></div>
+              </div>
+              
+              <!-- Upload Stats -->
+              <div class="row mt-4" id="uploadStats" style="display: none;">
+                <div class="col-4 text-center">
+                  <div class="text-primary fw-bold fs-4" id="statCreated">0</div>
+                  <small class="text-muted">Created</small>
+                </div>
+                <div class="col-4 text-center">
+                  <div class="text-warning fw-bold fs-4" id="statSkipped">0</div>
+                  <small class="text-muted">Skipped</small>
+                </div>
+                <div class="col-4 text-center">
+                  <div class="text-info fw-bold fs-4" id="statTotal">0</div>
+                  <small class="text-muted">Total</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <!-- CSV File -->
-          <div class="mb-3 d-flex justify-content-center">
-  <input type="file" id="csvUploadInput" name="csvFile" accept=".csv" hidden required>
-  <label for="csvUploadInput" class="btn btn-primary">
-    <i class="fas fa-upload me-2"></i>Select CSV File
-  </label>
-</div>
+        <form method="POST" action="/api/v1/customers/bulk-upload" enctype="multipart/form-data" id="csvUploadForm">
+          <!-- Enhanced File Upload Area -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold mb-3">
+              <i class="fas fa-file-csv text-primary me-2"></i>CSV File <span class="text-danger">*</span>
+            </label>
+            <div class="file-upload-area border-2 border-dashed rounded-3 p-5 text-center position-relative" id="fileUploadArea">
+              <input type="file" id="csvUploadInput" name="file" accept=".csv" hidden required>
+              
+              <!-- Default Upload Content -->
+              <div id="fileUploadContent">
+                <div class="mb-3">
+                  <i class="fas fa-cloud-upload-alt fa-4x text-muted"></i>
+                </div>
+                <h6 class="fw-semibold mb-2">Drop your CSV file here or click to browse</h6>
+                <p class="text-muted small mb-3">Supported format: CSV (Max size: 10MB)</p>
+                <label for="csvUploadInput" class="btn btn-primary btn-lg shadow-sm">
+                  <i class="fas fa-folder-open me-2"></i>Select CSV File
+                </label>
+              </div>
 
-         
+              <!-- File Selected Display -->
+              <div id="fileSelectedInfo" class="d-none">
+                <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+                  <div class="d-flex align-items-center">
+                    <div class="file-icon me-3">
+                      <i class="fas fa-file-csv fa-3x text-success"></i>
+                    </div>
+                    <div class="text-start">
+                      <h6 class="mb-1 fw-semibold" id="fileName">No file selected</h6>
+                      <p class="text-muted small mb-0" id="fileSize">0 KB</p>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFileSelection()">
+                    <i class="fas fa-times me-1"></i>Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CSV Format Help -->
+          <div class="alert alert-info border-0 mb-4">
+            <h6 class="alert-heading fw-semibold mb-2">
+              <i class="fas fa-info-circle me-2"></i>CSV Format Requirements
+            </h6>
+            <div class="mb-2">
+              <strong>Required columns:</strong>
+              <ul class="mb-2 small">
+                <li><code>name</code> - Customer name</li>
+                <li><code>phoneE164</code> - Phone number (10 digits, e.g., 9999999999)</li>
+              </ul>
+            </div>
+            <div class="mb-2">
+              <strong>Optional columns:</strong>
+              <ul class="mb-0 small">
+                <li><code>email</code> - Email address</li>
+                <li><code>whatsappE164</code> - WhatsApp number (10 digits, defaults to phoneE164 if not provided)</li>
+                <li><code>tags</code> - Comma-separated tags (e.g., vip,regular,premium)</li>
+                <li><code>consentAt</code> - Consent date (ISO format)</li>
+              </ul>
+            </div>
+            <div class="mt-2 pt-2 border-top">
+              <small class="text-muted">
+                <i class="fas fa-lightbulb me-1"></i><strong>Tip:</strong> Column names are case-insensitive. 
+                First row must contain headers. Phone numbers will be automatically converted to E.164 format (+91 prefix).
+                Example: <code>name,phoneE164,email</code>
+              </small>
+            </div>
+          </div>
 
           <!-- Actions -->
           <div class="d-flex justify-content-end gap-2">
-            <button type="submit" class="btn btn-primary">
-              Upload Data
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary shadow-sm" id="csvUploadBtn">
+              <i class="fas fa-upload me-2"></i>Upload Data
             </button>
           </div>
-
         </form>
       </div>
-
     </div>
   </div>
 </div>
 
 
+<style>
+  /* ============================================
+     PREMIUM ADD CUSTOMER MODAL STYLING
+     ============================================ */
+  
+  .premium-customer-modal .modal-dialog {
+    max-width: 600px;
+  }
+
+  .premium-customer-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  .premium-customer-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 1.75rem 2rem;
+    border-bottom: none;
+  }
+
+  .premium-customer-modal .modal-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .premium-customer-modal .modal-title i {
+    font-size: 1.25rem;
+  }
+
+  .premium-customer-modal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+
+  .premium-customer-modal .btn-close:hover {
+    opacity: 1;
+  }
+
+  .premium-customer-modal .modal-body {
+    padding: 2rem;
+    background: #ffffff;
+  }
+
+  .premium-customer-modal .form-label {
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .premium-customer-modal .form-label i {
+    color: #667eea;
+    font-size: 0.875rem;
+  }
+
+  .premium-customer-modal .form-label .text-danger {
+    color: #ef4444;
+    margin-left: 0.25rem;
+  }
+
+  .premium-customer-modal .form-control,
+  .premium-customer-modal .form-select {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: #ffffff;
+  }
+
+  .premium-customer-modal .form-control:focus,
+  .premium-customer-modal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .premium-customer-modal .form-control::placeholder {
+    color: #94a3b8;
+  }
+
+  .premium-customer-modal .input-group-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    font-weight: 600;
+    padding: 0.875rem 1rem;
+  }
+
+  .premium-customer-modal .input-group .form-control {
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+  }
+
+  .premium-customer-modal .input-group .form-control:focus {
+    border-left: 2px solid #667eea;
+  }
+
+  .premium-customer-modal .form-text {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .premium-customer-modal .form-text i {
+    font-size: 0.75rem;
+  }
+
+  /* Template Preview Styling - Darker text colors for visibility */
+  #templatePreview h6 {
+    color: #1e293b !important;
+    font-weight: 700 !important;
+  }
+
+  #templatePreview strong {
+    color: #334155 !important;
+    font-weight: 600 !important;
+  }
+
+  #templatePreviewSubject {
+    color: #475569 !important;
+  }
+
+  #templatePreviewBody {
+    color: #1e293b !important;
+  }
+
+  /* Send Email Modal - Reduced width for better UX */
+  #sendEmailModal .modal-dialog {
+    max-width: 800px;
+  }
+
+  @media (max-width: 768px) {
+    #sendEmailModal .modal-dialog {
+      max-width: 95%;
+      margin: 1rem auto;
+    }
+  }
+
+  /* Prevent modal from disturbing page layout */
+  body.modal-open {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+  }
+
+  #sendEmailModal.modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  #sendEmailModal .modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 800px;
+  }
+
+  #sendEmailModal .modal-content {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .modal-backdrop {
+    z-index: 1040;
+  }
+
+  #sendEmailModal {
+    z-index: 1050;
+  }
+
+  /* Prevent horizontal scroll when modal opens */
+  html.modal-open {
+    overflow: hidden !important;
+  }
+
+  /* Make email template dropdown narrower */
+  #sendEmailTemplateSelect {
+    max-width: 500px;
+  }
+
+  /* Email Source Toggle Buttons - Better visibility */
+  #sendEmailModal .btn-outline-primary {
+    color: #475569;
+    border-color: #cbd5e1;
+    background-color: #ffffff;
+    font-weight: 500;
+  }
+
+  #sendEmailModal .btn-outline-primary:hover {
+    color: #ffffff;
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+
+  #sendEmailModal .btn-check:checked + .btn-outline-primary {
+    color: #ffffff;
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+
+  #sendEmailModal .btn-check:not(:checked) + .btn-outline-primary {
+    color: #475569 !important;
+    background-color: #ffffff !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  .premium-customer-modal .modal-footer {
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+  }
+
+  .premium-customer-modal .btn-secondary {
+    background: #e2e8f0;
+    border: none;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .premium-customer-modal .btn-secondary:hover {
+    background: #cbd5e1;
+    transform: translateY(-1px);
+  }
+
+  .premium-customer-modal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .premium-customer-modal .btn-primary:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a8f 100%) !important;
+    border: none !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .premium-customer-modal .btn-primary:focus {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+  }
+
+  .premium-customer-modal .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Form Section Divider */
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(226, 232, 240, 0.8);
+  }
+
+  /* Tag Input Enhancement */
+  .tags-input-wrapper {
+    position: relative;
+  }
+
+  .tags-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: #475569;
+  }
+
+  .tags-hint .tag-example {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: white;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    margin: 0 0.25rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 576px) {
+    .premium-customer-modal .modal-body {
+      padding: 1.5rem;
+    }
+
+    .premium-customer-modal .modal-header {
+      padding: 1.25rem 1.5rem;
+    }
+
+    .premium-customer-modal .modal-footer {
+      padding: 1rem 1.5rem;
+      flex-direction: column-reverse;
+    }
+
+    .premium-customer-modal .btn-secondary,
+    .premium-customer-modal .btn-primary {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+  }
+</style>
+
 <!-- Add Customer Modal -->
-<div class="modal fade" id="addCustomerModal" tabindex="-1">
-  <div class="modal-dialog">
+<div class="modal fade premium-customer-modal" id="addCustomerModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Add New Customer</h5>
+        <h5 class="modal-title">
+          <i class="fas fa-user-plus"></i>
+          Add New Customer
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
         <form id="addCustomerForm">
-          <div class="mb-3">
-            <label for="customerBusiness" class="form-label">
-              Business <span class="text-danger">*</span>
-            </label>
-            <select class="form-select" id="customerBusiness" name="businessId" required>
-              <option value="">Select Business</option>
-            </select>
-          </div>
-
-          <div class="mb-3">
-            <label for="customerName" class="form-label">
-              Name <span class="text-danger">*</span>
-            </label>
-            <input type="text" class="form-control" id="customerName" name="name" required />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" id="customerEmail" name="email" placeholder="customer@gmail.com" />
-          </div>
-
-          <div class="mb-3">
-            <label for="customerPhone" class="form-label">
-              Phone Number <span class="text-danger">*</span>
-            </label>
-            <div class="input-group">
-              <span class="input-group-text">+91</span>
-              <input type="tel" class="form-control" id="customerPhone" name="phoneE164" placeholder="9999999999" required />
+          <!-- Business Information Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-building me-2"></i>Business Information
             </div>
-            <small class="form-text text-muted">Enter 10-digit mobile number without +91</small>
-          </div>
-
-          <div class="mb-3">
-            <label for="customerWhatsApp" class="form-label">
-              WhatsApp Number <span class="text-danger">*</span>
-            </label>
-            <div class="input-group">
-              <span class="input-group-text">+91</span>
-              <input type="tel" class="form-control" id="customerWhatsApp" name="whatsappE164" placeholder="9999999999" />
+            <div class="mb-3">
+              <label for="customerBusiness" class="form-label">
+                <i class="fas fa-briefcase"></i>
+                Business <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="customerBusiness" name="businessId" required>
+                <option value="">Select Business</option>
+              </select>
             </div>
-            <small class="form-text text-muted">Leave blank to use same as Phone</small>
           </div>
 
-          <div class="mb-3">
-            <label for="customerTags" class="form-label">Tags (comma separated)</label>
-            <input type="text" class="form-control" id="customerTags" name="tags" placeholder="vip, regular, premium" />
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-user me-2"></i>Personal Information
+            </div>
+            <div class="mb-3">
+              <label for="customerName" class="form-label">
+                <i class="fas fa-id-card"></i>
+                Full Name <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control" id="customerName" name="name" placeholder="John Doe" required />
+            </div>
+
+            <div class="mb-3">
+              <label for="customerEmail" class="form-label">
+                <i class="fas fa-envelope"></i>
+                Email Address
+              </label>
+              <input type="email" class="form-control" id="customerEmail" name="email" placeholder="customer@example.com" />
+              <small class="form-text">
+                <i class="fas fa-info-circle"></i>
+                Optional - Used for email communications
+              </small>
+            </div>
+          </div>
+
+          <!-- Contact Information Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-phone me-2"></i>Contact Information
+            </div>
+            <div class="mb-3">
+              <label for="customerPhone" class="form-label">
+                <i class="fas fa-mobile-alt"></i>
+                Phone Number <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">+91</span>
+                <input type="tel" class="form-control" id="customerPhone" name="phoneE164" placeholder="9999999999" required maxlength="10" />
+              </div>
+              <small class="form-text">
+                <i class="fas fa-info-circle"></i>
+                Enter 10-digit mobile number (e.g., 9999999999)
+              </small>
+            </div>
+
+            <div class="mb-3">
+              <label for="customerWhatsApp" class="form-label">
+                <i class="fab fa-whatsapp"></i>
+                WhatsApp Number
+              </label>
+              <div class="input-group">
+                <span class="input-group-text">+91</span>
+                <input type="tel" class="form-control" id="customerWhatsApp" name="whatsappE164" placeholder="9999999999" maxlength="10" />
+              </div>
+              <small class="form-text">
+                <i class="fas fa-lightbulb"></i>
+                Leave blank to use the same number as Phone
+              </small>
+            </div>
+          </div>
+
+          <!-- Additional Information Section -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <i class="fas fa-tags me-2"></i>Additional Information
+            </div>
+            <div class="mb-3">
+              <label for="customerTags" class="form-label">
+                <i class="fas fa-tag"></i>
+                Tags
+              </label>
+              <input type="text" class="form-control" id="customerTags" name="tags" placeholder="vip, regular, premium" />
+              <div class="tags-hint">
+                <i class="fas fa-info-circle"></i>
+                <span>Separate multiple tags with commas:</span>
+                <span class="tag-example">vip</span>
+                <span class="tag-example">regular</span>
+                <span class="tag-example">premium</span>
+              </div>
+            </div>
           </div>
         </form>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" onclick="addCustomer()">Add Customer</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-primary" onclick="addCustomer()">
+          <i class="fas fa-user-plus me-2"></i>Add Customer
+        </button>
       </div>
     </div>
   </div>
@@ -300,10 +833,107 @@
   </div>
 </div>
 
+<!-- Send Email Modal -->
+<div class="modal fade premium-customer-modal" id="sendEmailModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-envelope"></i>
+          Send Email
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">
+            <i class="fas fa-user"></i>
+            To
+          </label>
+          <input type="text" class="form-control" id="sendEmailTo" readonly />
+          <input type="hidden" id="sendEmailCustomerId" />
+          <input type="hidden" id="sendEmailCustomerName" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">
+            <i class="fas fa-envelope-open-text"></i>
+            Email Source
+          </label>
+          <div class="btn-group w-100" role="group">
+            <input type="radio" class="btn-check" name="emailSource" id="emailSourceTemplate" value="template" checked>
+            <label class="btn btn-outline-primary" for="emailSourceTemplate">
+              <i class="fas fa-file-alt me-1"></i>Use Template
+            </label>
+            <input type="radio" class="btn-check" name="emailSource" id="emailSourceCustom" value="custom">
+            <label class="btn btn-outline-primary" for="emailSourceCustom">
+              <i class="fas fa-edit me-1"></i>Custom Email
+            </label>
+          </div>
+        </div>
+
+        <!-- Template Selection -->
+        <div id="templateSelectionGroup">
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-list"></i>
+              Select Email Template
+            </label>
+            <select class="form-select" id="sendEmailTemplateSelect">
+              <option value="">Loading templates...</option>
+            </select>
+          </div>
+          <div id="templatePreview" class="border rounded p-3 bg-light" style="display: none;">
+            <h6 class="mb-2 fw-bold" style="color: #1e293b;">Template Preview</h6>
+            <div class="mb-2"><strong style="color: #334155;">Subject:</strong> <span id="templatePreviewSubject" style="color: #475569;">—</span></div>
+            <div class="mt-2 mb-2"><strong style="color: #334155;">Body:</strong></div>
+            <div id="templatePreviewBody" class="mt-1 p-2 bg-white border rounded" style="max-height: 300px; overflow-y: auto; color: #1e293b;"></div>
+          </div>
+        </div>
+
+        <!-- Custom Email Editor -->
+        <div id="customEmailGroup" style="display: none;">
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-heading"></i>
+              Subject <span class="text-danger">*</span>
+            </label>
+            <input type="text" class="form-control" id="sendEmailSubject" placeholder="Enter email subject" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">
+              <i class="fas fa-align-left"></i>
+              Email Body <span class="text-danger">*</span>
+            </label>
+            <textarea class="form-control" id="sendEmailBody" rows="10" placeholder="Enter email content (HTML supported)"></textarea>
+            <small class="text-muted">You can use HTML tags for formatting. Placeholders: {{customerName}}, {{monthYear}}, {{companyName}}</small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="sendEmailBtn" onclick="sendEmailToCustomer()">
+          <i class="fas fa-paper-plane me-1"></i>Send Email
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   let customers = [];
   let businesses = [];
   let currentDeleteId = null;
+  
+  // Pagination and filtering state
+  let currentPage = 1;
+  let pageSize = 10;
+  let currentSortBy = 'createdAt';
+  let currentSortOrder = 'DESC';
+  let currentSearch = '';
+  let currentBusinessFilter = '';
+  let currentTagFilter = '';
+  let paginationData = null;
 
   const phoneToE164 = (v) => {
     if (!v) return '';
@@ -317,6 +947,83 @@
 
   const coerceId = (v) => (/^\d+$/.test(v) ? Number(v) : v);
 
+  // Format file size
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  // Clear file selection
+  function clearFileSelection() {
+    const fileInput = document.getElementById('csvUploadInput');
+    const uploadArea = document.getElementById('fileUploadArea');
+    const uploadContent = document.getElementById('fileUploadContent');
+    const fileInfo = document.getElementById('fileSelectedInfo');
+    
+    fileInput.value = '';
+    uploadContent.classList.remove('d-none');
+    fileInfo.classList.add('d-none');
+    uploadArea.classList.remove('dragover');
+  }
+
+  // File upload area drag and drop functionality
+  const fileUploadArea = document.getElementById('fileUploadArea');
+  const csvUploadInput = document.getElementById('csvUploadInput');
+  const fileUploadContent = document.getElementById('fileUploadContent');
+  const fileSelectedInfo = document.getElementById('fileSelectedInfo');
+  const fileName = document.getElementById('fileName');
+  const fileSize = document.getElementById('fileSize');
+
+  if (fileUploadArea && csvUploadInput) {
+    // Click to upload
+    fileUploadContent.addEventListener('click', () => {
+      csvUploadInput.click();
+    });
+
+    // File input change
+    csvUploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileUploadContent.classList.add('d-none');
+        fileSelectedInfo.classList.remove('d-none');
+      }
+    });
+
+    // Drag and drop handlers
+    fileUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fileUploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.name.endsWith('.csv')) {
+        csvUploadInput.files = e.dataTransfer.files;
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileUploadContent.classList.add('d-none');
+        fileSelectedInfo.classList.remove('d-none');
+      } else {
+        showAlert('Please select a CSV file', 'warning');
+      }
+    });
+  }
+
   async function loadBusinesses() {
     try {
       const data = await apiCall('/business');
@@ -329,17 +1036,40 @@
 
   async function loadCustomers() {
     try {
-      const data = await apiCall('/customers');
-      customers = Array.isArray(data)
-        ? data
-        : (data && (data.data || data.items || data.customers)) || [];
-      displayCustomers(customers);
-      updateTagFilter(customers);
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: currentPage,
+        pageSize: pageSize,
+        sortBy: currentSortBy,
+        sortOrder: currentSortOrder
+      });
+
+      if (currentSearch) params.append('search', currentSearch);
+      if (currentBusinessFilter) params.append('businessId', currentBusinessFilter);
+      if (currentTagFilter) params.append('tag', currentTagFilter);
+
+      const data = await apiCall(`/customers?${params.toString()}`);
+      
+      // Handle new paginated response format
+      if (data && data.success && data.data) {
+        customers = data.data;
+        paginationData = data.pagination;
+        console.log('Loaded customers:', customers.length, 'Page:', currentPage, 'Total:', paginationData?.totalCount);
+        displayCustomers(customers);
+        updatePagination();
+        updateTagFilter();
+      } else {
+        // Fallback for old format
+        customers = Array.isArray(data)
+          ? data
+          : (data && (data.data || data.items || data.customers)) || [];
+        displayCustomers(customers);
+        updateTagFilter(customers);
+      }
     } catch (err) {
       console.error('Error loading customers:', err);
       customers = customers || [];
       displayCustomers(customers);
-      updateTagFilter(customers);
     }
   }
 
@@ -362,24 +1092,31 @@
     });
   }
 
-  function updateTagFilter(list) {
-    const tagFilter = document.getElementById('tagFilter');
-    const tags = new Set();
-    (list || []).forEach((c) => (c.tags || []).forEach((t) => tags.add(t)));
-    const keep = tagFilter.value;
+  async function updateTagFilter() {
+    // Load all tags from server for filter dropdown
+    try {
+      const data = await apiCall('/customers?pageSize=1000'); // Get all for tags
+      const allCustomers = data?.data || data || [];
+      const tagFilter = document.getElementById('tagFilter');
+      const tags = new Set();
+      allCustomers.forEach((c) => (c.tags || []).forEach((t) => tags.add(t)));
+      const keep = tagFilter.value;
 
-    tagFilter.innerHTML =
-      '<option value="">All Tags</option>' +
-      Array.from(tags).map((t) => `<option value="${t}">${t}</option>`).join('');
+      tagFilter.innerHTML =
+        '<option value="">All Tags</option>' +
+        Array.from(tags).sort().map((t) => `<option value="${t}">${t}</option>`).join('');
 
-    tagFilter.value = keep;
+      tagFilter.value = keep;
+    } catch (err) {
+      console.error('Error loading tags:', err);
+    }
   }
 
   function displayCustomers(customersToShow) {
     const tbody = document.getElementById('customersTableBody');
 
     if (!customersToShow || customersToShow.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No customers found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-5"><i class="fas fa-inbox fa-2x mb-2 d-block"></i>No customers found</td></tr>';
       return;
     }
 
@@ -390,18 +1127,21 @@
 
       return `
         <tr>
-          <td>${c.name || 'No Name'}</td>
-          <td>${c.email || '-'}</td>
-          <td>${c.phoneE164 || ''}</td>
-          <td>${c.whatsappE164 || c.phoneE164 || ''}</td>
-          <td>${bizName}</td>
+          <td class="fw-semibold">${c.name || 'No Name'}</td>
+          <td>${c.email || '<span class="text-muted">—</span>'}</td>
+          <td><code class="text-primary">${c.phoneE164 || ''}</code></td>
+          <td><code class="text-success">${c.whatsappE164 || c.phoneE164 || ''}</code></td>
+          <td><span class="badge bg-light text-dark">${bizName}</span></td>
           <td>${
             c.tags && c.tags.length
               ? c.tags.map((t) => `<span class="badge bg-secondary me-1">${t}</span>`).join('')
               : '<span class="text-muted">No tags</span>'
           }</td>
-          <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</td>
-          <td>
+          <td><small class="text-muted">${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</small></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" onclick="openSendEmailModal(${JSON.stringify(id)}, '${(c.email || '').replace(/'/g, "\\'")}', '${(c.name || 'Customer').replace(/'/g, "\\'")}')" title="Send Email" ${!c.email ? 'disabled' : ''}>
+              <i class="fas fa-envelope"></i>
+            </button>
             <button class="btn btn-sm btn-outline-primary me-1" onclick="editCustomer(${JSON.stringify(id)})" title="Edit">
               <i class="fas fa-edit"></i>
             </button>
@@ -411,37 +1151,142 @@
           </td>
         </tr>`;
     }).join('');
+    
+    updateSortIcons();
   }
 
-  function filterByBusiness() {
-    const selectedBusinessId = document.getElementById('businessFilter').value;
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-    const selectedTag = document.getElementById('tagFilter').value;
-
-    let list = customers || [];
-    if (selectedBusinessId) list = list.filter((c) => String(c.businessId) === String(selectedBusinessId));
-    if (selectedTag) list = list.filter((c) => (c.tags || []).includes(selectedTag));
-
-    if (searchTerm) {
-      list = list.filter((c) =>
-        (c.name || '').toLowerCase().includes(searchTerm) ||
-        (c.email || '').toLowerCase().includes(searchTerm) ||
-        (c.phoneE164 || '').includes(searchTerm) ||
-        (c.whatsappE164 || '').includes(searchTerm) ||
-        (c.tags || []).some((t) => t.toLowerCase().includes(searchTerm))
-      );
-    }
-    displayCustomers(list);
+  // Apply filters and reload data
+  function applyFilters() {
+    currentSearch = document.getElementById('searchInput').value.trim();
+    currentBusinessFilter = document.getElementById('businessFilter').value;
+    currentTagFilter = document.getElementById('tagFilter').value;
+    currentPage = 1; // Reset to first page when filtering
+    loadCustomers();
   }
-
-  function searchCustomers() { filterByBusiness(); }
-  function filterByTag() { filterByBusiness(); }
 
   function clearFilters() {
     document.getElementById('searchInput').value = '';
     document.getElementById('businessFilter').value = '';
     document.getElementById('tagFilter').value = '';
-    displayCustomers(customers);
+    currentSearch = '';
+    currentBusinessFilter = '';
+    currentTagFilter = '';
+    currentPage = 1;
+    loadCustomers();
+  }
+
+  function changePageSize() {
+    pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+    currentPage = 1;
+    loadCustomers();
+  }
+
+  function changePage(page) {
+    currentPage = page;
+    loadCustomers();
+    // Scroll to top of table
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function sortTable(sortBy) {
+    if (currentSortBy === sortBy) {
+      // Toggle sort order if clicking same column
+      currentSortOrder = currentSortOrder === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+      currentSortBy = sortBy;
+      currentSortOrder = 'DESC';
+    }
+    currentPage = 1; // Reset to first page when sorting
+    loadCustomers();
+    updateSortIcons();
+  }
+
+  function updateSortIcons() {
+    document.querySelectorAll('.sortable').forEach(th => {
+      const icon = th.querySelector('i');
+      const sortField = th.getAttribute('data-sort');
+      if (sortField === currentSortBy) {
+        icon.className = currentSortOrder === 'ASC' 
+          ? 'fas fa-sort-up ms-1 text-primary' 
+          : 'fas fa-sort-down ms-1 text-primary';
+      } else {
+        icon.className = 'fas fa-sort ms-1 text-muted';
+      }
+    });
+  }
+
+  function updatePagination() {
+    if (!paginationData) return;
+
+    const paginationEl = document.getElementById('pagination');
+    const showingFrom = document.getElementById('showingFrom');
+    const showingTo = document.getElementById('showingTo');
+    const totalRecords = document.getElementById('totalRecords');
+    const customerCount = document.getElementById('customerCount');
+
+    // Update counts
+    const from = paginationData.totalCount === 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
+    const to = Math.min(currentPage * pageSize, paginationData.totalCount);
+    
+    showingFrom.textContent = from;
+    showingTo.textContent = to;
+    totalRecords.textContent = paginationData.totalCount;
+    if (customerCount) customerCount.textContent = paginationData.totalCount;
+
+    // Generate pagination buttons
+    let paginationHTML = '';
+
+    // Previous button
+    paginationHTML += `
+      <li class="page-item ${!paginationData.hasPreviousPage ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); ${paginationData.hasPreviousPage ? `changePage(${currentPage - 1})` : ''}" ${!paginationData.hasPreviousPage ? 'tabindex="-1" aria-disabled="true"' : ''}>
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      </li>
+    `;
+
+    // Page numbers
+    const totalPages = paginationData.totalPages;
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    if (startPage > 1) {
+      paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); changePage(1)">1</a></li>`;
+      if (startPage > 2) {
+        paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      paginationHTML += `
+        <li class="page-item ${i === currentPage ? 'active' : ''}">
+          <a class="page-link" href="#" onclick="event.preventDefault(); changePage(${i})">${i}</a>
+        </li>
+      `;
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+      }
+      paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); changePage(${totalPages})">${totalPages}</a></li>`;
+    }
+
+    // Next button
+    paginationHTML += `
+      <li class="page-item ${!paginationData.hasNextPage ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); ${paginationData.hasNextPage ? `changePage(${currentPage + 1})` : ''}" ${!paginationData.hasNextPage ? 'tabindex="-1" aria-disabled="true"' : ''}>
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      </li>
+    `;
+
+    paginationEl.innerHTML = paginationHTML;
   }
 
   async function addCustomer() {
@@ -550,19 +1395,616 @@
     }
   }
 
+  // Handle bulk upload form submission
+  document.getElementById('csvUploadForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById('csvUploadInput');
+    const uploadBtn = document.getElementById('csvUploadBtn');
+    const progressContainer = document.getElementById('uploadProgressContainer');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const statusText = document.getElementById('uploadStatusText');
+    const uploadStats = document.getElementById('uploadStats');
+    const statCreated = document.getElementById('statCreated');
+    const statSkipped = document.getElementById('statSkipped');
+    const statTotal = document.getElementById('statTotal');
+
+    if (!fileInput.files.length) {
+      showAlert('Please select a CSV file', 'warning');
+      return;
+    }
+
+    // BusinessId is now automatically determined on the server side
+    // No need to send it from frontend
+
+    try {
+      // Show progress container
+      progressContainer.classList.remove('d-none');
+      uploadStats.style.display = 'none';
+      uploadBtn.disabled = true;
+      uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+      
+      // Reset progress bar
+      progressBar.style.width = '0%';
+      progressBar.classList.remove('bg-success', 'bg-danger');
+      progressBar.classList.add('bg-primary');
+      statusText.textContent = 'Preparing upload...';
+
+      // Simulate progress (since we can't track actual upload progress with fetch)
+      let progress = 0;
+      const progressInterval = setInterval(() => {
+        progress += 10;
+        if (progress <= 90) {
+          progressBar.style.width = progress + '%';
+          statusText.textContent = `Uploading... ${progress}%`;
+        }
+      }, 200);
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      // businessId is automatically determined on server from user's business
+
+      const response = await fetch('/api/v1/customers/bulk-upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: formData
+      });
+
+      clearInterval(progressInterval);
+      progressBar.style.width = '100%';
+      statusText.textContent = 'Processing file...';
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Show success stats
+        statCreated.textContent = data.created || 0;
+        statSkipped.textContent = data.skipped || 0;
+        statTotal.textContent = (data.created || 0) + (data.skipped || 0);
+        uploadStats.style.display = 'flex';
+        statusText.textContent = 'Upload completed successfully!';
+        progressBar.classList.remove('bg-primary');
+        progressBar.classList.add('bg-success');
+        
+        setTimeout(() => {
+          document.getElementById('csvUploadForm').reset();
+          clearFileSelection();
+          progressContainer.classList.add('d-none');
+          progressBar.classList.remove('bg-success');
+          progressBar.classList.add('bg-primary');
+          progressBar.style.width = '0%';
+          bootstrap.Modal.getInstance(document.getElementById('csvUploadModal'))?.hide();
+          showAlert(`✅ Uploaded successfully! Created: ${data.created}, Skipped: ${data.skipped}`, 'success');
+          loadCustomers();
+        }, 2000);
+      } else {
+        statusText.textContent = 'Upload failed';
+        progressBar.classList.remove('bg-primary');
+        progressBar.classList.add('bg-danger');
+        
+        // Build detailed error message
+        let errorMessage = data.error || data.message || 'Upload failed';
+        if (data.details) {
+          if (typeof data.details === 'string') {
+            errorMessage += ': ' + data.details;
+          } else if (Array.isArray(data.details) && data.details.length > 0) {
+            const errorList = data.details.slice(0, 5).map(err => {
+              if (typeof err === 'string') return err;
+              if (err.row) return `Row ${err.row}: ${err.error || err.message || 'Error'}`;
+              return err.error || err.message || 'Error';
+            }).join('<br>');
+            errorMessage += '<br><br><strong>Details:</strong><br>' + errorList;
+            if (data.details.length > 5) {
+              errorMessage += `<br><small>... and ${data.details.length - 5} more errors</small>`;
+            }
+          }
+        }
+        
+        showAlert(errorMessage, 'danger');
+        setTimeout(() => {
+          progressContainer.classList.add('d-none');
+          progressBar.classList.remove('bg-danger');
+          progressBar.classList.add('bg-primary');
+          progressBar.style.width = '0%';
+        }, 5000);
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      showAlert('Network error during upload', 'danger');
+      progressContainer.classList.add('d-none');
+      progressBar.style.width = '0%';
+    } finally {
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = '<i class="fas fa-upload me-2"></i>Upload Data';
+    }
+  });
+
   function showAlert(message, type) {
     const el = document.createElement('div');
-    el.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    el.style.cssText = 'top:20px;right:20px;z-index:9999;min-width:300px;';
-    el.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+    el.className = `alert alert-${type} alert-dismissible fade show position-fixed shadow-lg`;
+    el.style.cssText = 'top:20px;right:20px;z-index:9999;min-width:350px;max-width:500px;border-radius:0.75rem;';
+    el.innerHTML = `
+      <div class="d-flex align-items-start">
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'} me-2 mt-1"></i>
+        <div class="flex-grow-1">${message}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    `;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 5000);
+    const timeout = type === 'danger' ? 8000 : 5000;
+    setTimeout(() => el.remove(), timeout);
   }
 
+  // ========== Send Email Functions ==========
+  let emailTemplates = [];
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  async function openSendEmailModal(customerId, customerEmail, customerName) {
+    if (!customerEmail) {
+      showAlert('Customer does not have an email address', 'warning');
+      return;
+    }
+
+    document.getElementById('sendEmailCustomerId').value = customerId;
+    document.getElementById('sendEmailCustomerName').value = customerName;
+    document.getElementById('sendEmailTo').value = `${customerName} <${customerEmail}>`;
+
+    // Reset form
+    document.getElementById('emailSourceTemplate').checked = true;
+    document.getElementById('emailSourceCustom').checked = false;
+    document.getElementById('templateSelectionGroup').style.display = 'block';
+    document.getElementById('customEmailGroup').style.display = 'none';
+    document.getElementById('sendEmailTemplateSelect').value = '';
+    document.getElementById('sendEmailSubject').value = '';
+    document.getElementById('sendEmailBody').value = '';
+    document.getElementById('templatePreview').style.display = 'none';
+
+    // Load email templates
+    await loadEmailTemplatesForSend();
+
+    // Show modal - prevent layout shift
+    const modalElement = document.getElementById('sendEmailModal');
+    const modal = new bootstrap.Modal(modalElement, {
+      backdrop: true,
+      keyboard: true,
+      focus: true
+    });
+    
+    // Prevent body padding changes that cause layout shift
+    modalElement.addEventListener('shown.bs.modal', function() {
+      document.body.style.paddingRight = '0px';
+    });
+    
+    modalElement.addEventListener('hidden.bs.modal', function cleanupOnClose() {
+      // Clean up modal state completely
+      document.body.classList.remove('modal-open');
+      document.body.style.paddingRight = '';
+      document.body.style.overflow = '';
+      
+      // Remove backdrop if it exists
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
+      
+      // Remove this event listener to prevent memory leaks
+      modalElement.removeEventListener('hidden.bs.modal', cleanupOnClose);
+    }, { once: true });
+    
+    modal.show();
+  }
+
+  async function loadEmailTemplatesForSend() {
+    const select = document.getElementById('sendEmailTemplateSelect');
+    if (!select) {
+      console.error('sendEmailTemplateSelect element not found');
+      return;
+    }
+
+    try {
+      // Show loading state
+      select.innerHTML = '<option value="">Loading templates...</option>';
+      
+      // Use the correct endpoint path (apiCall prepends API_BASE which is /api/v1)
+      const response = await apiCall('/email-templates');
+      console.log('Email templates API call - endpoint: /email-templates');
+      console.log('Email templates response:', response);
+      console.log('Response type:', typeof response);
+      console.log('Is array:', Array.isArray(response));
+      
+      // Handle different response formats
+      let templates = [];
+      if (Array.isArray(response)) {
+        templates = response;
+      } else if (response && Array.isArray(response.data)) {
+        templates = response.data;
+      } else if (response && Array.isArray(response.templates)) {
+        templates = response.templates;
+      } else if (response && Array.isArray(response.items)) {
+        templates = response.items;
+      }
+      
+      emailTemplates = templates;
+      
+      if (emailTemplates.length === 0) {
+        select.innerHTML = '<option value="">No templates available</option>';
+      } else {
+        select.innerHTML = '<option value="">Select a template...</option>' +
+          emailTemplates.map(t => 
+            `<option value="${t.id}">${escapeHtml(t.templateName || t.name || 'Untitled')}</option>`
+          ).join('');
+      }
+    } catch (err) {
+      console.error('Error loading email templates:', err);
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack,
+        response: err.response
+      });
+      
+      const errorMsg = err.message || 'Unknown error';
+      select.innerHTML = `<option value="">Error: ${escapeHtml(errorMsg.substring(0, 50))}</option>`;
+    }
+  }
+
+  // Handle email source toggle
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('emailSourceTemplate')?.addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('templateSelectionGroup').style.display = 'block';
+        document.getElementById('customEmailGroup').style.display = 'none';
+      }
+    });
+
+    document.getElementById('emailSourceCustom')?.addEventListener('change', function() {
+      if (this.checked) {
+        document.getElementById('templateSelectionGroup').style.display = 'none';
+        document.getElementById('customEmailGroup').style.display = 'block';
+      }
+    });
+
+    // Handle template selection
+    document.getElementById('sendEmailTemplateSelect')?.addEventListener('change', function() {
+      const templateId = this.value;
+      if (templateId) {
+        const template = emailTemplates.find(t => t.id == templateId);
+        if (template) {
+          document.getElementById('templatePreviewSubject').textContent = template.subject || '—';
+          document.getElementById('templatePreviewBody').innerHTML = template.bodyHtml || '<em class="text-muted">No body content</em>';
+          document.getElementById('templatePreview').style.display = 'block';
+        } else {
+          document.getElementById('templatePreview').style.display = 'none';
+        }
+      } else {
+        document.getElementById('templatePreview').style.display = 'none';
+      }
+    });
+  });
+
+  async function sendEmailToCustomer() {
+    const customerId = document.getElementById('sendEmailCustomerId').value;
+    const toFieldValue = document.getElementById('sendEmailTo').value;
+    // Extract email from "Name <email>" format or use as-is
+    const customerEmail = toFieldValue.match(/<(.+)>/)?.[1] || toFieldValue;
+    const customerName = document.getElementById('sendEmailCustomerName').value;
+    const emailSource = document.querySelector('input[name="emailSource"]:checked')?.value;
+
+    if (!customerEmail) {
+      showAlert('Customer email is required', 'danger');
+      return;
+    }
+
+    let subject = '';
+    let bodyHtml = '';
+
+    if (emailSource === 'template') {
+      const templateId = document.getElementById('sendEmailTemplateSelect').value;
+      if (!templateId) {
+        showAlert('Please select an email template', 'warning');
+        return;
+      }
+
+      const template = emailTemplates.find(t => t.id == templateId);
+      if (!template) {
+        showAlert('Selected template not found', 'danger');
+        return;
+      }
+
+      subject = template.subject || '';
+      // Get the raw HTML from the template - ensure it's a string
+      bodyHtml = String(template.bodyHtml || '');
+    } else {
+      // Custom email
+      subject = document.getElementById('sendEmailSubject').value.trim();
+      bodyHtml = document.getElementById('sendEmailBody').value.trim();
+
+      if (!subject || !bodyHtml) {
+        showAlert('Please enter both subject and email body', 'warning');
+        return;
+      }
+    }
+
+    // Replace placeholders - only replace exact placeholder matches, not partial matches
+    const placeholders = {
+      '{{customerName}}': customerName || 'Customer',
+      '{{name}}': customerName || 'Customer',
+      '{{monthYear}}': new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+      '{{companyName}}': 'Company'
+    };
+
+    // Replace placeholders in subject (simple string replacement)
+    Object.keys(placeholders).forEach(key => {
+      const value = placeholders[key];
+      // Use a more specific regex that only matches the exact placeholder
+      const regex = new RegExp(key.replace(/[{}]/g, '\\$&'), 'g');
+      subject = subject.replace(regex, value);
+    });
+
+    // Replace placeholders in HTML body
+    // IMPORTANT: Only replace exact placeholder matches ({{placeholder}})
+    // Do NOT replace partial matches that might be in CSS class names or HTML attributes
+    // We need to be very careful to only match the exact placeholder pattern
+    Object.keys(placeholders).forEach(key => {
+      const value = placeholders[key];
+      // Extract the placeholder name (without braces)
+      const placeholderName = key.replace(/[{}]/g, '');
+      // Create a regex that matches the exact placeholder pattern {{placeholderName}}
+      // Use word boundaries to ensure we don't match partial words
+      // But be careful: we need to match {{placeholder}} exactly, not parts of CSS classes
+      const regex = new RegExp('\\{\\{' + placeholderName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\}\\}', 'g');
+      bodyHtml = bodyHtml.replace(regex, value);
+    });
+
+    // Disable send button
+    const sendBtn = document.getElementById('sendEmailBtn');
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Sending...';
+
+    try {
+      // Ensure HTML is properly stringified before sending
+      const emailPayload = {
+        customerId,
+        to: customerEmail,
+        subject: String(subject),
+        html: String(bodyHtml) // Ensure it's a string
+      };
+
+      const response = await apiCall('/customers/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(emailPayload)
+      });
+
+      showAlert('Email sent successfully!', 'success');
+      
+      // Properly close modal and clean up
+      const modalElement = document.getElementById('sendEmailModal');
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+      }
+      
+      // Clean up modal state after it's hidden
+      modalElement.addEventListener('hidden.bs.modal', function cleanup() {
+        // Remove modal-open class and backdrop
+        document.body.classList.remove('modal-open');
+        document.body.style.paddingRight = '';
+        document.body.style.overflow = '';
+        
+        // Remove backdrop if it exists
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+          backdrop.remove();
+        }
+        
+        // Remove this event listener after cleanup
+        modalElement.removeEventListener('hidden.bs.modal', cleanup);
+      }, { once: true });
+    } catch (err) {
+      console.error('Error sending email:', err);
+      showAlert('Failed to send email: ' + (err.message || 'Unknown error'), 'danger');
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Send Email';
+    }
+  }
+
+  // Initialize sortable table headers
   document.addEventListener('DOMContentLoaded', async () => {
     await loadBusinesses();
     await loadCustomers();
-  });
+    
+    // Add click handlers to sortable headers
+    document.querySelectorAll('.sortable').forEach(th => {
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', () => {
+        const sortField = th.getAttribute('data-sort');
+        sortTable(sortField);
+      });
+    });
 
-  document.getElementById('searchInput')?.addEventListener('input', searchCustomers);
+    // Debounced search input
+    let searchTimeout;
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        applyFilters();
+      }, 500); // Wait 500ms after user stops typing
+    });
+  });
 </script>
+
+<style>
+  /* Enhanced Bulk Upload Styles */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .file-upload-area {
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .file-upload-area:hover {
+    background: #e9ecef;
+    border-color: #667eea !important;
+  }
+
+  .file-upload-area.dragover {
+    background: #e7f3ff;
+    border-color: #667eea !important;
+    transform: scale(1.02);
+  }
+
+  .file-icon {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  .modal-header.bg-gradient-primary {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .progress {
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #e9ecef;
+  }
+
+  .progress-bar {
+    transition: width 0.3s ease;
+  }
+
+  .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  .alert {
+    border-radius: 0.75rem;
+  }
+
+  #fileSelectedInfo {
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card {
+    border-radius: 0.75rem;
+  }
+
+  /* Sortable table headers */
+  .sortable {
+    user-select: none;
+    position: relative;
+  }
+
+  .sortable:hover {
+    background-color: #f8f9fa;
+  }
+
+  .sortable i {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    transition: all 0.2s;
+  }
+
+  .sortable:hover i {
+    opacity: 1;
+  }
+
+  /* Pagination styling */
+  .pagination .page-link {
+    border-radius: 0.375rem;
+    margin: 0 2px;
+    color: #667eea;
+    border-color: #dee2e6;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+
+  .pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #667eea;
+  }
+
+  /* Table row hover */
+  .table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+  .table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Ensure table rows maintain proper colors after modal closes */
+  body:not(.modal-open) .table tbody tr {
+    background-color: transparent !important;
+  }
+
+  body:not(.modal-open) .table tbody tr:hover {
+    background-color: #f8f9fa !important;
+  }
+
+  /* Remove any dark overlay effects when modal is closed */
+  body:not(.modal-open) {
+    background-color: #ffffff !important;
+  }
+
+  /* Ensure modal backdrop is properly removed */
+  body:not(.modal-open) .modal-backdrop {
+    display: none !important;
+  }
+</style>

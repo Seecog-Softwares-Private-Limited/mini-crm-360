@@ -1,52 +1,902 @@
-<div class="container-fluid vh-100 d-flex align-items-center justify-content-center"
-  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-  <div class="card shadow-lg" style="width: 100%; max-width: 400px;">
-    <div class="card-body p-4">
-      <div class="text-center mb-4">
-        <h1 class="h3 mb-2">📱 WhatsApp Manager</h1>
-        <p class="text-muted">Bulk messaging made simple</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - Mini CRM 360</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+  /* ============================================
+     PREMIUM LOGIN PAGE STYLING
+     Mini CRM Professional Theme
+     ============================================ */
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  /* Subtle Background Pattern */
+  .login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 80%, rgba(240, 147, 251, 0.02) 0%, transparent 50%);
+    z-index: 1;
+  }
+
+  /* Cartoon CRM Icons */
+  .cartoon-icon {
+    position: absolute;
+    z-index: 2;
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    animation: floatGentle 6s ease-in-out infinite;
+    transition: transform 0.3s ease;
+  }
+
+  .cartoon-icon:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  /* Different colored backgrounds for each icon */
+  .cartoon-icon.customer {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    top: 8%;
+    left: 8%;
+    animation-delay: 0s;
+  }
+
+  .cartoon-icon.business {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    top: 15%;
+    right: 10%;
+    animation-delay: 1s;
+  }
+
+  .cartoon-icon.campaign {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    bottom: 12%;
+    left: 12%;
+    animation-delay: 2s;
+  }
+
+  .cartoon-icon.analytics {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    bottom: 20%;
+    right: 8%;
+    animation-delay: 3s;
+  }
+
+  .cartoon-icon.email {
+    background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+    top: 45%;
+    left: 5%;
+    animation-delay: 4s;
+  }
+
+  .cartoon-icon.whatsapp {
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    top: 55%;
+    right: 5%;
+    animation-delay: 5s;
+  }
+
+  .cartoon-icon.team {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    top: 30%;
+    left: 15%;
+    animation-delay: 1.5s;
+  }
+
+  .cartoon-icon.chart {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    bottom: 35%;
+    right: 18%;
+    animation-delay: 2.5s;
+  }
+
+  .cartoon-icon.document {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    top: 70%;
+    left: 20%;
+    animation-delay: 3.5s;
+  }
+
+  .cartoon-icon.notification {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    top: 25%;
+    right: 25%;
+    animation-delay: 4.5s;
+  }
+
+  @keyframes floatGentle {
+    0%, 100% { 
+      transform: translateY(0px) rotate(0deg); 
+    }
+    50% { 
+      transform: translateY(-20px) rotate(5deg); 
+    }
+  }
+
+  /* Login Card */
+  .login-card {
+    position: relative;
+    z-index: 10;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 440px;
+    padding: 3rem 2.5rem;
+    animation: cardSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  @keyframes cardSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Logo/Brand Section */
+  .login-brand {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .login-logo {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    animation: logoPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes logoPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+    50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
+  }
+
+  .login-logo i {
+    font-size: 2.5rem;
+    color: #ffffff;
+  }
+
+  .login-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.5px;
+  }
+
+  .login-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 400;
+  }
+
+  /* Form Styling */
+  .login-form {
+    margin-top: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.75rem;
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.3px;
+    transition: color 0.3s ease;
+  }
+
+  .form-group:focus-within .form-label {
+    color: #667eea;
+  }
+
+  /* Forgot Password Link */
+  .forgot-password-link {
+    font-size: 0.875rem;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .forgot-password-link:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  /* Premium Modal Styling */
+  .premium-modal {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .premium-modal .modal-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.5rem;
+  }
+
+  .premium-modal .modal-title {
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+  }
+
+  .premium-modal .modal-body {
+    padding: 1.5rem;
+  }
+
+  /* Premium Input Wrapper */
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1.125rem;
+    color: #9ca3af;
+    font-size: 1.1rem;
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .form-group:focus-within .input-icon {
+    color: #667eea;
+    transform: scale(1.1);
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 14px;
+    background: linear-gradient(to bottom, #ffffff 0%, #fafbfc 100%);
+    color: #1e293b;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.02),
+      inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+
+  .form-control:hover {
+    border-color: #cbd5e1;
+    box-shadow: 
+      0 4px 8px rgba(0, 0, 0, 0.04),
+      inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  }
+
+  .form-control:focus {
+    border-color: #667eea;
+    background: #ffffff;
+    box-shadow: 
+      0 0 0 4px rgba(102, 126, 234, 0.12),
+      0 8px 16px rgba(102, 126, 234, 0.15),
+      inset 0 1px 2px rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+  }
+
+  /* Animated Border Gradient on Focus */
+  .form-group::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 0 0 14px 14px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  .form-group:focus-within::after {
+    width: 100%;
+  }
+
+  .form-control::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+  }
+
+  .form-control:focus::placeholder {
+    opacity: 0.5;
+  }
+
+  /* Password field specific styling */
+  .form-control[type="password"] {
+    letter-spacing: 0.2em;
+  }
+
+  /* Login Button */
+  .btn-login {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    position: relative;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+
+  .btn-login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-login:hover::before {
+    left: 100%;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+  }
+
+  .btn-login:active {
+    transform: translateY(0);
+  }
+
+  .btn-login:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Alert Container */
+  #alertContainer {
+    margin-bottom: 1.5rem;
+  }
+
+  .alert {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .alert-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+  }
+
+  .alert-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+  }
+
+  .alert-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+  }
+
+  /* Footer Links */
+  .login-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .login-footer p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .login-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .login-footer a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+  }
+
+  .btn-clear-storage {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+  }
+
+  .btn-clear-storage:hover {
+    color: #64748b;
+  }
+
+  /* Loading Spinner */
+  .spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 576px) {
+    .login-card {
+      padding: 2rem 1.5rem;
+      margin: 1rem;
+      border-radius: 20px;
+    }
+
+    .login-title {
+      font-size: 1.75rem;
+    }
+
+    .login-logo {
+      width: 70px;
+      height: 70px;
+    }
+
+    .login-logo i {
+      font-size: 2rem;
+    }
+
+    .cartoon-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      border-radius: 15px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .cartoon-icon {
+      width: 70px;
+      height: 70px;
+      font-size: 1.75rem;
+    }
+  }
+
+  /* Premium Glassmorphism Effect */
+  .login-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
+  }
+
+  /* Social Login Divider */
+  .social-divider {
+    display: flex;
+    align-items: center;
+    margin: 1.75rem 0 1.25rem;
+    gap: 0.75rem;
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+  }
+
+  .divider-text {
+    color: #9ca3af;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+
+  /* Social Login Buttons - Compact & Professional */
+  .social-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .social-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+
+  .social-btn:hover::before {
+    width: 100%;
+    height: 100%;
+  }
+
+  .social-btn i {
+    font-size: 1.1rem;
+    transition: all 0.25s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  .social-btn:hover i {
+    transform: scale(1.1);
+  }
+
+  .social-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Google Button */
+  .social-btn.google {
+    color: #4285f4;
+    border-color: rgba(66, 133, 244, 0.2);
+  }
+
+  .social-btn.google:hover {
+    background: #4285f4;
+    color: #ffffff;
+    border-color: #4285f4;
+  }
+
+  /* Instagram Button */
+  .social-btn.instagram {
+    color: #e4405f;
+    border-color: rgba(228, 64, 95, 0.2);
+  }
+
+  .social-btn.instagram:hover {
+    background: linear-gradient(135deg, #f09433 0%, #e4405f 50%, #bc1888 100%);
+    color: #ffffff;
+    border-color: #e4405f;
+  }
+
+  /* Facebook Button */
+  .social-btn.facebook {
+    color: #1877f2;
+    border-color: rgba(24, 119, 242, 0.2);
+  }
+
+  .social-btn.facebook:hover {
+    background: #1877f2;
+    color: #ffffff;
+    border-color: #1877f2;
+  }
+
+  /* GitHub Button */
+  .social-btn.github {
+    color: #333333;
+    border-color: rgba(51, 51, 51, 0.2);
+  }
+
+  .social-btn.github:hover {
+    background: #333333;
+    color: #ffffff;
+    border-color: #333333;
+  }
+
+  /* LinkedIn Button */
+  .social-btn.linkedin {
+    color: #0077b5;
+    border-color: rgba(0, 119, 181, 0.2);
+  }
+
+  .social-btn.linkedin:hover {
+    background: #0077b5;
+    color: #ffffff;
+    border-color: #0077b5;
+  }
+
+  /* Twitter Button */
+  .social-btn.twitter {
+    color: #1da1f2;
+    border-color: rgba(29, 161, 242, 0.2);
+  }
+
+  .social-btn.twitter:hover {
+    background: #1da1f2;
+    color: #ffffff;
+    border-color: #1da1f2;
+  }
+
+  /* Responsive Social Buttons */
+  @media (max-width: 576px) {
+    .social-login {
+      gap: 0.5rem;
+    }
+
+    .social-btn {
+      width: 40px;
+      height: 40px;
+    }
+
+    .social-btn i {
+      font-size: 1rem;
+    }
+
+    .social-divider {
+      margin: 1.5rem 0 1rem;
+    }
+
+    .divider-text {
+      font-size: 0.75rem;
+    }
+  }
+</style>
+
+<div class="login-container">
+  <!-- Cartoon CRM Icons - Representing CRM Features -->
+  <div class="cartoon-icon customer" title="Manage Customers">
+    <i class="fas fa-users"></i>
+  </div>
+  <div class="cartoon-icon business" title="Business Management">
+    <i class="fas fa-building"></i>
+  </div>
+  <div class="cartoon-icon campaign" title="Marketing Campaigns">
+    <i class="fas fa-bullhorn"></i>
+  </div>
+  <div class="cartoon-icon analytics" title="Analytics & Reports">
+    <i class="fas fa-chart-line"></i>
+  </div>
+  <div class="cartoon-icon email" title="Email Marketing">
+    <i class="fas fa-envelope"></i>
+  </div>
+  <div class="cartoon-icon whatsapp" title="WhatsApp Messaging">
+    <i class="fab fa-whatsapp"></i>
+  </div>
+  <div class="cartoon-icon team" title="Team Collaboration">
+    <i class="fas fa-user-friends"></i>
+  </div>
+  <div class="cartoon-icon chart" title="Data Insights">
+    <i class="fas fa-chart-pie"></i>
+  </div>
+  <div class="cartoon-icon document" title="Document Management">
+    <i class="fas fa-file-alt"></i>
+  </div>
+  <div class="cartoon-icon notification" title="Smart Notifications">
+    <i class="fas fa-bell"></i>
+  </div>
+
+  <!-- Login Card -->
+  <div class="login-card">
+    <!-- Brand Section -->
+    <div class="login-brand">
+      <div class="login-logo">
+        <i class="fas fa-briefcase"></i>
+      </div>
+      <h1 class="login-title">Mini CRM 360</h1>
+      <p class="login-subtitle">Professional Customer Relationship Management</p>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon"></i>
+          <input 
+            type="email" 
+            class="form-control" 
+            id="email" 
+            name="email" 
+            placeholder="Enter your email"
+            required
+            autocomplete="email"
+          >
+        </div>
       </div>
 
-      <div id="alertContainer"></div>
-
-      <form id="loginForm">
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" name="email" required>
+      <div class="form-group">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label for="password" class="form-label mb-0">Password</label>
+          <a href="#" class="forgot-password-link" onclick="event.preventDefault(); openForgotPasswordModal();">
+            Forgot Password?
+          </a>
         </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
-          <input type="password" class="form-control" id="password" name="password" required>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="password" 
+            name="password" 
+            placeholder="Enter your password"
+            required
+            autocomplete="current-password"
+          >
         </div>
-
-        <button type="submit" class="btn btn-primary w-100 mb-3" id="loginBtn">
-          <span id="loginText">Login</span>
-          <span id="loadingText" class="d-none">
-            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-            Logging in...
-          </span>
-        </button>
-      </form>
-
-      <div class="flex">
-        <a href="/auth/google" class="btn btn-danger w-100 mb-2">
-          <i class="fab fa-google"></i> Continue with Google
-        </a>
-
-        <a href="/auth/facebook" class="btn btn-primary w-100 mb-2">
-          <i class="fab fa-facebook"></i> Continue with Facebook
-        </a>
-
-        <a href="/auth/facebook?provider=instagram" class="btn btn-dark w-100">
-          <i class="fab fa-instagram"></i> Continue with Instagram
-        </a>
-
       </div>
 
-      <div class="text-center">
-        <p class="mb-0">Don't have an account? <a href="/register" class="text-decoration-none">Register here</a></p>
-        <button type="button" class="btn btn-link btn-sm mt-2" onclick="clearStorage()">Clear Storage & Refresh</button>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span id="loginText">Sign In</span>
+        <span id="loadingText" class="d-none">
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Signing in...
+        </span>
+      </button>
+    </form>
+
+    <!-- Social Login Divider -->
+    <div class="social-divider">
+      <span class="divider-line"></span>
+      <span class="divider-text">Or continue with</span>
+      <span class="divider-line"></span>
+    </div>
+
+    <!-- Social Login Buttons -->
+    <div class="social-login">
+      <button type="button" class="social-btn google" onclick="handleSocialLogin('google')" title="Sign in with Google">
+        <i class="fab fa-google"></i>
+      </button>
+      <button type="button" class="social-btn instagram" onclick="handleSocialLogin('instagram')" title="Sign in with Instagram">
+        <i class="fab fa-instagram"></i>
+      </button>
+      <button type="button" class="social-btn facebook" onclick="handleSocialLogin('facebook')" title="Sign in with Facebook">
+        <i class="fab fa-facebook-f"></i>
+      </button>
+      <button type="button" class="social-btn github" onclick="handleSocialLogin('github')" title="Sign in with GitHub">
+        <i class="fab fa-github"></i>
+      </button>
+      <button type="button" class="social-btn linkedin" onclick="handleSocialLogin('linkedin')" title="Sign in with LinkedIn">
+        <i class="fab fa-linkedin-in"></i>
+      </button>
+      <button type="button" class="social-btn twitter" onclick="handleSocialLogin('twitter')" title="Sign in with Twitter">
+        <i class="fab fa-twitter"></i>
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p class="mb-2">Don't have an account? <a href="/register">Create Account</a></p>
+      <button type="button" class="btn-clear-storage" onclick="clearStorage()">
+        Clear Storage & Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content premium-modal">
+        <div class="modal-header">
+          <h5 class="modal-title" id="forgotPasswordModalLabel">
+            <i class="fas fa-key me-2"></i>Reset Password
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="forgotPasswordAlert"></div>
+          <p class="text-muted mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+          <form id="forgotPasswordForm">
+            <div class="form-group">
+              <label for="forgotEmail" class="form-label">Email Address</label>
+              <div class="input-wrapper">
+                <i class="fas fa-envelope input-icon"></i>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  id="forgotEmail" 
+                  name="email" 
+                  placeholder="Enter your email"
+                  required
+                  autocomplete="email"
+                >
+              </div>
+            </div>
+            <button type="submit" class="btn-login w-100" id="forgotPasswordBtn">
+              <span id="forgotPasswordText">Send Reset Link</span>
+              <span id="forgotPasswordLoading" class="d-none">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Sending...
+              </span>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -79,45 +929,100 @@
         skipAuth: true
       });
 
+      console.log('Login response:', resObj);
+      console.log('Response type:', typeof resObj);
+      console.log('Response keys:', Object.keys(resObj || {}));
+
       // resObj is already JSON (from main.hbs apiCall)
       const data = resObj || {};
+      
+      // Handle ApiResponse structure: { statusCode, data: { tokens, user }, message, success }
+      // ApiResponse format: { statusCode: 200, data: { tokens: {...}, user: {...} }, message: "...", success: true }
       const payload = data.data || data; // handle ApiResponse or plain
 
-      // If API returned an error shape
-      if (data.error || data.message && !payload.tokens) {
+      console.log('Full response data:', JSON.stringify(data, null, 2));
+      console.log('Payload:', JSON.stringify(payload, null, 2));
+
+      // Check for error - simplified condition
+      if (data.error || data.success === false) {
+        console.error('Login error detected:', data.error || data.message);
         showAlert(data.message || data.error || 'Login failed', 'danger');
         return;
       }
 
-      const user = payload.user || payload.data?.user || null;
-      const tokens = payload.tokens || payload.data?.tokens || {};
+      // Extract user and tokens from response
+      // Response structure: data.data = { tokens: { accessToken, refreshToken }, user: {...} }
+      const user = payload?.user || null;
+      const tokens = payload?.tokens || {};
+
+      console.log('Extracted tokens:', tokens);
+      console.log('Extracted user:', user);
+      console.log('Has accessToken:', !!tokens?.accessToken);
 
       if (!tokens || !tokens.accessToken) {
-        showAlert('Login failed: no token received', 'danger');
+        console.error('Login response structure:', JSON.stringify(data, null, 2));
+        console.error('Payload structure:', JSON.stringify(payload, null, 2));
+        showAlert('Login failed: no token received. Please check console for details.', 'danger');
         return;
       }
 
-      // Store user + token
-      //if (user) localStorage.setItem('user', JSON.stringify(user));
-      //localStorage.setItem('accessToken', tokens.accessToken);
+      // Store user + token in localStorage
+      try {
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          console.log('✅ User stored in localStorage');
+        }
+        localStorage.setItem('accessToken', tokens.accessToken);
+        console.log('✅ Access token stored in localStorage');
+        if (tokens.refreshToken) {
+          localStorage.setItem('refreshToken', tokens.refreshToken);
+          console.log('✅ Refresh token stored in localStorage');
+        }
+      } catch (storageError) {
+        console.error('❌ Error storing in localStorage:', storageError);
+        showAlert('Error saving login data. Please try again.', 'danger');
+        loginBtn.disabled = false;
+        loginText.classList.remove('d-none');
+        loadingText.classList.add('d-none');
+        return;
+      }
 
-      // Success + redirect
-      showAlert('Login successful! Redirecting...', 'success');
+      console.log('✅ Tokens stored successfully');
+      console.log('✅ Access token:', tokens.accessToken ? 'Present' : 'Missing');
+      console.log('✅ About to redirect to dashboard...');
+
+      // Force redirect - use replace to prevent back button issues
       const url = new URL(location.href);
       const next = url.searchParams.get('next');
+      const redirectUrl = next || '/dashboard';
+      
+      console.log('✅ Redirect URL:', redirectUrl);
+      console.log('✅ Current location:', window.location.href);
+      
+      // IMPORTANT: Wait a tiny bit for cookies to be set by server
+      // Cookies are set via Set-Cookie header, browser needs a moment to process them
       setTimeout(() => {
-        window.location.replace(next || '/dashboard');
-      }, 500);
+        console.log('🚀 REDIRECTING TO:', redirectUrl);
+        console.log('🚀 Current URL:', window.location.href);
+        console.log('🚀 Cookies should be set by now');
+        
+        // Store redirect flag
+        window.loginRedirectInProgress = true;
+        
+        // Redirect using replace (prevents back button issues)
+        window.location.replace(redirectUrl);
+      }, 100);
 
     } catch (error) {
       console.error('Login error:', error);
+      console.error('Error stack:', error.stack);
       showAlert('Network error. Please try again.', 'danger');
-    } finally {
-      // Hide loading
+      // Re-enable button on error
       loginBtn.disabled = false;
       loginText.classList.remove('d-none');
       loadingText.classList.add('d-none');
     }
+    // Note: No finally block - we don't want to re-enable the button if redirect is happening
   });
 
   function showAlert(message, type) {
@@ -125,18 +1030,20 @@
     alertContainer.innerHTML = `
       <div class="alert alert-${type} alert-dismissible fade show" role="alert">
         ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     `;
   }
 
-  // This log is harmless; it does not block redirects
-  document.addEventListener('DOMContentLoaded', function () {
+  // Prevent auto-redirect on page load to avoid redirect loops
+  // This only affects page load, not the redirect after successful login
+  document.addEventListener('DOMContentLoaded', function() {
     window.loginRedirected = false;
-    console.log('Login page loaded - auto-redirect disabled to prevent loops');
+    // Removed console.log to reduce noise - this is normal behavior
     const token = localStorage.getItem('accessToken');
     if (token) {
-      // Intentionally not auto-redirecting here
+      // Intentionally not auto-redirecting here to prevent loops
+      // Redirect after successful login is handled in the form submit handler above
     }
   });
 
@@ -146,4 +1053,193 @@
     console.log('Storage cleared, refreshing page...');
     window.location.reload();
   }
+
+  // Handle Social Login
+  // Handle Social Login (FIXED)
+function handleSocialLogin(provider) {
+  const alertContainer = document.getElementById('alertContainer');
+  alertContainer.innerHTML = `
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      <i class="fas fa-spinner fa-spin me-2"></i>Redirecting to ${provider.charAt(0).toUpperCase() + provider.slice(1)}...
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
+
+  // ✅ Only these providers are enabled
+  if (provider === "google" || provider === "facebook") {
+    window.location.href = `/auth/${provider}`;   // ✅ this will redirect now
+    return;
+  }
+
+  showAlert(`${provider} login coming soon`, 'info');
+}
+
+
+  // Check for error in URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const error = urlParams.get('error');
+  if (error) {
+    showAlert(error, 'danger');
+  }
+
+  // Forgot Password Modal Functions
+  function openForgotPasswordModal() {
+    const modal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+    modal.show();
+    // Clear form and alerts when opening
+    document.getElementById('forgotPasswordForm').reset();
+    document.getElementById('forgotPasswordAlert').innerHTML = '';
+  }
+
+  function showForgotPasswordAlert(message, type) {
+    const alertContainer = document.getElementById('forgotPasswordAlert');
+    alertContainer.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+  }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // API Configuration - Set from backend based on environment
+  // login.hbs is standalone (layout: false), so we define API_BASE here
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+
+  // Helper: detect if current page is login or register
+  function isAuthPage() {
+    const p = window.location.pathname.toLowerCase();
+    return p === '/login' || p === '/register' || p.endsWith('/login') || p.endsWith('/register');
+  }
+  
+  // Helper function to make API calls
+  async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('accessToken') || null;
+
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+
+    // Attach Authorization only if we have a real token and caller didn't skip auth
+    if (token && !options.skipAuth) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const defaultOptions = {
+      credentials: 'include',
+      ...options,
+      headers
+    };
+    
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, defaultOptions);
+
+      // If unauthorized:
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
+        const isAuthError =
+          response.status === 401 ||
+          (errorData.error && (
+            String(errorData.error).includes('jwt expired') ||
+            String(errorData.error).includes('Invalid access Token') ||
+            String(errorData.error).includes('Authentication failed')
+          ));
+
+        if (isAuthError) {
+          // Only redirect to /login if we are NOT already on login/register
+          if (!isAuthPage()) {
+            console.log('Authentication failed, redirecting to login...');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            window.location.replace('/login');
+            return;
+          }
+          // If we are on an auth page, just return the error JSON to the caller
+          return errorData;
+        }
+
+        // Non-auth failure: throw with message for the caller
+        throw new Error(errorData.message || errorData.error || 'API request failed');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      // Network or other errors; don't force redirect if already on auth pages
+      const msg = String(error && error.message || '');
+      if (
+        (msg.includes('jwt expired') || msg.includes('Invalid access Token') || msg.includes('Authentication failed')) &&
+        !isAuthPage()
+      ) {
+        console.log('Authentication failed, redirecting to login...');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        window.location.replace('/login');
+        return;
+      }
+      throw error;
+    }
+  }
+
+  // Forgot Password Form Handler (must be after apiCall is defined)
+  document.addEventListener('DOMContentLoaded', function() {
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    if (forgotPasswordForm) {
+      forgotPasswordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('forgotEmail').value;
+        const forgotBtn = document.getElementById('forgotPasswordBtn');
+        const forgotText = document.getElementById('forgotPasswordText');
+        const forgotLoading = document.getElementById('forgotPasswordLoading');
+        const alertContainer = document.getElementById('forgotPasswordAlert');
+
+        // Clear previous alerts
+        alertContainer.innerHTML = '';
+
+        // Show loading
+        forgotBtn.disabled = true;
+        forgotText.classList.add('d-none');
+        forgotLoading.classList.remove('d-none');
+
+        try {
+          const resObj = await apiCall('/auth/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({ email }),
+            skipAuth: true
+          });
+
+          const data = resObj || {};
+
+          if (data.error) {
+            showForgotPasswordAlert(data.message || data.error || 'Failed to send reset link', 'danger');
+          } else {
+            showForgotPasswordAlert(
+              'If an account with that email exists, a password reset link has been sent. Please check your email.',
+              'success'
+            );
+            // Clear form
+            document.getElementById('forgotPasswordForm').reset();
+            // Close modal after 3 seconds
+            setTimeout(() => {
+              const modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+              if (modal) modal.hide();
+            }, 3000);
+          }
+        } catch (error) {
+          console.error('Forgot password error:', error);
+          showForgotPasswordAlert('Network error. Please try again.', 'danger');
+        } finally {
+          // Hide loading
+          forgotBtn.disabled = false;
+          forgotText.classList.remove('d-none');
+          forgotLoading.classList.add('d-none');
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

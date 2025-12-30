@@ -1,275 +1,1420 @@
 <div class="container-fluid">
   <div class="row">
-    <!-- Sidebar -->
     {{> sidebar}}
 
-    <!-- Main Content -->
-    <div class="col-md-9 col-lg-10">
-      <div class="main-content p-4">
+    <div class="col-md-9 col-lg-10 main-content">
+      <div class="container-fluid p-4">
+        <style>
+          .main-content {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            position: relative;
+          }
 
-        <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2>Profile</h2>
+          .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+              radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+          }
+
+          .container-fluid.p-4 {
+            position: relative;
+          }
+
+          .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+          }
+
+          .profile-header h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 2.5rem;
+          }
+
+          .profile-tabs {
+            background: white;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+          }
+
+          .profile-tabs .nav-tabs {
+            border-bottom: 2px solid #e5e7eb;
+            padding: 0;
+            margin: 0;
+          }
+
+          .profile-tabs .nav-link {
+            border: none;
+            border-radius: 0;
+            padding: 1.25rem 2rem;
+            color: #6b7280;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+          }
+
+          .profile-tabs .nav-link:hover {
+            color: #667eea;
+            background: #f9fafb;
+          }
+
+          .profile-tabs .nav-link.active {
+            color: #667eea;
+            background: #f9fafb;
+            border-bottom-color: #667eea;
+          }
+
+          .profile-tab-content {
+            padding: 2.5rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          }
+
+          .avatar-container {
+            text-align: center;
+            margin-bottom: 2rem;
+          }
+
+          .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+          }
+
+          .avatar-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+          }
+
+          .avatar-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+          }
+
+          .avatar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+          }
+
+          .avatar-wrapper:hover .avatar-overlay {
+            opacity: 1;
+          }
+
+          /* Image Cropper Modal Styles */
+          #avatarCropModal {
+            z-index: 1055 !important;
+          }
+
+          #avatarCropModal .modal-backdrop {
+            z-index: 1050 !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+          }
+
+          #avatarCropModal .modal-content {
+            background: white !important;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          }
+
+          #avatarCropModal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            border-radius: 16px 16px 0 0;
+            padding: 1.5rem;
+            border-bottom: none;
+          }
+
+          #avatarCropModal .modal-body {
+            padding: 2rem;
+            background: white !important;
+          }
+
+          #avatarCropModal .modal-footer {
+            background: white !important;
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem 1.5rem;
+            border-radius: 0 0 16px 16px;
+          }
+
+          .cropper-container {
+            max-width: 100%;
+            max-height: 70vh;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1rem;
+          }
+
+          .cropper-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            min-height: 400px;
+            position: relative;
+          }
+
+          .cropper-wrapper img {
+            max-width: 100%;
+            max-height: 70vh;
+            display: block;
+          }
+
+          .cropper-preview-container {
+            margin-top: 1rem;
+            text-align: center;
+          }
+
+          .cropper-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto;
+            border: 4px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background: white;
+          }
+
+          .cropper-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+          }
+
+          /* Ensure cropper controls are visible */
+          .cropper-container .cropper-view-box {
+            outline: 2px solid #667eea !important;
+            outline-offset: -2px;
+          }
+
+          .cropper-container .cropper-face {
+            background-color: rgba(102, 126, 234, 0.1) !important;
+          }
+
+          .cropper-container .cropper-line {
+            background-color: #667eea !important;
+          }
+
+          .cropper-container .cropper-point {
+            background-color: #667eea !important;
+            width: 8px !important;
+            height: 8px !important;
+          }
+
+          .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+          }
+
+          .form-control,
+          .form-select {
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+          }
+
+          .form-control:focus,
+          .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+          }
+
+          .password-strength-meter {
+            height: 4px;
+            border-radius: 2px;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+          }
+
+          .password-strength-meter.weak {
+            background: #ef4444;
+            width: 33%;
+          }
+
+          .password-strength-meter.medium {
+            background: #f59e0b;
+            width: 66%;
+          }
+
+          .password-strength-meter.strong {
+            background: #10b981;
+            width: 100%;
+          }
+
+          .session-item {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+          }
+
+          .session-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+          }
+
+          .session-item.current {
+            border-color: #10b981;
+            background: #f0fdf4;
+          }
+
+          .activity-log-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+          }
+
+          .activity-log-item:hover {
+            background: #f9fafb;
+          }
+
+          .activity-log-item:last-child {
+            border-bottom: none;
+          }
+
+          .plan-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+          }
+
+          .plan-badge.free {
+            background: #fef3c7;
+            color: #92400e;
+          }
+
+          .plan-badge.silver {
+            background: #e0e7ff;
+            color: #4338ca;
+          }
+
+          .plan-badge.gold {
+            background: #fef3c7;
+            color: #d97706;
+          }
+
+          .usage-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            overflow: hidden;
+            margin-top: 0.5rem;
+          }
+
+          .usage-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+          }
+
+          .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          }
+
+          .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+          }
+        </style>
+
+        <!-- Header -->
+        <div class="profile-header">
+          <h2><i class="fas fa-user-circle me-2"></i>Profile Settings</h2>
+          <p class="mb-0 mt-2 opacity-90">Manage your account settings and preferences</p>
         </div>
 
-        <!-- Top Cards -->
-        <div class="row mb-4">
-          <!-- User Card -->
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-body d-flex align-items-center gap-3">
-                <img
-                  src="{{user.avatarUrl}}"
-                  onerror="this.src='https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250'"
-                  style="width:70px;height:70px;border-radius:50%;object-fit:cover;"
-                />
-                <div>
-                  <h5 class="mb-1">{{user.firstName}} {{user.lastName}}</h5>
-                  <div class="text-muted">{{user.email}}</div>
-                  <span class="badge bg-primary mt-1">{{user.role}}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Business Card -->
-          <div class="col-md-6">
-            <div class="card">
-              <div class="card-body d-flex align-items-center gap-3">
-                <img
-                  src="{{business.logoUrl}}"
-                  onerror="this.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkr2dJA6j3aCU8dYK3OAAsTwsLS6lbz9GFcw&s'"
-                  style="width:70px;height:70px;border-radius:8px;object-fit:contain;"
-                />
-                <div>
-                  <h5 class="mb-1">{{business.businessName}}</h5>
-                  <div class="text-muted">
-                    {{business.city}}, {{business.state}}, {{business.country}}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- Tabs Navigation -->
+        <div class="profile-tabs">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                <i class="fas fa-user me-2"></i>My Profile
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                <i class="fas fa-shield-alt me-2"></i>Security
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="workspace-tab" data-bs-toggle="tab" data-bs-target="#workspace" type="button" role="tab">
+                <i class="fas fa-briefcase me-2"></i>Workspace
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="notifications-tab" data-bs-toggle="tab" data-bs-target="#notifications" type="button" role="tab">
+                <i class="fas fa-bell me-2"></i>Notifications
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="billing-tab" data-bs-toggle="tab" data-bs-target="#billing" type="button" role="tab">
+                <i class="fas fa-credit-card me-2"></i>Billing
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">
+                <i class="fas fa-history me-2"></i>Activity Log
+              </button>
+            </li>
+          </ul>
         </div>
 
-        <!-- Tabs -->
-        <ul class="nav nav-tabs mb-3" role="tablist">
-          <li class="nav-item">
-            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-account">
-              <i class="fas fa-user me-1"></i> Account
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-business">
-              <i class="fas fa-building me-1"></i> Business
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-whatsapp">
-              <i class="fab fa-whatsapp me-1"></i> WhatsApp Setup
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-preferences">
-              <i class="fas fa-cog me-1"></i> Preferences
-            </button>
-          </li>
-        </ul>
-
-        <div class="tab-content">
-
-          <!-- ================= ACCOUNT TAB ================= -->
-          <div class="tab-pane fade show active" id="tab-account">
-            <div class="card">
-              <div class="card-body">
-                <form id="accountForm">
-
-                  <div class="mb-3">
-                    <label class="form-label">Full Name *</label>
-                    <input type="text" class="form-control" name="fullName"
-                      value="{{user.firstName}} {{user.lastName}}" required />
+        <!-- Tab Content -->
+        <div class="tab-content" id="profileTabContent">
+          <!-- My Profile Tab -->
+          <div class="tab-pane fade show active" id="profile" role="tabpanel">
+            <div class="profile-tab-content">
+              <div class="avatar-container">
+                <div class="avatar-wrapper">
+                  <img 
+                    id="avatarPreview" 
+                    src="{{user.avatar}}" 
+                    alt="Avatar" 
+                    class="avatar-img"
+                    onerror="this.src='https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=150'"
+                    onclick="document.getElementById('avatarInput').click()">
+                  <div class="avatar-overlay" onclick="document.getElementById('avatarInput').click()">
+                    <i class="fas fa-camera text-white fa-2x"></i>
                   </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">Email *</label>
-                    <input type="email" class="form-control" value="{{user.email}}" required />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">Mobile Number *</label>
-                    <input type="text" class="form-control" name="phone"
-                      value="{{user.phone}}" placeholder="+91XXXXXXXXXX" required />
-                  </div>
-
-                  <hr />
-
-                  <div class="mb-3">
-                    <label class="form-label">Change Password</label>
-                    <input type="password" class="form-control" name="newPassword"
-                      placeholder="Leave blank to keep current password" />
-                  </div>
-
-                  <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary" onclick="saveAccount()">
-                      Save Account
-                    </button>
-                  </div>
-
-                </form>
+                </div>
+                <input type="file" id="avatarInput" accept="image/jpeg,image/jpg,image/png,image/webp" style="display: none;" onchange="handleAvatarUpload(event)">
+                <div>
+                  <button class="btn btn-sm btn-outline-primary me-2" onclick="document.getElementById('avatarInput').click()">
+                    <i class="fas fa-upload me-1"></i>Upload Photo
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="removeAvatar()">
+                    <i class="fas fa-trash me-1"></i>Remove
+                  </button>
+                </div>
+                <small class="text-muted d-block mt-2">Max size: 2MB. Formats: JPG, PNG, WebP</small>
               </div>
-            </div>
-          </div>
 
-          <!-- ================= BUSINESS TAB ================= -->
-          <div class="tab-pane fade" id="tab-business">
-            <div class="card">
-              <div class="card-body">
-                <form id="businessForm" enctype="multipart/form-data">
-
-                  <div class="mb-3">
-                    <label class="form-label">Business Name *</label>
-                    <input type="text" class="form-control" name="businessName"
-                      value="{{business.businessName}}" required />
+              <form id="profileForm">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" class="form-control" id="firstName" value="{{user.firstName}}" required>
                   </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">Business Logo *</label>
-                    <input type="file" class="form-control" name="logo"
-                      accept="image/png,image/jpeg" />
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" class="form-control" id="lastName" value="{{user.lastName}}" required>
                   </div>
+                </div>
 
-                  <div class="row">
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label">City *</label>
-                      <input type="text" class="form-control" name="city"
-                        value="{{business.city}}" required />
-                    </div>
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label">State *</label>
-                      <input type="text" class="form-control" name="state"
-                        value="{{business.state}}" required />
-                    </div>
-                    <div class="col-md-4 mb-3">
-                      <label class="form-label">Country *</label>
-                      <input type="text" class="form-control" name="country"
-                        value="{{business.country}}" required />
-                    </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" value="{{user.email}}" readonly>
+                    <small class="text-muted">Email cannot be changed</small>
                   </div>
-
-                  <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary" onclick="saveBusiness()">
-                      Save Business
-                    </button>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-control" id="phone" value="{{user.phone}}">
                   </div>
+                </div>
 
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <!-- ================= WHATSAPP TAB ================= -->
-          <div class="tab-pane fade" id="tab-whatsapp">
-            <div class="card">
-              <div class="card-body">
-                <form id="whatsappForm">
-
-                  <div class="alert alert-info mb-3">
-                    <strong>Status:</strong>
-                    {{#if whatsapp.connected}}
-                      <span class="text-success">Connected ✅</span>
-                    {{else}}
-                      <span class="text-danger">Not Connected ❌</span>
-                    {{/if}}
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Role</label>
+                    <input type="text" class="form-control" id="role" value="{{user.role}}" readonly>
                   </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">WABA ID *</label>
-                    <input type="text" class="form-control" name="wabaId"
-                      value="{{whatsapp.wabaId}}" required />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">Phone Number ID *</label>
-                    <input type="text" class="form-control" name="phoneNumberId"
-                      value="{{whatsapp.phoneNumberId}}" required />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">WhatsApp Number *</label>
-                    <input type="text" class="form-control" name="whatsappNumber"
-                      value="{{whatsapp.whatsappNumber}}" placeholder="+91XXXXXXXXXX" required />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">Permanent Access Token *</label>
-                    <input type="password" class="form-control"
-                      placeholder="************abcd" />
-                    <small class="text-muted">Token is stored securely</small>
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">Webhook Verify Token *</label>
-                    <input type="text" class="form-control"
-                      value="{{whatsapp.verifyToken}}" required />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label">Webhook URL</label>
-                    <input type="text" class="form-control"
-                      value="{{whatsapp.webhookUrl}}" readonly />
-                  </div>
-
-                  <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-success" onclick="saveWhatsApp()">
-                      Save WhatsApp Setup
-                    </button>
-                  </div>
-
-                </form>
-              </div>
-            </div>
-          </div>
-
-          <!-- ================= PREFERENCES TAB ================= -->
-          <div class="tab-pane fade" id="tab-preferences">
-            <div class="card">
-              <div class="card-body">
-                <form id="preferencesForm">
-
-                  <div class="mb-3">
-                    <label class="form-label">Timezone *</label>
-                    <select class="form-select" name="timezone" required>
-                      <option value="Asia/Kolkata" selected>Asia/Kolkata</option>
-                      <option value="UTC">UTC</option>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Timezone</label>
+                    <select class="form-select" id="timezone">
+                      <option value="Asia/Kolkata" {{#if (eq user.timezone 'Asia/Kolkata')}}selected{{/if}}>Asia/Kolkata (IST)</option>
+                      <option value="UTC" {{#if (eq user.timezone 'UTC')}}selected{{/if}}>UTC</option>
+                      <option value="America/New_York" {{#if (eq user.timezone 'America/New_York')}}selected{{/if}}>America/New_York (EST)</option>
+                      <option value="Europe/London" {{#if (eq user.timezone 'Europe/London')}}selected{{/if}}>Europe/London (GMT)</option>
                     </select>
                   </div>
+                </div>
 
-                  <div class="mb-3">
-                    <label class="form-label">Default Footer</label>
-                    <input type="text" class="form-control"
-                      placeholder="Powered by Mini CRM 360" />
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Language</label>
+                    <select class="form-select" id="language">
+                      <option value="en" {{#if (eq user.language 'en')}}selected{{/if}}>English</option>
+                      <option value="hi" {{#if (eq user.language 'hi')}}selected{{/if}}>Hindi</option>
+                    </select>
                   </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Last Updated</label>
+                    <input type="text" class="form-control" value="{{user.updatedAt}}" readonly>
+                  </div>
+                </div>
 
-                  <div class="d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary" onclick="savePreferences()">
-                      Save Preferences
+                <div class="mt-4">
+                  <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Security Tab -->
+          <div class="tab-pane fade" id="security" role="tabpanel">
+            <div class="profile-tab-content">
+              <h4 class="mb-4"><i class="fas fa-shield-alt me-2"></i>Change Password</h4>
+              
+              <form id="passwordForm">
+                <div class="mb-3">
+                  <label class="form-label">Current Password *</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="currentPassword" required>
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword')">
+                      <i class="fas fa-eye" id="currentPasswordIcon"></i>
                     </button>
                   </div>
+                </div>
 
-                </form>
+                <div class="mb-3">
+                  <label class="form-label">New Password *</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="newPassword" required oninput="checkPasswordStrength()">
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword')">
+                      <i class="fas fa-eye" id="newPasswordIcon"></i>
+                    </button>
+                  </div>
+                  <div class="password-strength-meter" id="passwordStrength"></div>
+                  <small class="text-muted">Must be at least 8 characters with uppercase, lowercase, number, and special character</small>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Confirm New Password *</label>
+                  <div class="input-group">
+                    <input type="password" class="form-control" id="confirmPassword" required>
+                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword')">
+                      <i class="fas fa-eye" id="confirmPasswordIcon"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="logoutAllDevices">
+                    <label class="form-check-label" for="logoutAllDevices">
+                      Log out from all devices
+                    </label>
+                  </div>
+                </div>
+
+                <div class="mt-4">
+                  <button type="button" class="btn btn-primary" onclick="changePassword()">
+                    <i class="fas fa-key me-2"></i>Change Password
+                  </button>
+                </div>
+              </form>
+
+              <hr class="my-5">
+
+              <h4 class="mb-4"><i class="fas fa-desktop me-2"></i>Active Sessions</h4>
+              <div id="sessionsList">
+                <div class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="mt-2 text-muted">Loading sessions...</p>
+                </div>
               </div>
             </div>
           </div>
 
+          <!-- Workspace Tab -->
+          <div class="tab-pane fade" id="workspace" role="tabpanel">
+            <div class="profile-tab-content">
+              <h4 class="mb-4"><i class="fas fa-briefcase me-2"></i>Workspace & Business</h4>
+              
+              <div id="workspaceInfo">
+                <div class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="mt-2 text-muted">Loading workspace info...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notifications Tab -->
+          <div class="tab-pane fade" id="notifications" role="tabpanel">
+            <div class="profile-tab-content">
+              <h4 class="mb-4"><i class="fas fa-bell me-2"></i>Notification Preferences</h4>
+              
+              <form id="notificationsForm">
+                <h5 class="mb-3">Email Notifications</h5>
+                <div class="mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailNewLead">
+                    <label class="form-check-label" for="emailNewLead">
+                      New lead captured
+                    </label>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailTaskReminder">
+                    <label class="form-check-label" for="emailTaskReminder">
+                      Task reminder (today/overdue)
+                    </label>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailCampaignCompleted">
+                    <label class="form-check-label" for="emailCampaignCompleted">
+                      Campaign completed
+                    </label>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="emailPaymentReceipt">
+                    <label class="form-check-label" for="emailPaymentReceipt">
+                      Payment/renewal receipts
+                    </label>
+                  </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h5 class="mb-3">Reminder Timing</h5>
+                <div class="mb-3">
+                  <label class="form-label">Remind me</label>
+                  <select class="form-select" id="reminderTiming">
+                    <option value="1hour">1 hour before</option>
+                    <option value="1day">1 day before</option>
+                    <option value="2days">2 days before</option>
+                  </select>
+                </div>
+
+                <div class="mt-4">
+                  <button type="button" class="btn btn-primary" onclick="saveNotificationPreferences()">
+                    <i class="fas fa-save me-2"></i>Save Preferences
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Billing Tab -->
+          <div class="tab-pane fade" id="billing" role="tabpanel">
+            <div class="profile-tab-content">
+              <h4 class="mb-4"><i class="fas fa-credit-card me-2"></i>Billing & Subscription</h4>
+              
+              <div id="billingInfo">
+                <div class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="mt-2 text-muted">Loading billing info...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Log Tab -->
+          <div class="tab-pane fade" id="activity" role="tabpanel">
+            <div class="profile-tab-content">
+              <h4 class="mb-4"><i class="fas fa-history me-2"></i>Activity Log</h4>
+              
+              <div id="activityLogs">
+                <div class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="mt-2 text-muted">Loading activity logs...</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Image Cropper Modal -->
+<div class="modal fade" id="avatarCropModal" tabindex="-1" aria-labelledby="avatarCropModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="avatarCropModalLabel">
+          <i class="fas fa-crop me-2"></i>Crop Your Avatar
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="cropper-wrapper">
+          <img id="cropperImage" src="" alt="Crop preview">
+        </div>
+        <div class="cropper-preview-container">
+          <p class="text-muted mb-2"><strong>Preview:</strong></p>
+          <div class="cropper-preview">
+            <img id="cropperPreview" src="" alt="Preview">
+          </div>
+        </div>
+        <div class="alert alert-info mt-3 mb-0">
+          <i class="fas fa-info-circle me-2"></i>
+          Drag to reposition, use handles to resize. The image will be cropped to a square.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-primary" id="cropAndUploadBtn">
+          <i class="fas fa-check me-1"></i>Crop & Upload
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cropper.js CSS and JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <script>
-  function saveAccount() { alert('Account saved (API integration pending)'); }
-  function saveBusiness() { alert('Business saved (API integration pending)'); }
-  function saveWhatsApp() { alert('WhatsApp setup saved (API integration pending)'); }
-  function savePreferences() { alert('Preferences saved (API integration pending)'); }
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+
+  // Load data when tabs are shown
+  document.addEventListener('DOMContentLoaded', () => {
+    // Load sessions when security tab is clicked
+    document.getElementById('security-tab').addEventListener('shown.bs.tab', loadSessions);
+    document.getElementById('workspace-tab').addEventListener('shown.bs.tab', loadWorkspaceInfo);
+    document.getElementById('billing-tab').addEventListener('shown.bs.tab', loadBillingInfo);
+    document.getElementById('activity-tab').addEventListener('shown.bs.tab', loadActivityLogs);
+    
+    // Load notification preferences
+    loadNotificationPreferences();
+  });
+
+  // Cropper instance
+  let cropper = null;
+  let currentFile = null;
+
+  // Avatar upload - show cropper modal
+  async function handleAvatarUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      showToast('error', 'Invalid file type. Only JPG, PNG, and WebP are allowed.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // Increased limit for original file, will compress after crop
+      showToast('error', 'File size exceeds 10MB limit.');
+      return;
+    }
+
+    // Store file for later use
+    currentFile = file;
+
+    // Read file and show in cropper modal
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const imageSrc = e.target.result;
+      
+      // Set image source
+      const cropperImage = document.getElementById('cropperImage');
+      cropperImage.src = imageSrc;
+      
+      // Destroy previous cropper instance if exists
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+
+      // Show modal
+      const modalElement = document.getElementById('avatarCropModal');
+      const modal = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      modal.show();
+
+      // Initialize cropper after modal is shown
+      modalElement.addEventListener('shown.bs.modal', function initializeCropper() {
+        // Small delay to ensure image is loaded and modal is fully visible
+        setTimeout(() => {
+          if (cropper) {
+            cropper.destroy();
+            cropper = null;
+          }
+
+          cropper = new Cropper(cropperImage, {
+            aspectRatio: 1, // Square crop for avatar
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 0.8,
+            restore: false,
+            guides: true,
+            center: true,
+            highlight: false,
+            cropBoxMovable: true,
+            cropBoxResizable: true,
+            toggleDragModeOnDblclick: false,
+            minCropBoxWidth: 100,
+            minCropBoxHeight: 100,
+            background: true,
+            ready: function() {
+              // Update preview when cropper is ready
+              updatePreview();
+            },
+            crop: function() {
+              // Update preview on crop
+              updatePreview();
+            }
+          });
+        }, 200);
+        
+        // Remove listener after first use
+        modalElement.removeEventListener('shown.bs.modal', initializeCropper);
+      });
+    };
+    reader.readAsDataURL(file);
+
+    // Reset file input
+    event.target.value = '';
+  }
+
+  // Update cropper preview
+  function updatePreview() {
+    if (!cropper) return;
+    
+    const canvas = cropper.getCroppedCanvas({
+      width: 300,
+      height: 300,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high'
+    });
+
+    if (canvas) {
+      const previewImg = document.getElementById('cropperPreview');
+      previewImg.src = canvas.toDataURL('image/jpeg', 0.9);
+    }
+  }
+
+  // Crop and upload
+  document.getElementById('cropAndUploadBtn').addEventListener('click', async function() {
+    if (!cropper) {
+      showToast('error', 'Cropper not initialized');
+      return;
+    }
+
+    // Get cropped canvas
+    const canvas = cropper.getCroppedCanvas({
+      width: 300,
+      height: 300,
+      imageSmoothingEnabled: true,
+      imageSmoothingQuality: 'high'
+    });
+
+    if (!canvas) {
+      showToast('error', 'Failed to crop image');
+      return;
+    }
+
+    // Convert canvas to blob
+    canvas.toBlob(async function(blob) {
+      if (!blob) {
+        showToast('error', 'Failed to process image');
+        return;
+      }
+
+      // Check file size (should be under 2MB after compression)
+      if (blob.size > 2 * 1024 * 1024) {
+        // Try with lower quality
+        canvas.toBlob(async function(compressedBlob) {
+          if (!compressedBlob) {
+            showToast('error', 'Image is too large. Please try a smaller image.');
+            return;
+          }
+          await uploadCroppedImage(compressedBlob);
+        }, 'image/jpeg', 0.7);
+      } else {
+        await uploadCroppedImage(blob);
+      }
+    }, 'image/jpeg', 0.9);
+  });
+
+  // Upload cropped image
+  async function uploadCroppedImage(blob) {
+    const formData = new FormData();
+    
+    // Create a File object from blob with original filename
+    const fileName = currentFile ? currentFile.name : 'avatar.jpg';
+    const file = new File([blob], fileName, { type: 'image/jpeg' });
+    formData.append('avatar', file);
+
+    // Show loading state
+    const uploadBtn = document.getElementById('cropAndUploadBtn');
+    const originalText = uploadBtn.innerHTML;
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Uploading...';
+
+    try {
+      const response = await fetch(`${API_BASE}/profile/avatar`, {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Update avatar preview
+        document.getElementById('avatarPreview').src = result.data.avatar;
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('avatarCropModal'));
+        modal.hide();
+
+        // Clean up cropper
+        if (cropper) {
+          cropper.destroy();
+          cropper = null;
+        }
+
+        showToast('success', 'Avatar uploaded successfully');
+      } else {
+        showToast('error', result.message || 'Failed to upload avatar');
+      }
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      showToast('error', 'Failed to upload avatar');
+    } finally {
+      // Restore button state
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = originalText;
+    }
+  }
+
+  // Clean up cropper when modal is hidden
+  document.getElementById('avatarCropModal').addEventListener('hidden.bs.modal', function() {
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+    // Clear image sources
+    document.getElementById('cropperImage').src = '';
+    document.getElementById('cropperPreview').src = '';
+    currentFile = null;
+  });
+
+  async function removeAvatar() {
+    if (!confirm('Are you sure you want to remove your avatar?')) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/profile/avatar`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        document.getElementById('avatarPreview').src = 'https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=150';
+        showToast('success', 'Avatar removed successfully');
+      } else {
+        showToast('error', result.message || 'Failed to remove avatar');
+      }
+    } catch (error) {
+      console.error('Error removing avatar:', error);
+      showToast('error', 'Failed to remove avatar');
+    }
+  }
+
+  // Save profile
+  async function saveProfile() {
+    const data = {
+      firstName: document.getElementById('firstName').value,
+      lastName: document.getElementById('lastName').value,
+      phone: document.getElementById('phone').value,
+      timezone: document.getElementById('timezone').value,
+      language: document.getElementById('language').value
+    };
+
+    try {
+      const response = await fetch(`${API_BASE}/profile`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        showToast('success', 'Profile updated successfully');
+      } else {
+        showToast('error', result.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      showToast('error', 'Failed to update profile');
+    }
+  }
+
+  // Password strength checker
+  function checkPasswordStrength() {
+    const password = document.getElementById('newPassword').value;
+    const strengthMeter = document.getElementById('passwordStrength');
+    
+    if (!password) {
+      strengthMeter.className = 'password-strength-meter';
+      strengthMeter.style.width = '0%';
+      return;
+    }
+
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[@$!%*?&]/.test(password)) strength++;
+
+    if (strength <= 2) {
+      strengthMeter.className = 'password-strength-meter weak';
+    } else if (strength <= 4) {
+      strengthMeter.className = 'password-strength-meter medium';
+    } else {
+      strengthMeter.className = 'password-strength-meter strong';
+    }
+  }
+
+  function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + 'Icon');
+    if (field.type === 'password') {
+      field.type = 'text';
+      icon.className = 'fas fa-eye-slash';
+    } else {
+      field.type = 'password';
+      icon.className = 'fas fa-eye';
+    }
+  }
+
+  // Change password
+  async function changePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const logoutAllDevices = document.getElementById('logoutAllDevices').checked;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showToast('error', 'All password fields are required');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showToast('error', 'New passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/profile/change-password`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+          confirmPassword,
+          logoutAllDevices
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        document.getElementById('passwordForm').reset();
+        document.getElementById('passwordStrength').className = 'password-strength-meter';
+        document.getElementById('passwordStrength').style.width = '0%';
+        showToast('success', 'Password changed successfully');
+        if (logoutAllDevices) {
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        }
+      } else {
+        showToast('error', result.message || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      showToast('error', 'Failed to change password');
+    }
+  }
+
+  // Load sessions
+  async function loadSessions() {
+    try {
+      const response = await fetch(`${API_BASE}/profile/sessions`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const sessions = result.data || [];
+        const sessionsList = document.getElementById('sessionsList');
+        
+        if (sessions.length === 0) {
+          sessionsList.innerHTML = '<p class="text-muted">No active sessions found.</p>';
+          return;
+        }
+
+        sessionsList.innerHTML = sessions.map(session => {
+          const isCurrent = session.sessionToken === getCookie('token'); // You'll need to implement getCookie
+          return `
+            <div class="session-item ${isCurrent ? 'current' : ''}">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">${escapeHtml(session.deviceInfo || 'Unknown Device')}</h6>
+                  <small class="text-muted">${escapeHtml(session.browserInfo || 'Unknown Browser')}</small>
+                  <div class="mt-2">
+                    <small class="text-muted">IP: ${maskIP(session.ipAddress)}</small>
+                    ${session.location ? `<small class="text-muted ms-2">• ${escapeHtml(session.location)}</small>` : ''}
+                  </div>
+                  <small class="text-muted d-block mt-1">Last active: ${formatDate(session.lastActiveAt)}</small>
+                  ${isCurrent ? '<span class="badge bg-success mt-2">Current Session</span>' : ''}
+                </div>
+                ${!isCurrent ? `
+                  <button class="btn btn-sm btn-outline-danger" onclick="logoutSession(${session.id})">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('') + `
+          <div class="mt-3">
+            <button class="btn btn-danger" onclick="logoutSession('all')">
+              <i class="fas fa-sign-out-alt me-2"></i>Logout All Devices
+            </button>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading sessions:', error);
+      document.getElementById('sessionsList').innerHTML = '<p class="text-danger">Failed to load sessions.</p>';
+    }
+  }
+
+  async function logoutSession(sessionId) {
+    const message = sessionId === 'all' 
+      ? 'Are you sure you want to logout from all devices?'
+      : 'Are you sure you want to logout this session?';
+    
+    if (!confirm(message)) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/profile/sessions/${sessionId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        showToast('success', 'Session logged out successfully');
+        if (sessionId === 'all') {
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else {
+          loadSessions();
+        }
+      } else {
+        showToast('error', result.message || 'Failed to logout session');
+      }
+    } catch (error) {
+      console.error('Error logging out session:', error);
+      showToast('error', 'Failed to logout session');
+    }
+  }
+
+  // Load workspace info
+  async function loadWorkspaceInfo() {
+    try {
+      const response = await fetch(`${API_BASE}/profile/workspace`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const { businesses, defaultBusiness, planLimits, plan } = result.data;
+        const workspaceInfo = document.getElementById('workspaceInfo');
+        
+        workspaceInfo.innerHTML = `
+          <div class="mb-4">
+            <h5>Current Workspace</h5>
+            <p class="mb-0"><strong>${escapeHtml(defaultBusiness?.name || 'No business')}</strong></p>
+            <small class="text-muted">${businesses.length} business${businesses.length !== 1 ? 'es' : ''} total</small>
+          </div>
+
+          <div class="mb-4">
+            <h5>Plan Limits</h5>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Businesses</span>
+                <span><strong>${planLimits.businessesUsed}/${planLimits.maxBusinesses}</strong></span>
+              </div>
+              <div class="usage-bar">
+                <div class="usage-bar-fill" style="width: ${(planLimits.businessesUsed / planLimits.maxBusinesses * 100)}%"></div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="d-flex justify-content-between mb-1">
+                <span>Customers</span>
+                <span><strong>${planLimits.customersUsed}/${planLimits.maxCustomers}</strong></span>
+              </div>
+              <div class="usage-bar">
+                <div class="usage-bar-fill" style="width: ${(planLimits.customersUsed / planLimits.maxCustomers * 100)}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <a href="/business" class="btn btn-primary">
+              <i class="fas fa-briefcase me-2"></i>Manage Businesses
+            </a>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading workspace info:', error);
+      document.getElementById('workspaceInfo').innerHTML = '<p class="text-danger">Failed to load workspace info.</p>';
+    }
+  }
+
+  // Load notification preferences
+  async function loadNotificationPreferences() {
+    try {
+      const response = await fetch(`${API_BASE}/profile`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const prefs = result.data.notificationPreferences || {};
+        document.getElementById('emailNewLead').checked = prefs.emailNewLead !== false;
+        document.getElementById('emailTaskReminder').checked = prefs.emailTaskReminder !== false;
+        document.getElementById('emailCampaignCompleted').checked = prefs.emailCampaignCompleted !== false;
+        document.getElementById('emailPaymentReceipt').checked = prefs.emailPaymentReceipt !== false;
+        document.getElementById('reminderTiming').value = prefs.reminderTiming || '1hour';
+      }
+    } catch (error) {
+      console.error('Error loading notification preferences:', error);
+    }
+  }
+
+  async function saveNotificationPreferences() {
+    const preferences = {
+      emailNewLead: document.getElementById('emailNewLead').checked,
+      emailTaskReminder: document.getElementById('emailTaskReminder').checked,
+      emailCampaignCompleted: document.getElementById('emailCampaignCompleted').checked,
+      emailPaymentReceipt: document.getElementById('emailPaymentReceipt').checked,
+      reminderTiming: document.getElementById('reminderTiming').value
+    };
+
+    try {
+      const response = await fetch(`${API_BASE}/profile/notifications`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(preferences)
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        showToast('success', 'Notification preferences saved successfully');
+      } else {
+        showToast('error', result.message || 'Failed to save preferences');
+      }
+    } catch (error) {
+      console.error('Error saving notification preferences:', error);
+      showToast('error', 'Failed to save preferences');
+    }
+  }
+
+  // Load billing info
+  async function loadBillingInfo() {
+    try {
+      const response = await fetch(`${API_BASE}/profile/billing`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const billing = result.data;
+        const plan = billing.plan;
+        const planSlug = plan?.slug || 'free';
+        
+        const billingInfo = document.getElementById('billingInfo');
+        billingInfo.innerHTML = `
+          <div class="mb-4">
+            <h5>Current Plan</h5>
+            <span class="plan-badge ${planSlug}">${plan?.name || 'Free Trial'}</span>
+            ${plan?.price ? `<p class="mt-2 mb-0"><strong>₹${plan.price}/month</strong></p>` : ''}
+          </div>
+
+          ${billing.renewalDate ? `
+            <div class="mb-4">
+              <h5>Renewal Date</h5>
+              <p>${formatDate(billing.renewalDate)}</p>
+            </div>
+          ` : ''}
+
+          <div class="mb-4">
+            <h5>Plan Status</h5>
+            <span class="badge bg-${billing.status === 'active' ? 'success' : 'warning'}">${billing.status || 'trial'}</span>
+          </div>
+
+          <div>
+            <a href="/plans" class="btn btn-primary">
+              <i class="fas fa-credit-card me-2"></i>Manage Plan
+            </a>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading billing info:', error);
+      document.getElementById('billingInfo').innerHTML = '<p class="text-danger">Failed to load billing info.</p>';
+    }
+  }
+
+  // Load activity logs
+  async function loadActivityLogs() {
+    try {
+      const response = await fetch(`${API_BASE}/profile/activity?limit=50`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        const logs = result.data || [];
+        const activityLogs = document.getElementById('activityLogs');
+        
+        if (logs.length === 0) {
+          activityLogs.innerHTML = '<p class="text-muted">No activity logs found.</p>';
+          return;
+        }
+
+        activityLogs.innerHTML = logs.map(log => `
+          <div class="activity-log-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1">${escapeHtml(log.action)}</h6>
+                <p class="mb-1 text-muted">${escapeHtml(log.description || '')}</p>
+                <small class="text-muted">${formatDate(log.createdAt)}</small>
+              </div>
+              ${log.ipAddress ? `<small class="text-muted">${maskIP(log.ipAddress)}</small>` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (error) {
+      console.error('Error loading activity logs:', error);
+      document.getElementById('activityLogs').innerHTML = '<p class="text-danger">Failed to load activity logs.</p>';
+    }
+  }
+
+  // Helper functions
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function maskIP(ip) {
+    if (!ip) return 'N/A';
+    const parts = ip.split('.');
+    if (parts.length === 4) {
+      return `${parts[0]}.${parts[1]}.xxx.xxx`;
+    }
+    return ip;
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
+
+  function showToast(type, message) {
+    // You can implement a toast notification system here
+    alert(message); // Temporary fallback
+  }
 </script>
+

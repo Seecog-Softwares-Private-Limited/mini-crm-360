@@ -25,6 +25,7 @@ passport.use(
           provider: "google",
           providerId: profile.id,
           avatarUrl: profile.photos[0]?.value,
+          password: null, 
         });
       }
 

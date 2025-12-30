@@ -1,21 +1,350 @@
-<!-- Allow fully expanded submenus on this page -->
-{{! <style>
-  /* allow the sidebar to scroll if content exceeds screen height */
-  .sidebar {
-    max-height: 100vh;
-    overflow-y: auto;
-    /* <-- key fix */
+<style>
+  /* ============================================
+     PREMIUM DASHBOARD STYLING
+     ============================================ */
+  
+  .dashboard-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
   }
 
-  /* remove the 200px cap from the global stylesheet */
-  .sidebar .submenu.show {
-    max-height: none !important;
-    /* beat the head CSS */
-    overflow: visible !important;
+  .main-content {
+    background: transparent;
   }
-</style> }}
 
-<div class="container-fluid">
+  /* Dashboard Header */
+  .dashboard-header {
+    margin-bottom: 2rem;
+  }
+
+  .dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .dashboard-title::before {
+    content: '';
+    width: 4px;
+    height: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+  }
+
+  .dashboard-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Premium Stat Cards */
+  .stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1rem;
+    height: 100%;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--card-gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+
+  .stat-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Card Variants */
+  .stat-card.primary {
+    --card-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .stat-card.success {
+    --card-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .stat-card.warning {
+    --card-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  .stat-card.info {
+    --card-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  }
+
+  .stat-card.secondary {
+    --card-gradient: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  }
+
+  .stat-card.danger {
+    --card-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  }
+
+  .stat-icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    background: var(--card-gradient);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-icon-wrapper i {
+    font-size: 1.25rem;
+    color: #ffffff;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0.25rem 0;
+    line-height: 1;
+  }
+
+  .stat-label {
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+  }
+
+  .stat-link {
+    color: #667eea;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+    transition: all 0.2s ease;
+  }
+
+  .stat-link:hover {
+    color: #764ba2;
+    gap: 0.5rem;
+  }
+
+  /* Premium Table Card */
+  .premium-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .premium-card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .premium-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .premium-card-title i {
+    color: #667eea;
+  }
+
+  .premium-card-body {
+    padding: 1.5rem;
+  }
+
+  /* Premium Table */
+  .premium-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .premium-table thead {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  }
+
+  .premium-table thead th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .premium-table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  }
+
+  .premium-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    transform: scale(1.01);
+  }
+
+  .premium-table tbody td {
+    padding: 1rem;
+    color: #334155;
+    font-size: 0.9rem;
+  }
+
+  .premium-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Premium Badges */
+  .premium-badge {
+    display: inline-block;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    color: #4338ca;
+    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #94a3b8;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  /* Loading State */
+  .loading-state {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba(102, 126, 234, 0.2);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dashboard-title {
+      font-size: 1.5rem;
+    }
+
+    .stat-value {
+      font-size: 1.25rem;
+    }
+
+    .stat-card {
+      margin-bottom: 0.5rem;
+      padding: 0.75rem;
+    }
+
+    .stat-icon-wrapper {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-icon-wrapper i {
+      font-size: 1rem;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+    }
+  }
+
+  /* Prevent vertical scrolling - ensure cards fit in viewport */
+  .dashboard-container {
+    overflow-x: hidden;
+  }
+
+  .main-content {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* View All Button */
+  .btn-view-all {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-view-all:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    color: white;
+  }
+</style>
+
+<div class="container-fluid dashboard-container">
   <div class="row">
     <!-- Sidebar -->
     {{> sidebar}}
@@ -24,102 +353,160 @@
     <div class="col-md-9 col-lg-10">
       <div class="main-content p-4">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2>Dashboard</h2>
-          {{!-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-            <i class="fas fa-plus me-2"></i>Add Customer
-          </button> --}}
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+          <h1 class="dashboard-title">Dashboard</h1>
+          <p class="dashboard-subtitle">Welcome back! Here's what's happening with your business today.</p>
         </div>
 
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-          <div class="col-md-2 mb-3">
-            <div class="card text-center h-100" style="cursor: pointer; transition: all 0.3s ease;"
-              onclick="window.location.href='/business'"
-              onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
-              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-              <div class="card-body">
-                <i class="fas fa-building fa-2x text-primary mb-2"></i>
-                <h5 class="card-title" id="countBusinesses">{{counts.businesses}}</h5>
-                <p class="card-text text-muted">Businesses</p>
-                <small class="text-primary"><i class="fas fa-external-link-alt me-1"></i>View All</small>
+        <!-- Premium Stats Cards -->
+        <div class="row g-2 mb-3" style="display: flex; flex-wrap: wrap;">
+          <div class="col-6 col-sm-4 col-md-3 col-lg-auto" style="flex: 1 1 auto; min-width: 140px; max-width: 180px;">
+            <div class="stat-card primary" onclick="window.location.href='/business'">
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-building"></i>
+              </div>
+              <div class="text-center">
+                <div class="stat-label">Businesses</div>
+                <div class="stat-value" id="countBusinesses">{{counts.businesses}}</div>
+                <a href="/business" class="stat-link">
+                  View All <i class="fas fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
 
-          <div class="col-md-2 mb-3">
-            <div class="card text-center h-100" style="cursor: pointer; transition: all 0.3s ease;"
-              onclick="window.location.href='/customers'"
-              onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
-              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-              <div class="card-body">
-                <i class="fas fa-users fa-2x text-success mb-2"></i>
-                <h5 class="card-title" id="countCustomers">{{counts.customers}}</h5>
-                <p class="card-text text-muted">Customers</p>
-                <small class="text-success"><i class="fas fa-external-link-alt me-1"></i>View All</small>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-auto" style="flex: 1 1 auto; min-width: 140px; max-width: 180px;">
+            <div class="stat-card success" onclick="window.location.href='/customers'">
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="text-center">
+                <div class="stat-label">Customers</div>
+                <div class="stat-value" id="countCustomers">{{counts.customers}}</div>
+                <a href="/customers" class="stat-link">
+                  View All <i class="fas fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
 
-          <div class="col-md-2 mb-3">
-            <div class="card text-center h-100" style="cursor: pointer; transition: all 0.3s ease;"
-              onclick="window.location.href='/templates'"
-              onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
-              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-              <div class="card-body">
-                <i class="fas fa-file-alt fa-2x text-warning mb-2"></i>
-                <h5 class="card-title" id="countTemplates">{{counts.templates}}</h5>
-                <p class="card-text text-muted">Templates</p>
-                <small class="text-warning"><i class="fas fa-external-link-alt me-1"></i>View All</small>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-auto" style="flex: 1 1 auto; min-width: 140px; max-width: 180px;">
+            <div class="stat-card warning" onclick="window.location.href='/email-templates'">
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <div class="text-center">
+                <div class="stat-label">Email Templates</div>
+                <div class="stat-value" id="countEmailTemplates">{{counts.emailTemplates}}</div>
+                <a href="/email-templates" class="stat-link">
+                  View All <i class="fas fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
 
-          <div class="col-md-2 mb-3">
-            <div class="card text-center h-100" style="cursor: pointer; transition: all 0.3s ease;"
-              onclick="window.location.href='/campaigns'"
-              onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.1)'"
-              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
-              <div class="card-body">
-                <i class="fas fa-bullhorn fa-2x text-info mb-2"></i>
-                <h5 class="card-title" id="countCampaigns">{{counts.campaigns}}</h5>
-                <p class="card-text text-muted">Campaigns</p>
-                <small class="text-info"><i class="fas fa-external-link-alt me-1"></i>View All</small>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-auto" style="flex: 1 1 auto; min-width: 140px; max-width: 180px;">
+            <div class="stat-card info" onclick="window.location.href='/templates'">
+              <div class="stat-icon-wrapper">
+                <i class="fab fa-whatsapp"></i>
+              </div>
+              <div class="text-center">
+                <div class="stat-label">WhatsApp Templates</div>
+                <div class="stat-value" id="countWhatsappTemplates">{{counts.whatsappTemplates}}</div>
+                <a href="/templates" class="stat-link">
+                  View All <i class="fas fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
 
-          <div class="col-md-2 mb-3">
-            <div class="card text-center h-100">
-              <div class="card-body">
-                <i class="fas fa-chart-line fa-2x text-secondary mb-2"></i>
-                <h5 class="card-title" id="countMessages">{{counts.messages}}</h5>
-                <p class="card-text text-muted">Messages Sent</p>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-auto" style="flex: 1 1 auto; min-width: 140px; max-width: 180px;">
+            <div class="stat-card secondary" onclick="window.location.href='/campaigns'">
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-bullhorn"></i>
+              </div>
+              <div class="text-center">
+                <div class="stat-label">Campaigns</div>
+                <div class="stat-value" id="countCampaigns">{{counts.campaigns}}</div>
+                <a href="/campaigns" class="stat-link">
+                  View All <i class="fas fa-arrow-right"></i>
+                </a>
               </div>
             </div>
           </div>
 
-          <div class="col-md-2 mb-3">
-            <div class="card text-center h-100">
-              <div class="card-body">
-                <i class="fas fa-paper-plane fa-2x text-danger mb-2"></i>
-                <h5 class="card-title" id="countSuccessRate">{{counts.successRate}}%</h5>
-                <p class="card-text text-muted">Success Rate</p>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-auto" style="flex: 1 1 auto; min-width: 140px; max-width: 180px;">
+            <div class="stat-card secondary">
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="text-center">
+                <div class="stat-label">Messages</div>
+                <div class="stat-value" id="countMessages">{{counts.messages}}</div>
+                <div class="stat-link" style="opacity: 0.5; cursor: default;">
+                  Total Sent
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-6 col-sm-4 col-md-3 col-lg-auto" style="flex: 1 1 auto; min-width: 140px; max-width: 180px;">
+            <div class="stat-card danger">
+              <div class="stat-icon-wrapper">
+                <i class="fas fa-paper-plane"></i>
+              </div>
+              <div class="text-center">
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-value" id="countSuccessRate">{{counts.successRate}}%</div>
+                <div class="stat-link" style="opacity: 0.5; cursor: default;">
+                  Delivery Rate
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Recent Customers -->
-        <div class="card">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Recent Customers</h5>
-            <a href="/customers" class="btn btn-sm btn-outline-primary">View All</a>
+        <!-- Upcoming Reminders Card -->
+        <div class="premium-card mb-3">
+          <div class="premium-card-header">
+            <h5 class="premium-card-title">
+              <i class="fas fa-birthday-cake"></i>
+              Upcoming Birthdays & Anniversaries
+            </h5>
+            <a href="/reminders" class="btn-view-all">
+              View All <i class="fas fa-arrow-right"></i>
+            </a>
           </div>
 
-          <div class="card-body">
+          <div class="premium-card-body">
+            <div id="remindersList">
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p class="mt-2 mb-0">Loading reminders...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Customers Card -->
+        <div class="premium-card">
+          <div class="premium-card-header">
+            <h5 class="premium-card-title">
+              <i class="fas fa-clock"></i>
+              Recent Customers
+            </h5>
+            <a href="/customers" class="btn-view-all">
+              View All <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+
+          <div class="premium-card-body">
             <div id="customersList">
-              <div class="text-muted">Loading...</div>
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p class="mt-2 mb-0">Loading customers...</p>
+              </div>
             </div>
           </div>
         </div>
@@ -233,7 +620,8 @@
       const c = await res.json();
       if (document.getElementById('countBusinesses')) document.getElementById('countBusinesses').innerText = c.businesses ?? 0;
       if (document.getElementById('countCustomers')) document.getElementById('countCustomers').innerText = c.customers ?? 0;
-      if (document.getElementById('countTemplates')) document.getElementById('countTemplates').innerText = c.templates ?? 0;
+      if (document.getElementById('countEmailTemplates')) document.getElementById('countEmailTemplates').innerText = c.emailTemplates ?? 0;
+      if (document.getElementById('countWhatsappTemplates')) document.getElementById('countWhatsappTemplates').innerText = c.whatsappTemplates ?? 0;
       if (document.getElementById('countCampaigns')) document.getElementById('countCampaigns').innerText = c.campaigns ?? 0;
     } catch (e) {
       // fallback (optional)
@@ -241,33 +629,119 @@
     }
   }
 
+  // Load upcoming reminders
+  async function loadUpcomingReminders() {
+    const el = document.getElementById('remindersList');
+    try {
+      const res = await fetch('/api/v1/reminders?days=7');
+      const response = await res.json();
+
+      let reminders = [];
+      if (response.success && Array.isArray(response.data)) {
+        reminders = response.data.slice(0, 5); // Show only top 5
+      } else if (Array.isArray(response)) {
+        reminders = response.slice(0, 5);
+      } else if (response.data && Array.isArray(response.data)) {
+        reminders = response.data.slice(0, 5);
+      }
+
+      if (reminders.length === 0) {
+        el.innerHTML = `
+          <div class="text-center p-4">
+            <i class="fas fa-birthday-cake" style="font-size: 2rem; color: #cbd5e1; margin-bottom: 0.5rem;"></i>
+            <p class="text-muted mb-0">No upcoming birthdays or anniversaries in the next 7 days</p>
+          </div>
+        `;
+        return;
+      }
+
+      const remindersHTML = reminders.map(reminder => {
+        const dateStr = new Date(reminder.date).toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric'
+        });
+        const typeIcon = reminder.type === 'birthday' ? '🎂' : '💍';
+        const typeLabel = reminder.type === 'birthday' ? 'Birthday' : 'Anniversary';
+        const daysText = reminder.isToday ? 'Today!' : reminder.daysUntil === 1 ? 'Tomorrow' : `${reminder.daysUntil} days`;
+
+        return `
+          <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="border-left: 3px solid ${reminder.type === 'birthday' ? '#ec4899' : '#f59e0b'}; background: ${reminder.type === 'birthday' ? '#fdf2f8' : '#fffbeb'}; border-radius: 6px;">
+            <div>
+              <strong>${escapeHtml(reminder.customerName)}</strong>
+              <div class="text-muted" style="font-size: 0.85rem;">${typeIcon} ${typeLabel} • ${dateStr}</div>
+            </div>
+            <div class="text-end">
+              <div style="font-weight: 700; color: ${reminder.isToday ? '#10b981' : '#667eea'};">${daysText}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      el.innerHTML = remindersHTML;
+    } catch (error) {
+      console.error('Error loading reminders:', error);
+      el.innerHTML = `
+        <div class="text-center p-4">
+          <p class="text-danger mb-0">Failed to load reminders</p>
+        </div>
+      `;
+    }
+  }
+
   async function loadRecentCustomers() {
     const el = document.getElementById('customersList');
     try {
-      const res = await fetch('/api/v1/customers?limit=5');
-      const rows = await res.json();
+      const res = await fetch('/api/v1/customers?pageSize=5&page=1');
+      const response = await res.json();
 
-      if (!Array.isArray(rows) || rows.length === 0) {
-        el.innerHTML = `<div class="text-muted">No customers yet.</div>`;
+      // Handle paginated response format { success: true, data: [...], pagination: {...} }
+      let rows = [];
+      if (response.success && Array.isArray(response.data)) {
+        rows = response.data;
+      } else if (Array.isArray(response)) {
+        // Fallback: if response is directly an array
+        rows = response;
+      }
+
+      if (!rows || rows.length === 0) {
+        el.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-users"></i>
+            <p class="mb-0">No customers yet. Start by adding your first customer!</p>
+          </div>
+        `;
         return;
       }
 
       el.innerHTML = `
         <div class="table-responsive">
-          <table class="table table-sm table-hover">
+          <table class="premium-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Tags</th>
+                <th><i class="fas fa-user me-2"></i>Name</th>
+                <th><i class="fas fa-phone me-2"></i>Phone</th>
+                <th><i class="fas fa-tags me-2"></i>Tags</th>
               </tr>
             </thead>
             <tbody>
               ${rows.map(r => `
                 <tr>
-                  <td>${escapeHtml(r.name || '-')}</td>
-                  <td>${escapeHtml(r.phoneE164 || '-')}</td>
-                  <td>${Array.isArray(r.tags) ? r.tags.map(t => `<span class="badge bg-light text-dark me-1">${escapeHtml(t)}</span>`).join('') : '-'}</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-circle me-2" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.75rem;">
+                        ${escapeHtml((r.name || 'U')[0].toUpperCase())}
+                      </div>
+                      <span class="fw-semibold">${escapeHtml(r.name || '-')}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="text-muted">${escapeHtml(r.phoneE164 || '-')}</span>
+                  </td>
+                  <td>
+                    ${Array.isArray(r.tags) && r.tags.length > 0 
+                      ? r.tags.map(t => `<span class="premium-badge">${escapeHtml(t)}</span>`).join('') 
+                      : '<span class="text-muted">-</span>'}
+                  </td>
                 </tr>
               `).join('')}
             </tbody>
@@ -275,7 +749,12 @@
         </div>
       `;
     } catch (e) {
-      el.innerHTML = `<div class="text-danger">Failed to load customers</div>`;
+      el.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle text-danger"></i>
+          <p class="text-danger mb-0">Failed to load customers. Please try again.</p>
+        </div>
+      `;
     }
   }
 
@@ -303,6 +782,7 @@
 
   // Load recent customers on page load
   document.addEventListener('DOMContentLoaded', () => {
+    loadUpcomingReminders();
     loadRecentCustomers();
   });
 </script>

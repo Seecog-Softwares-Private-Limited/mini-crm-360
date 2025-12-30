@@ -1,53 +1,112 @@
 <div class="col-md-3 col-lg-2 px-0">
-  <div class="sidebar p-2">
-    <div class="text-center mb-2">
-      <h5 class="text-white">Mini CRM 360</h5>
-      <div class="flex gap-">
-        <img src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" alt="imag not found"
-          style="width: 50px; height: 50px; border-radius:50px;">
-        <small class="">{{user.firstName}}
-          {{user.lastName}}</small>
-      </div>
-    </div>
-    <nav class="nav flex-column">
-      <div class="profile-toggle" onclick="toggleprofile('profile-submenu')"> 
-          <a class="nav-link {{#if (eq activePage 'profile')}}active{{/if}}" href="/profile">
-            <i class="fa-solid fa-user"></i>
-          Profile
-          </a> 
-      </div>
-      <!-- CRM tools -->
-      <div class="menu-toggle" onclick="toggleMenu('whatsapp-submenu')">
-        <div class="nav-link">
-          <i class="fa-solid fa-envelopes-bulk"></i>
-          CRM Tools
-          <i class="fas fa-chevron-down float-end"></i>
+  <div class="sidebar">
+    <!-- Logo and Brand Section -->
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <div class="logo-wrapper">
+          <img src="/assets/logo.jpg" alt="Logo" class="sidebar-logo" 
+               onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22%3E%3Crect width=%2240%22 height=%2240%22 fill=%22%23667eea%22 rx=%228%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22white%22 font-size=%2216%22 font-weight=%22bold%22%3ECRM%3C/text%3E%3C/svg%3E';">
+        </div>
+        <div class="brand-info">
+          <h5 class="brand-title">Mini CRM 360</h5>
+          <small class="brand-subtitle">Business Management</small>
         </div>
       </div>
-      <div class="submenu show" id="whatsapp-submenu">
-        <a class="nav-link {{#if (eq activePage 'dashboard')}}active{{/if}}" href="/dashboard">
-          <i class="fas fa-tachometer-alt"></i>
-          Dashboard
-        </a>
-        {{!-- <a class="nav-link {{#if (eq activePage 'business')}}active{{/if}}" href="/business">
-          <i class="fas fa-building"></i>
-          Business
-        </a> --}}
+    </div>
 
-        <a class="nav-link {{#if (eq activePage 'customers')}}active{{/if}}" href="/customers">
-          <i class="fas fa-users"></i>
-          Customers
-        </a>
+    <!-- User Profile Section -->
+    <div class="sidebar-profile">
+      <div class="profile-avatar">
+        {{#if (or user.avatar user.avatarUrl)}}
+        <img src="{{#if user.avatar}}{{user.avatar}}{{else}}{{user.avatarUrl}}{{/if}}" 
+             alt="User Avatar" 
+             class="avatar-img"
+             onerror="this.src='https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=128'">
+        {{else}}
+        <img src="https://ui-avatars.com/api/?name={{user.firstName}}+{{user.lastName}}&background=667eea&color=fff&size=128" 
+             alt="User Avatar" 
+             class="avatar-img">
+        {{/if}}
+      </div>
+      <div class="profile-info">
+        <div class="profile-name">{{user.firstName}} {{user.lastName}}</div>
+        <div class="profile-role">Administrator</div>
+      </div>
+    </div>
 
-        <a class="nav-link {{#if (eq activePage 'campaigns')}}active{{/if}}" href="/campaigns">
-          <i class="fas fa-bullhorn"></i>
-          Run Campaigns
+    <!-- Navigation Menu -->
+    <nav class="sidebar-nav">
+      <!-- Profile Menu Item -->
+      <div class="nav-item">
+        <a class="nav-link {{#if (eq activePage 'profile')}}active{{/if}}" href="/profile">
+          <i class="fas fa-user-circle"></i>
+          <span class="nav-text">Profile</span>
         </a>
-        <a class="nav-link {{#if (eq activePage 'invoice')}}active{{/if}}" href="/invoice">
-          <i class="fa-solid fa-file-invoice-dollar"></i>
-          Generate Invoice
-        </a>
+      </div>
 
+      <!-- CRM Tools Section -->
+      <div class="nav-section">
+        <div class="menu-toggle" onclick="toggleMenu('whatsapp-submenu')">
+          <div class="nav-link">
+            <i class="fas fa-briefcase"></i>
+            <span class="nav-text">CRM Tools</span>
+            <i class="fas fa-chevron-down nav-arrow"></i>
+          </div>
+        </div>
+        <div class="submenu show" id="whatsapp-submenu">
+          <a class="nav-link submenu-link {{#if (eq activePage 'dashboard')}}active{{/if}}" href="/dashboard">
+            <i class="fas fa-tachometer-alt"></i>
+            <span class="nav-text">Dashboard</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'business')}}active{{/if}}" href="/business">
+            <i class="fas fa-building"></i>
+            <span class="nav-text">Business</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'customers')}}active{{/if}}" href="/customers">
+            <i class="fas fa-users"></i>
+            <span class="nav-text">Customers</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'campaigns')}}active{{/if}}" href="/campaigns">
+            <i class="fas fa-bullhorn"></i>
+            <span class="nav-text">Campaigns</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'tasks')}}active{{/if}}" href="/tasks">
+            <i class="fas fa-tasks"></i>
+            <span class="nav-text">Tasks & Follow-ups</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'notes')}}active{{/if}}" href="/notes">
+            <i class="fas fa-sticky-note"></i>
+            <span class="nav-text">Notes & Timeline</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'reminders')}}active{{/if}}" href="/reminders">
+            <i class="fas fa-birthday-cake"></i>
+            <span class="nav-text">Birthday & Anniversary</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'leadForms')}}active{{/if}}" href="/lead-forms">
+            <i class="fas fa-wpforms"></i>
+            <span class="nav-text">Lead Capture Forms</span>
+          </a>
+          {{#if user.plan}}
+            {{#if user.plan.hasInvoice}}
+            <a class="nav-link submenu-link {{#if (eq activePage 'invoice')}}active{{/if}}" href="/invoice">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span class="nav-text">Invoice</span>
+            </a>
+            {{else}}
+            <a class="nav-link submenu-link disabled-invoice" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span class="nav-text">Invoice</span>
+              <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
+            </a>
+            {{/if}}
+          {{else}}
+            <a class="nav-link submenu-link disabled-invoice" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
+              <i class="fas fa-file-invoice-dollar"></i>
+              <span class="nav-text">Invoice</span>
+              <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
+            </a>
+          {{/if}}
+        </div>
       </div>
 
       <!-- HR Tools Menu -->
@@ -67,28 +126,43 @@
           Documents</a>
       </div> --}}
 
-      <!-- Utilities -->
-      <div class="menu-toggle mt-2" onclick="toggleMenu('utilities-submenu')">
-        <div class="nav-link">
-          <i class="fas fa-tools"></i>
-          Utilities
-          <i class="fas fa-chevron-down float-end"></i>
+      <!-- Utilities Section -->
+      <div class="nav-section">
+        <div class="menu-toggle collapsed" onclick="toggleMenu('utilities-submenu')">
+          <div class="nav-link">
+            <i class="fas fa-cog"></i>
+            <span class="nav-text">Utilities</span>
+            <i class="fas fa-chevron-down nav-arrow"></i>
+          </div>
+        </div>
+        <div class="submenu" id="utilities-submenu">
+          <a class="nav-link submenu-link {{#if (eq activePage 'email-templates')}}active{{/if}}" href="/email-templates">
+            <i class="fas fa-envelope-open-text"></i>
+            <span class="nav-text">Email Templates</span>
+          </a>
+          <a class="nav-link submenu-link {{#if (eq activePage 'templates')}}active{{/if}}" href="/templates">
+            <i class="fas fa-comment-dots"></i>
+            <span class="nav-text">WhatsApp Templates</span>
+          </a>
         </div>
       </div>
-      <div class="submenu show" id="utilities-submenu">
-        {{!-- <a class="nav-link {{#if (eq activePage 'document-types')}}active{{/if}}" href="/document-types"><i
-            class="fas fa-layer-group"></i>
-          Document Types</a> --}}
-        <a class="nav-link {{#if (eq activePage 'email-templates')}}active{{/if}}" href="/email-templates">
-          <i class="fas fa-envelope-open-text"></i>
-          Email Templates
-        </a>
-        <a class="nav-link {{#if (eq activePage 'templates')}}active{{/if}}" href="/templates">
-          <i class="fas fa-file-alt"></i>
-          Whatsapp Templates
+
+      <!-- Plans Section -->
+      <div class="nav-item">
+        <a class="nav-link {{#if (eq activePage 'plans')}}active{{/if}}" href="/plans">
+          <i class="fas fa-crown"></i>
+          <span class="nav-text">Plans</span>
         </a>
       </div>
 
+      <!-- Logout Section -->
+      <div class="nav-item" style="margin-top: 0.5rem;">
+        <hr class="sidebar-divider" />
+        <a class="nav-link logout-link" href="#" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="nav-text">Logout</span>
+        </a>
+      </div>
 
       <!-- product notification -->
       {{!-- <div class="menu-toggle mt-2" onclick="toggleMenu('notification-submenu')">
@@ -107,12 +181,6 @@
           Sub Menu 2
         </a>
       </div> --}}
-
-      <hr class="text-white-50" />
-      <a class="nav-link" href="#" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        Logout
-      </a>
     </nav>
   </div>
 </div>

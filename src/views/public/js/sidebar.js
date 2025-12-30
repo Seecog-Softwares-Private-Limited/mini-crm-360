@@ -1,15 +1,21 @@
-function toggleMenu(id) {
-  const target = document.getElementById(id);
-  if (!target) return;
-
-  // Close all other submenus
-  document.querySelectorAll(".submenu").forEach((sm) => {
-    if (sm.id !== id) sm.classList.remove("show");
-  });
-
-  // Toggle clicked submenu
-  target.classList.toggle("show");
-}
+// Menu toggle functionality - Make it globally available
+window.toggleMenu = function(menuId) {
+  const submenu = document.getElementById(menuId);
+  if (!submenu) {
+    console.warn('Submenu not found:', menuId);
+    return;
+  }
+  
+  const toggle = document.querySelector(`[onclick="toggleMenu('${menuId}')"]`);
+  
+  if (submenu.classList.contains('show')) {
+    submenu.classList.remove('show');
+    if (toggle) toggle.classList.add('collapsed');
+  } else {
+    submenu.classList.add('show');
+    if (toggle) toggle.classList.remove('collapsed');
+  }
+};
 
 // On page load: open only submenu that contains active link
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,7 +30,20 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-function logout() {
-  localStorage.removeItem("accessToken");
-  window.location.href = "/login";
+async function logout() {
+  try {
+    await fetch('/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+  } catch (e) {
+    console.error('Logout failed:', e);
+  } finally {
+    // optional cleanup
+    localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+
+    window.location.replace('/login');
+  }
 }

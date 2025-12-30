@@ -1,0 +1,1088 @@
+<div class="container-fluid">
+  <div class="row">
+    {{> sidebar}}
+
+    <div class="col-md-9 col-lg-10 main-content">
+      <div class="container-fluid p-4">
+        <style>
+          /* ============================================
+             WORLD-CLASS PREMIUM NOTES & TIMELINE PAGE STYLING
+             ============================================ */
+          
+          /* Page Background with Subtle Pattern */
+          .main-content {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            position: relative;
+          }
+
+          .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+              radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+          }
+
+          .container-fluid.p-4 {
+            position: relative;
+          }
+
+          /* Ensure modal is always on top */
+          .premium-modal {
+            z-index: 1055 !important;
+          }
+
+          .premium-modal .modal-dialog {
+            z-index: 1056 !important;
+            pointer-events: auto !important;
+            margin: 1.75rem auto;
+            animation: modalSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          }
+
+          @keyframes modalSlideIn {
+            from {
+              opacity: 0;
+              transform: translateY(-50px) scale(0.95);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0) scale(1);
+            }
+          }
+
+          /* Fix any potential overlay blocking */
+          body.modal-open {
+            overflow: hidden;
+            padding-right: 0 !important;
+          }
+
+          /* Ensure modal backdrop doesn't block */
+          .modal-backdrop {
+            z-index: 1050 !important;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+          }
+
+          /* Premium Header */
+          .notes-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            margin-bottom: 2.5rem;
+            color: white;
+            box-shadow: 
+              0 20px 60px rgba(102, 126, 234, 0.4),
+              0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+          }
+
+          .notes-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 8s infinite;
+          }
+
+          @keyframes shimmer {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+          }
+
+          .notes-header h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 2.5rem;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+          }
+
+          .notes-header p {
+            margin: 0.75rem 0 0 0;
+            opacity: 0.95;
+            font-size: 1.1rem;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+          }
+
+          /* Customer Selection Card */
+          .customer-select-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 
+              0 10px 30px rgba(0, 0, 0, 0.08),
+              0 0 0 1px rgba(0, 0, 0, 0.05);
+          }
+
+          .customer-select-card label {
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+          }
+
+          .customer-select-card select {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            font-size: 1rem;
+            background: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+          }
+
+          .customer-select-card select:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          }
+
+          .customer-select-card select:focus {
+            border-color: #667eea;
+            box-shadow: 
+              0 0 0 4px rgba(102, 126, 234, 0.1),
+              0 4px 12px rgba(102, 126, 234, 0.15);
+            outline: none;
+          }
+
+          /* Timeline Container */
+          .timeline-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 
+              0 10px 30px rgba(0, 0, 0, 0.08),
+              0 0 0 1px rgba(0, 0, 0, 0.05);
+            min-height: 400px;
+          }
+
+          .timeline-empty {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+          }
+
+          .timeline-empty i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+          }
+
+          /* Timeline Item */
+          .timeline-item {
+            position: relative;
+            padding-left: 3rem;
+            padding-bottom: 2rem;
+            border-left: 3px solid #e5e7eb;
+          }
+
+          .timeline-item:last-child {
+            border-left: none;
+            padding-bottom: 0;
+          }
+
+          .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0.5rem;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #667eea;
+            box-shadow: 0 0 0 4px white;
+          }
+
+          .timeline-item.note::before {
+            border-color: #667eea;
+          }
+
+          .timeline-item.campaign_sent::before {
+            border-color: #10b981;
+          }
+
+          .timeline-item.invoice_created::before {
+            border-color: #f59e0b;
+          }
+
+          .timeline-item.whatsapp_sent::before,
+          .timeline-item.email_sent::before {
+            border-color: #3b82f6;
+          }
+
+          .timeline-item.task_created::before,
+          .timeline-item.task_completed::before {
+            border-color: #8b5cf6;
+          }
+
+          .timeline-item.customer_created::before,
+          .timeline-item.customer_updated::before {
+            border-color: #ec4899;
+          }
+
+          .timeline-content {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            transition: all 0.3s ease;
+          }
+
+          .timeline-content:hover {
+            background: #f3f4f6;
+            transform: translateX(4px);
+          }
+
+          .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+          }
+
+          .timeline-title {
+            font-weight: 700;
+            color: #1f2937;
+            font-size: 1.1rem;
+            margin: 0;
+          }
+
+          .timeline-type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+
+          .timeline-type-badge.note {
+            background: #eef2ff;
+            color: #667eea;
+          }
+
+          .timeline-type-badge.campaign_sent {
+            background: #d1fae5;
+            color: #059669;
+          }
+
+          .timeline-type-badge.invoice_created {
+            background: #fef3c7;
+            color: #d97706;
+          }
+
+          .timeline-type-badge.whatsapp_sent,
+          .timeline-type-badge.email_sent {
+            background: #dbeafe;
+            color: #2563eb;
+          }
+
+          .timeline-type-badge.task_created,
+          .timeline-type-badge.task_completed {
+            background: #ede9fe;
+            color: #7c3aed;
+          }
+
+          .timeline-type-badge.customer_created,
+          .timeline-type-badge.customer_updated {
+            background: #fce7f3;
+            color: #db2777;
+          }
+
+          .timeline-content-text {
+            color: #4b5563;
+            line-height: 1.6;
+            margin: 0.5rem 0 0 0;
+          }
+
+          .timeline-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: #6b7280;
+          }
+
+          .timeline-meta i {
+            font-size: 0.75rem;
+            opacity: 0.6;
+          }
+
+          .timeline-actions {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.5rem;
+          }
+
+          .timeline-actions button {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+
+          .timeline-actions .btn-edit {
+            background: #eef2ff;
+            color: #667eea;
+          }
+
+          .timeline-actions .btn-edit:hover {
+            background: #e0e7ff;
+          }
+
+          .timeline-actions .btn-delete {
+            background: #fef2f2;
+            color: #ef4444;
+          }
+
+          .timeline-actions .btn-delete:hover {
+            background: #fee2e2;
+          }
+
+          /* Add Note Button */
+          .add-note-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 1.5rem;
+          }
+
+          .add-note-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+          }
+
+          /* Premium Modal - Enhanced */
+          .premium-modal .modal-content {
+            border-radius: 28px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 
+              0 40px 100px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+              0 20px 60px rgba(102, 126, 234, 0.3);
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 1057 !important;
+            background: #ffffff;
+            backdrop-filter: blur(20px);
+          }
+
+          .premium-modal .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+              #667eea 0%, 
+              #764ba2 25%, 
+              #f093fb 50%, 
+              #4facfe 75%, 
+              #667eea 100%);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+          }
+
+          @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+          }
+
+          .premium-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 8s ease infinite;
+            color: white;
+            padding: 3rem 3rem 2.5rem;
+            border-bottom: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);
+          }
+
+          @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+          }
+
+          .premium-modal .modal-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+            pointer-events: none;
+          }
+
+          .premium-modal .modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+              transparent 0%, 
+              rgba(255, 255, 255, 0.3) 50%, 
+              transparent 100%);
+          }
+
+          .premium-modal .modal-title {
+            font-weight: 800;
+            font-size: 2rem;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.8px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          .premium-modal .modal-title i {
+            font-size: 1.5rem;
+            opacity: 0.95;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+          }
+
+          .premium-modal .btn-close {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            opacity: 1;
+            padding: 0.75rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 2;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+          }
+
+          .premium-modal .btn-close:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: rotate(90deg) scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+          }
+
+          .premium-modal .modal-body {
+            padding: 3rem;
+            background: linear-gradient(135deg, #fafbfc 0%, #ffffff 50%, #f8fafc 100%);
+            position: relative;
+            overflow: hidden;
+          }
+
+          .premium-modal .modal-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+              transparent 0%, 
+              rgba(102, 126, 234, 0.1) 50%, 
+              transparent 100%);
+          }
+
+          .premium-modal .form-label {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.875rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            padding-left: 0.5rem;
+          }
+
+          .premium-modal .form-label::before {
+            content: '';
+            width: 5px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 3px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+            flex-shrink: 0;
+          }
+
+          .premium-modal .form-control {
+            border-radius: 14px;
+            border: 2px solid #e2e8f0;
+            padding: 1rem 1.5rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            background: #ffffff;
+            box-shadow: 
+              0 2px 8px rgba(0, 0, 0, 0.04),
+              0 0 0 0 rgba(102, 126, 234, 0);
+            color: #1e293b;
+            font-weight: 500;
+            position: relative;
+          }
+
+          .premium-modal .form-control:hover {
+            border-color: #cbd5e1;
+            box-shadow: 
+              0 4px 16px rgba(0, 0, 0, 0.08),
+              0 0 0 2px rgba(102, 126, 234, 0.05);
+            transform: translateY(-1px);
+            background: #fefefe;
+          }
+
+          .premium-modal .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 
+              0 0 0 4px rgba(102, 126, 234, 0.12),
+              0 6px 20px rgba(102, 126, 234, 0.2),
+              0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            outline: none;
+            background: #ffffff;
+          }
+
+          .premium-modal .form-control::placeholder {
+            color: #94a3b8;
+            font-style: italic;
+            font-weight: 400;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+          }
+
+          .premium-modal .form-control:focus::placeholder {
+            opacity: 0.5;
+          }
+
+          .premium-modal textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          }
+
+          .premium-modal textarea.form-control:focus {
+            min-height: 160px;
+          }
+
+          .premium-modal .modal-footer {
+            border-top: 1px solid #e2e8f0;
+            padding: 2.5rem 3rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+            position: relative;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+          }
+
+          .premium-modal .modal-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+              transparent 0%, 
+              rgba(102, 126, 234, 0.1) 50%, 
+              transparent 100%);
+          }
+
+          .premium-modal .btn {
+            border-radius: 14px;
+            padding: 1rem 2.75rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
+          .premium-modal .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+          }
+
+          .premium-modal .btn:hover::before {
+            width: 300px;
+            height: 300px;
+          }
+
+          .premium-modal .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+            color: white;
+            box-shadow: 
+              0 6px 20px rgba(102, 126, 234, 0.4),
+              0 2px 8px rgba(102, 126, 234, 0.3),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+          }
+
+          .premium-modal .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+              0 12px 35px rgba(102, 126, 234, 0.5),
+              0 4px 12px rgba(102, 126, 234, 0.4),
+              0 0 0 4px rgba(102, 126, 234, 0.15),
+              inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            background-position: 100% 50%;
+          }
+
+          .premium-modal .btn-primary:active {
+            transform: translateY(-1px) scale(1);
+            box-shadow: 
+              0 4px 15px rgba(102, 126, 234, 0.4),
+              0 0 0 2px rgba(102, 126, 234, 0.2);
+          }
+
+          .premium-modal .btn-primary i {
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+          }
+
+          .premium-modal .btn-secondary {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #e2e8f0;
+            color: #64748b;
+            box-shadow: 
+              0 2px 8px rgba(0, 0, 0, 0.05),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+          }
+
+          .premium-modal .btn-secondary:hover {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 
+              0 6px 16px rgba(0, 0, 0, 0.1),
+              0 0 0 2px rgba(148, 163, 184, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9);
+            color: #475569;
+          }
+
+          .premium-modal .btn-secondary:active {
+            transform: translateY(0);
+            box-shadow: 
+              0 2px 6px rgba(0, 0, 0, 0.08),
+              inset 0 1px 2px rgba(0, 0, 0, 0.05);
+          }
+
+          /* Ensure all form elements are clickable */
+          .premium-modal input,
+          .premium-modal select,
+          .premium-modal textarea,
+          .premium-modal button,
+          .premium-modal .btn-close {
+            pointer-events: auto !important;
+            cursor: pointer;
+          }
+
+          .premium-modal input[type="text"],
+          .premium-modal textarea {
+            cursor: text !important;
+          }
+        </style>
+
+        <!-- Header -->
+        <div class="notes-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2><i class="fas fa-sticky-note me-2"></i>Notes & Timeline</h2>
+              <p class="mb-0 mt-2 opacity-90">Track customer activity history and add notes</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Selection -->
+        <div class="customer-select-card">
+          <label for="customerSelect">
+            <i class="fas fa-user me-2"></i>Select Customer
+          </label>
+          <select class="form-select" id="customerSelect" onchange="loadTimeline()">
+            <option value="">Choose a customer to view timeline...</option>
+          </select>
+        </div>
+
+        <!-- Timeline Container -->
+        <div class="timeline-container" id="timelineContainer">
+          <div class="timeline-empty">
+            <i class="fas fa-clock"></i>
+            <h4>No customer selected</h4>
+            <p>Select a customer from the dropdown above to view their timeline</p>
+          </div>
+        </div>
+
+        <!-- Add Note Button (shown when customer is selected) -->
+        <div id="addNoteButtonContainer" style="display: none;">
+          <button class="add-note-btn w-100" onclick="showAddNoteModal()">
+            <i class="fas fa-plus me-2"></i>Add Note
+          </button>
+        </div>
+
+        <!-- Add/Edit Note Modal -->
+        <div class="modal fade premium-modal" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="noteModalLabel">
+                  <i class="fas fa-sticky-note me-2"></i>Add Note
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="noteForm">
+                  <input type="hidden" id="noteId" name="noteId">
+                  <div class="mb-3">
+                    <label for="noteTitle" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="noteTitle" name="title" placeholder="Enter note title (optional)">
+                  </div>
+                  <div class="mb-3">
+                    <label for="noteContent" class="form-label">Content *</label>
+                    <textarea class="form-control" id="noteContent" name="content" rows="5" placeholder="Enter your note here..." required></textarea>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveNote()">
+                  <i class="fas fa-save me-2"></i>Save Note
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+  let allCustomers = [];
+  let selectedCustomerId = null;
+
+  // Load customers on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCustomers();
+  });
+
+  // Load customers for dropdown
+  async function loadCustomers() {
+    try {
+      const response = await fetch(`${API_BASE}/customers?pageSize=1000`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const customers = result.data || result.data?.customers || result.customers || [];
+        allCustomers = customers;
+
+        const select = document.getElementById('customerSelect');
+        customers.forEach(customer => {
+          const option = document.createElement('option');
+          option.value = customer.id;
+          const customerName = customer.name || 
+            (customer.firstName && customer.lastName 
+              ? `${customer.firstName} ${customer.lastName}`.trim()
+              : customer.firstName || customer.lastName || 'Unnamed Customer');
+          option.textContent = customerName;
+          select.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error('Error loading customers:', error);
+    }
+  }
+
+  // Load timeline for selected customer
+  async function loadTimeline() {
+    const customerId = document.getElementById('customerSelect').value;
+    selectedCustomerId = customerId;
+
+    if (!customerId) {
+      document.getElementById('timelineContainer').innerHTML = `
+        <div class="timeline-empty">
+          <i class="fas fa-clock"></i>
+          <h4>No customer selected</h4>
+          <p>Select a customer from the dropdown above to view their timeline</p>
+        </div>
+      `;
+      document.getElementById('addNoteButtonContainer').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('addNoteButtonContainer').style.display = 'block';
+    document.getElementById('timelineContainer').innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-3 text-muted">Loading timeline...</p></div>';
+
+    try {
+      const response = await fetch(`${API_BASE}/notes/customer/${customerId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const notes = result.data || result.notes || [];
+        displayTimeline(notes);
+      } else {
+        throw new Error('Failed to load timeline');
+      }
+    } catch (error) {
+      console.error('Error loading timeline:', error);
+      document.getElementById('timelineContainer').innerHTML = `
+        <div class="timeline-empty">
+          <i class="fas fa-exclamation-triangle text-danger"></i>
+          <h4>Error loading timeline</h4>
+          <p>Please try again later</p>
+        </div>
+      `;
+    }
+  }
+
+  // Display timeline
+  function displayTimeline(notes) {
+    const container = document.getElementById('timelineContainer');
+
+    if (notes.length === 0) {
+      container.innerHTML = `
+        <div class="timeline-empty">
+          <i class="fas fa-sticky-note"></i>
+          <h4>No timeline entries yet</h4>
+          <p>Start by adding a note or wait for automatic events to be logged</p>
+        </div>
+      `;
+      return;
+    }
+
+    const timelineHTML = notes.map(note => {
+      const type = note.type || 'note';
+      const typeLabel = type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const creatorName = note.creator 
+        ? `${note.creator.firstName || ''} ${note.creator.lastName || ''}`.trim() || note.creator.email || 'Unknown'
+        : 'System';
+      const createdAt = new Date(note.createdAt);
+      const formattedDate = createdAt.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const canEdit = type === 'note' && note.createdBy;
+      const actionsHTML = canEdit ? `
+        <div class="timeline-actions">
+          <button class="btn-edit" onclick="editNote(${note.id})">
+            <i class="fas fa-edit me-1"></i>Edit
+          </button>
+          <button class="btn-delete" onclick="deleteNote(${note.id})">
+            <i class="fas fa-trash me-1"></i>Delete
+          </button>
+        </div>
+      ` : '';
+
+      return `
+        <div class="timeline-item ${type}">
+          <div class="timeline-content">
+            <div class="timeline-header">
+              <h6 class="timeline-title">${escapeHtml(note.title || typeLabel)}</h6>
+              <span class="timeline-type-badge ${type}">${typeLabel}</span>
+            </div>
+            ${note.content ? `<p class="timeline-content-text">${escapeHtml(note.content)}</p>` : ''}
+            <div class="timeline-meta">
+              <span><i class="fas fa-user"></i> ${escapeHtml(creatorName)}</span>
+              <span><i class="fas fa-clock"></i> ${formattedDate}</span>
+            </div>
+            ${actionsHTML}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = timelineHTML;
+  }
+
+  // Show add note modal
+  function showAddNoteModal() {
+    if (!selectedCustomerId) {
+      alert('Please select a customer first');
+      return;
+    }
+    document.getElementById('noteForm').reset();
+    document.getElementById('noteId').value = '';
+    document.getElementById('noteModalLabel').innerHTML = '<i class="fas fa-sticky-note me-2"></i>Add Note';
+    new bootstrap.Modal(document.getElementById('noteModal')).show();
+  }
+
+  // Edit note
+  async function editNote(noteId) {
+    try {
+      const response = await fetch(`${API_BASE}/notes/customer/${selectedCustomerId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        const notes = result.data || result.notes || [];
+        const note = notes.find(n => n.id === noteId);
+
+        if (note && note.type === 'note') {
+          document.getElementById('noteId').value = note.id;
+          document.getElementById('noteTitle').value = note.title || '';
+          document.getElementById('noteContent').value = note.content || '';
+          document.getElementById('noteModalLabel').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Note';
+          new bootstrap.Modal(document.getElementById('noteModal')).show();
+        }
+      }
+    } catch (error) {
+      console.error('Error loading note:', error);
+    }
+  }
+
+  // Save note
+  async function saveNote() {
+    const form = document.getElementById('noteForm');
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const noteId = document.getElementById('noteId').value;
+    const title = document.getElementById('noteTitle').value;
+    const content = document.getElementById('noteContent').value;
+
+    if (!content.trim()) {
+      alert('Please enter note content');
+      return;
+    }
+
+    try {
+      const url = noteId 
+        ? `${API_BASE}/notes/${noteId}`
+        : `${API_BASE}/notes`;
+      const method = noteId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          customerId: selectedCustomerId,
+          title: title.trim() || null,
+          content: content.trim()
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('noteModal')).hide();
+        loadTimeline();
+      } else {
+        alert(result.message || 'Failed to save note');
+      }
+    } catch (error) {
+      console.error('Error saving note:', error);
+      alert('Failed to save note. Please try again.');
+    }
+  }
+
+  // Delete note
+  async function deleteNote(noteId) {
+    if (!confirm('Are you sure you want to delete this note?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/notes/${noteId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (response.ok) {
+        loadTimeline();
+      } else {
+        const result = await response.json();
+        alert(result.message || 'Failed to delete note');
+      }
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert('Failed to delete note. Please try again.');
+    }
+  }
+
+  // Escape HTML
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>
+
