@@ -135,6 +135,7 @@ import noteRoutes from "./routes/note.routes.js";
 import reminderRoutes from "./routes/reminder.routes.js";
 import leadFormRoutes from "./routes/leadForm.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
+import { initBilling } from "./billing/index.js";
 
 // ---------- Frontend pages ----------
 // Helper function to get API_BASE based on environment
@@ -352,5 +353,16 @@ app.get('/email-templates', verifyUser, renderEmailTemplatesPage);
 
 // API routes under /api/v1/email-templates
 app.use('/', emailTemplateRoutes);
+
+// Initialize billing module (async)
+let billingRouter = null;
+initBilling().then(billing => {
+  billingRouter = billing.router;
+  // Mount billing routes (webhook needs raw body, mounted before other routes with json parsing)
+  app.use('/', billing.router);
+  console.log('✅ Billing routes mounted');
+}).catch(err => {
+  console.error('❌ Failed to initialize billing module:', err.message);
+});
 
 export { app };
