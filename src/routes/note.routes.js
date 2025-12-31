@@ -19,3 +19,4 @@ router.delete("/api/v1/notes/:id", verifyUser, deleteNote); // Delete note
 
 export default router;
 
+

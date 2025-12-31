@@ -16,6 +16,15 @@ export const loginUser = asyncHandler(async (req, res) => {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
+        // Check if account is activated
+        if (!user.isActivated) {
+            return res.status(403).json({ 
+                message: "Account not activated. Please check your email for the activation link.",
+                requiresActivation: true,
+                email: user.email
+            });
+        }
+
         const isValid = await user.isPasswordCorrect(password);
         if (!isValid) {
             return res.status(401).json({ message: "Invalid email or password" });

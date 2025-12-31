@@ -417,32 +417,211 @@
     transform: none;
   }
 
-  /* Alert Container */
+  /* Premium Alert Container */
   #alertContainer {
     margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 10;
   }
 
   .alert {
-    border-radius: 12px;
+    border-radius: 16px;
     border: none;
-    padding: 1rem 1.25rem;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem 1.75rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    animation: slideDownFade 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
+  }
+
+  @keyframes slideDownFade {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+    border-radius: 16px 16px 0 0;
+  }
+
+  .alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 15px 50px rgba(0, 0, 0, 0.2),
+      0 6px 16px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+
+  .alert strong {
+    font-weight: 700;
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.3px;
   }
 
   .alert-success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
     color: #ffffff;
+    border-left: 4px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .alert-success::before {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2));
   }
 
   .alert-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);
     color: #ffffff;
+    border-left: 4px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+  }
+
+  .alert-danger::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.1);
+    }
+  }
+
+  .alert-danger::before {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.15));
   }
 
   .alert-info {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
     color: #ffffff;
+    border-left: 4px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .alert-info::before {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.15));
+  }
+
+  /* Premium Button Styles in Alerts */
+  .alert .btn,
+  .alert button {
+    margin-top: 0.75rem;
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .alert .btn::before,
+  .alert button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .alert .btn:hover,
+  .alert button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 
+      0 6px 20px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .alert .btn:hover::before,
+  .alert button:hover::before {
+    left: 100%;
+  }
+
+  .alert .btn:active,
+  .alert button:active {
+    transform: translateY(0);
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .alert .btn i,
+  .alert button i {
+    margin-right: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* Close Button Enhancement */
+  .alert .btn-close {
+    opacity: 0.8;
+    filter: brightness(0) invert(1);
+    transition: all 0.3s ease;
+    padding: 0.5rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .alert .btn-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg) scale(1.1);
+  }
+
+  /* Alert Content Styling */
+  .alert br {
+    margin-bottom: 0.5rem;
+  }
+
+  .alert p {
+    margin-bottom: 0.5rem;
+  }
+
+  .alert p:last-child {
+    margin-bottom: 0;
   }
 
   /* Footer Links */
@@ -903,6 +1082,102 @@
 </div>
 
 <script>
+  // API Configuration - Set from backend based on environment
+  // login.hbs is standalone (layout: false), so we define API_BASE here
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+
+  // Helper: detect if current page is login or register
+  function isAuthPage() {
+    const p = window.location.pathname.toLowerCase();
+    return p === '/login' || p === '/register' || p.endsWith('/login') || p.endsWith('/register');
+  }
+  
+  // Helper function to make API calls
+  async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('accessToken') || null;
+
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+
+    // Attach Authorization only if we have a real token and caller didn't skip auth
+    if (token && !options.skipAuth) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const defaultOptions = {
+      credentials: 'include',
+      ...options,
+      headers
+    };
+    
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, defaultOptions);
+
+      // If unauthorized or forbidden:
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
+        // Handle activation errors (403) - return error data instead of throwing
+        if (response.status === 403 && errorData.requiresActivation) {
+          // Return error data so caller can handle activation message
+          return errorData;
+        }
+
+        const isAuthError =
+          response.status === 401 ||
+          (errorData.error && (
+            String(errorData.error).includes('jwt expired') ||
+            String(errorData.error).includes('Invalid access Token') ||
+            String(errorData.error).includes('Authentication failed')
+          ));
+
+        if (isAuthError) {
+          // Only redirect to /login if we are NOT already on login/register
+          if (!isAuthPage()) {
+            console.log('Authentication failed, redirecting to login...');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            window.location.replace('/login');
+            return;
+          }
+          // If we are on an auth page, just return the error JSON to the caller
+          return errorData;
+        }
+
+        // Non-auth failure: throw with message for the caller
+        throw new Error(errorData.message || errorData.error || 'API request failed');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      // Network or other errors; don't force redirect if already on auth pages
+      const msg = String(error && error.message || '');
+      if (
+        (msg.includes('jwt expired') || msg.includes('Invalid access Token') || msg.includes('Authentication failed')) &&
+        !isAuthPage()
+      ) {
+        console.log('Authentication failed, redirecting to login...');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        window.location.replace('/login');
+        return;
+      }
+      throw error;
+    }
+  }
+
+  function showAlert(message, type) {
+    const alertContainer = document.getElementById('alertContainer');
+    alertContainer.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `;
+  }
+
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -933,8 +1208,24 @@
       console.log('Response type:', typeof resObj);
       console.log('Response keys:', Object.keys(resObj || {}));
 
-      // resObj is already JSON (from main.hbs apiCall)
+      // resObj is already JSON (from apiCall)
       const data = resObj || {};
+      
+      // Check for activation error first (403 with requiresActivation)
+      if (data.requiresActivation || (data.message && data.message.includes('not activated'))) {
+        const userEmail = data.email || email || '';
+        showAlert(
+          `<strong>Account Not Activated</strong><br>${data.message || 'Please check your email for the activation link.'}<br><br>
+          <button class="btn btn-sm btn-outline-primary mt-2" onclick="resendActivationEmail('${userEmail}')">
+            <i class="fas fa-envelope me-1"></i>Resend Activation Email
+          </button>`,
+          'danger'
+        );
+        loginBtn.disabled = false;
+        loginText.classList.remove('d-none');
+        loadingText.classList.add('d-none');
+        return;
+      }
       
       // Handle ApiResponse structure: { statusCode, data: { tokens, user }, message, success }
       // ApiResponse format: { statusCode: 200, data: { tokens: {...}, user: {...} }, message: "...", success: true }
@@ -943,10 +1234,13 @@
       console.log('Full response data:', JSON.stringify(data, null, 2));
       console.log('Payload:', JSON.stringify(payload, null, 2));
 
-      // Check for error - simplified condition
+      // Check for other errors
       if (data.error || data.success === false) {
         console.error('Login error detected:', data.error || data.message);
         showAlert(data.message || data.error || 'Login failed', 'danger');
+        loginBtn.disabled = false;
+        loginText.classList.remove('d-none');
+        loadingText.classList.add('d-none');
         return;
       }
 
@@ -1070,8 +1364,9 @@
   }
 
   // Check for error in URL params
-  const urlParams = new URLSearchParams(window.location.search);
-  const error = urlParams.get('error');
+  // Check for error in URL params (if redirected from another page)
+  const urlParamsForError = new URLSearchParams(window.location.search);
+  const error = urlParamsForError.get('error');
   if (error) {
     showAlert(error, 'danger');
   }
@@ -1097,85 +1392,8 @@
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // API Configuration - Set from backend based on environment
-  // login.hbs is standalone (layout: false), so we define API_BASE here
-  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
-
-  // Helper: detect if current page is login or register
-  function isAuthPage() {
-    const p = window.location.pathname.toLowerCase();
-    return p === '/login' || p === '/register' || p.endsWith('/login') || p.endsWith('/register');
-  }
-  
-  // Helper function to make API calls
-  async function apiCall(endpoint, options = {}) {
-    const token = localStorage.getItem('accessToken') || null;
-
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    };
-
-    // Attach Authorization only if we have a real token and caller didn't skip auth
-    if (token && !options.skipAuth) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const defaultOptions = {
-      credentials: 'include',
-      ...options,
-      headers
-    };
-    
-    try {
-      const response = await fetch(`${API_BASE}${endpoint}`, defaultOptions);
-
-      // If unauthorized:
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-
-        const isAuthError =
-          response.status === 401 ||
-          (errorData.error && (
-            String(errorData.error).includes('jwt expired') ||
-            String(errorData.error).includes('Invalid access Token') ||
-            String(errorData.error).includes('Authentication failed')
-          ));
-
-        if (isAuthError) {
-          // Only redirect to /login if we are NOT already on login/register
-          if (!isAuthPage()) {
-            console.log('Authentication failed, redirecting to login...');
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('user');
-            window.location.replace('/login');
-            return;
-          }
-          // If we are on an auth page, just return the error JSON to the caller
-          return errorData;
-        }
-
-        // Non-auth failure: throw with message for the caller
-        throw new Error(errorData.message || errorData.error || 'API request failed');
-      }
-      
-      return await response.json();
-    } catch (error) {
-      // Network or other errors; don't force redirect if already on auth pages
-      const msg = String(error && error.message || '');
-      if (
-        (msg.includes('jwt expired') || msg.includes('Invalid access Token') || msg.includes('Authentication failed')) &&
-        !isAuthPage()
-      ) {
-        console.log('Authentication failed, redirecting to login...');
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-        window.location.replace('/login');
-        return;
-      }
-      throw error;
-    }
-  }
+  // Note: API_BASE, isAuthPage, apiCall, and showAlert are already defined above
+  // This script block is for additional functionality only
 
   // Forgot Password Form Handler (must be after apiCall is defined)
   document.addEventListener('DOMContentLoaded', function() {
@@ -1234,6 +1452,57 @@
       });
     }
   });
+
+  // Resend activation email function
+  async function resendActivationEmail(email) {
+    if (!email) {
+      email = document.getElementById('email').value.trim();
+    }
+    
+    if (!email) {
+      showAlert('Please enter your email address', 'danger');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/users/resend-activation`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+      
+      if (data.success !== false && response.ok) {
+        showAlert(data.message || 'Activation email has been sent. Please check your inbox.', 'success');
+      } else {
+        showAlert(data.message || data.error || 'Failed to send activation email', 'danger');
+      }
+    } catch (error) {
+      console.error('Error resending activation email:', error);
+      showAlert('Network error. Please try again later.', 'danger');
+    }
+  }
+
+  // Check if resend activation is requested from URL
+  const urlParamsForResend = new URLSearchParams(window.location.search);
+  if (urlParamsForResend.get('resend') === 'true') {
+    const email = urlParamsForResend.get('email');
+    if (email) {
+      document.getElementById('email').value = email;
+      setTimeout(() => {
+        resendActivationEmail(email);
+      }, 500);
+    } else {
+      showAlert('Please enter your email address and click "Resend Activation Email"', 'info');
+    }
+  }
+
+  // If already logged in, go to dashboard
+  if (localStorage.getItem('accessToken')) {
+    window.location.href = '/dashboard';
+  }
 </script>
 </body>
 </html>

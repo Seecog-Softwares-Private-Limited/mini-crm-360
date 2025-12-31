@@ -63,3 +63,4 @@ const UserSession = sequelize.define('UserSession', {
 
 export { UserSession };
 
+

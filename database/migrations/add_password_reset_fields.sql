@@ -13,3 +13,4 @@ ADD COLUMN `passwordResetExpires` DATETIME NULL AFTER `passwordResetToken`;
 -- Add index for better query performance
 CREATE INDEX `idx_users_password_reset_token` ON `users` (`passwordResetToken`);
 
+

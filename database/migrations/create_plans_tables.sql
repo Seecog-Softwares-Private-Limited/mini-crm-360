@@ -56,3 +56,4 @@ INSERT INTO `plans` (`name`, `slug`, `description`, `price`, `currency`, `billin
 ('Gold Plan', 'gold', 'Complete solution for established businesses', 2999.00, 'INR', 'monthly', NULL, NULL, NULL, NULL, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 3)
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
 
+

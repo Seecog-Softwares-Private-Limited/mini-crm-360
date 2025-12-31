@@ -24,6 +24,8 @@ import { LeadForm } from './LeadForm.js';
 import { FormSubmission } from './FormSubmission.js';
 import { UserSession } from './UserSession.js';
 import { ActivityLog } from './ActivityLog.js';
+import { MenuItem } from './MenuItem.js';
+import { PlanMenuItem } from './PlanMenuItem.js';
 
 // Billing models - define locally to avoid circular dependency
 // The actual models are in src/billing/store/SequelizeStore.js
@@ -201,6 +203,15 @@ Plan.hasMany(UserPlan, { foreignKey: 'planId', as: 'userPlans' });
 UserPlan.belongsTo(Plan, { foreignKey: 'planId', as: 'plan' });
 
 /* =========================================================
+   PLAN ↔ MENU ITEM (Plan-specific menu locks)
+========================================================= */
+Plan.hasMany(PlanMenuItem, { foreignKey: 'planId', as: 'planMenuItems' });
+PlanMenuItem.belongsTo(Plan, { foreignKey: 'planId', as: 'plan' });
+
+MenuItem.hasMany(PlanMenuItem, { foreignKey: 'menuItemId', as: 'planMenuItems' });
+PlanMenuItem.belongsTo(MenuItem, { foreignKey: 'menuItemId', as: 'menuItem' });
+
+/* =========================================================
    USER ↔ TASK ↔ CUSTOMER
 ========================================================= */
 User.hasMany(Task, { foreignKey: 'userId', as: 'tasks' });
@@ -304,6 +315,8 @@ export {
   FormSubmission,
   UserSession,
   ActivityLog,
+  MenuItem,
+  PlanMenuItem,
   
   // Billing models
   PaymentLog,

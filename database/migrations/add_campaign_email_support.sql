@@ -20,3 +20,4 @@ ADD COLUMN `emailTemplateId` INT NULL AFTER `channelType`;
 CREATE INDEX `idx_campaigns_channel_type` ON `campaigns` (`channelType`);
 CREATE INDEX `idx_campaigns_email_template` ON `campaigns` (`emailTemplateId`);
 
+

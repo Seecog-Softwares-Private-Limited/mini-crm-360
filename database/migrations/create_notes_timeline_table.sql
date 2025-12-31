@@ -20,3 +20,4 @@ CREATE TABLE IF NOT EXISTS `notes_timeline` (
   INDEX `idx_notes_customer_created` (`customerId`, `createdAt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+

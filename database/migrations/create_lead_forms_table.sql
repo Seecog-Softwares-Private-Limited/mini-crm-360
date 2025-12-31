@@ -19,3 +19,4 @@ CREATE TABLE IF NOT EXISTS `lead_forms` (
   INDEX `idx_lead_forms_active` (`isActive`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+

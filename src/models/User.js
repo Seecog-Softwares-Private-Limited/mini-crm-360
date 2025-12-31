@@ -100,6 +100,22 @@ const User = sequelize.define('User', {
   twoFactorSecret: {
     type: DataTypes.STRING(255),
     allowNull: true
+  },
+  isActivated: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+    field: 'isActivated'
+  },
+  activationToken: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    field: 'activationToken'
+  },
+  activationTokenExpires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'activationTokenExpires'
   }
 }, {
   tableName: 'users',
