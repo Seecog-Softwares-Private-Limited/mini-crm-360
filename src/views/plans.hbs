@@ -6,173 +6,404 @@
   <div class="container-fluid p-3">
     <style>
       /* ============================================
-         PREMIUM PLANS PAGE STYLING
+         PREMIUM PLANS PAGE STYLING - ULTRA PREMIUM
          ============================================ */
       
       .plans-container {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: 
+          radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+          linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
         min-height: calc(100vh - 2rem);
-        padding: 1.5rem 0;
+        padding: 3rem 0;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Animated background particles */
+      .plans-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+          radial-gradient(circle at 10% 20%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
+          radial-gradient(circle at 90% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
+        animation: backgroundShift 20s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      @keyframes backgroundShift {
+        0%, 100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        50% {
+          opacity: 0.8;
+          transform: translateY(-20px);
+        }
       }
 
       .plans-header {
         text-align: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 3rem;
+        position: relative;
+        z-index: 1;
       }
 
       .plans-title {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 0.5rem;
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.75rem;
+        gap: 1rem;
+        letter-spacing: -0.02em;
+        position: relative;
+        animation: titleGlow 3s ease-in-out infinite;
+      }
+
+      @keyframes titleGlow {
+        0%, 100% {
+          filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.3));
+        }
+        50% {
+          filter: drop-shadow(0 0 20px rgba(118, 75, 162, 0.5));
+        }
       }
 
       .plans-title::before {
         content: '';
-        width: 4px;
-        height: 2rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        width: 6px;
+        height: 3rem;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        border-radius: 3px;
+        box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        animation: accentPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes accentPulse {
+        0%, 100% {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scaleY(1.1);
+          opacity: 0.8;
+        }
+      }
+
+      .plans-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, #667eea, transparent);
         border-radius: 2px;
+        animation: underlineGlow 2s ease-in-out infinite;
+      }
+
+      @keyframes underlineGlow {
+        0%, 100% {
+          width: 100px;
+          opacity: 0.6;
+        }
+        50% {
+          width: 150px;
+          opacity: 1;
+        }
       }
 
       .plans-subtitle {
         color: #64748b;
-        font-size: 0.95rem;
-        margin-top: 0.5rem;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        font-weight: 500;
+        letter-spacing: 0.01em;
       }
 
       .plans-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        max-width: 1200px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 0 1rem;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 1;
       }
 
       .plan-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 1.5rem 1.5rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 2px solid transparent;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 2.5rem 2rem;
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.08),
+          0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 2px solid rgba(255, 255, 255, 0.8);
         position: relative;
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        transform: translateY(0);
       }
 
+      /* Premium glassmorphism effect */
       .plan-card::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 5px;
+        height: 6px;
         background: var(--plan-gradient);
         transform: scaleX(0);
         transform-origin: left;
-        transition: transform 0.4s ease;
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Shimmer effect on hover */
+      .plan-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 70%
+        );
+        transform: rotate(45deg);
+        transition: all 0.6s;
+        opacity: 0;
+      }
+
+      .plan-card:hover::after {
+        animation: shimmer 0.6s ease-in-out;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%) translateY(-100%) rotate(45deg);
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(100%) translateY(100%) rotate(45deg);
+          opacity: 0;
+        }
       }
 
       .plan-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        transform: translateY(-15px) scale(1.03);
+        box-shadow: 
+          0 30px 80px rgba(0, 0, 0, 0.12),
+          0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+          0 0 40px rgba(var(--plan-color-rgb, 102, 126, 234), 0.15);
         border-color: var(--plan-color);
+        background: rgba(255, 255, 255, 1);
       }
 
       .plan-card:hover::before {
         transform: scaleX(1);
+        height: 6px;
       }
 
       .plan-card.featured {
         border-color: #f59e0b;
-        box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25);
-        transform: scale(1.02);
+        box-shadow: 
+          0 25px 70px rgba(245, 158, 11, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+          0 0 50px rgba(245, 158, 11, 0.2);
+        transform: scale(1.05);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 248, 240, 0.95) 100%);
       }
 
       .plan-card.featured::before {
         transform: scaleX(1);
-        height: 6px;
+        height: 8px;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+        animation: featuredGlow 2s ease-in-out infinite;
+      }
+
+      @keyframes featuredGlow {
+        0%, 100% {
+          box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 20px rgba(245, 158, 11, 0.8);
+        }
       }
 
       /* Plan Header */
       .plan-header {
         text-align: center;
-        margin-bottom: 1.25rem;
+        margin-bottom: 2rem;
+        position: relative;
       }
 
       .plan-icon {
-        width: 60px;
-        height: 60px;
-        margin: 0 auto 1rem;
-        border-radius: 16px;
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
+        font-size: 2.5rem;
         color: #ffffff;
         background: var(--plan-gradient);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        box-shadow: 
+          0 15px 35px rgba(0, 0, 0, 0.2),
+          0 0 0 4px rgba(255, 255, 255, 0.3) inset;
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .plan-icon::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 24px;
+        padding: 4px;
+        background: var(--plan-gradient);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+
+      .plan-card:hover .plan-icon {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 
+          0 20px 45px rgba(0, 0, 0, 0.25),
+          0 0 0 4px rgba(255, 255, 255, 0.4) inset,
+          0 0 30px rgba(var(--plan-color-rgb, 102, 126, 234), 0.4);
+      }
+
+      .plan-card:hover .plan-icon::before {
+        opacity: 1;
       }
 
       .plan-name {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 0.4rem;
+        font-size: 1.75rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.01em;
       }
 
       .plan-description {
         color: #64748b;
-        font-size: 0.85rem;
-        line-height: 1.5;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        font-weight: 400;
       }
 
       /* Plan Pricing */
       .plan-pricing {
         text-align: center;
-        margin-bottom: 1.25rem;
-        padding-bottom: 1.25rem;
-        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid rgba(229, 231, 235, 0.5);
+        position: relative;
+      }
+
+      .plan-pricing::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 2px;
+        background: var(--plan-gradient);
+        border-radius: 1px;
+        opacity: 0;
+        transition: all 0.4s;
+      }
+
+      .plan-card:hover .plan-pricing::after {
+        width: 100px;
+        opacity: 1;
       }
 
       .plan-price {
-        font-size: 2.25rem;
-        font-weight: 700;
-        color: var(--plan-color);
+        font-size: 3rem;
+        font-weight: 800;
+        background: var(--plan-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         line-height: 1;
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+        position: relative;
       }
 
       .plan-price-currency {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         vertical-align: super;
+        opacity: 0.8;
       }
 
       .plan-period {
         color: #64748b;
-        font-size: 0.85rem;
-        font-weight: 500;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
       /* Plan Features */
       .plan-features {
         flex: 1;
-        margin-bottom: 1.25rem;
+        margin-bottom: 2rem;
       }
 
       .plan-features-title {
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: 1.1rem;
+        font-weight: 700;
         color: #1e293b;
-        margin-bottom: 0.9rem;
+        margin-bottom: 1.25rem;
         text-align: center;
+        letter-spacing: 0.01em;
+        position: relative;
+        padding-bottom: 0.75rem;
+      }
+
+      .plan-features-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 3px;
+        background: var(--plan-gradient);
+        border-radius: 2px;
       }
 
       .feature-list {
@@ -184,35 +415,50 @@
       .feature-item {
         display: flex;
         align-items: flex-start;
-        gap: 0.6rem;
-        padding: 0.5rem 0;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
         color: #374151;
-        font-size: 0.85rem;
-        line-height: 1.5;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+
+      .feature-item:hover {
+        background: rgba(0, 0, 0, 0.02);
+        transform: translateX(5px);
       }
 
       .feature-item i {
         color: var(--plan-color);
-        font-size: 0.95rem;
-        margin-top: 0.15rem;
+        font-size: 1.1rem;
+        margin-top: 0.1rem;
         flex-shrink: 0;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
       }
 
       /* Plan Button */
       .plan-button {
         width: 100%;
-        padding: 0.85rem 1.5rem;
-        font-size: 0.95rem;
-        font-weight: 600;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 700;
         color: #ffffff;
         background: var(--plan-gradient);
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 
+          0 8px 20px rgba(0, 0, 0, 0.15),
+          0 0 0 0 rgba(255, 255, 255, 0.2) inset;
         position: relative;
         overflow: hidden;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        font-size: 0.9rem;
       }
 
       .plan-button::before {
@@ -222,8 +468,8 @@
         left: -100%;
         width: 100%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-        transition: left 0.5s;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.6s;
       }
 
       .plan-button:hover::before {
@@ -231,57 +477,226 @@
       }
 
       .plan-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 
+          0 15px 35px rgba(0, 0, 0, 0.25),
+          0 0 0 2px rgba(255, 255, 255, 0.3) inset,
+          0 0 30px rgba(var(--plan-color-rgb, 102, 126, 234), 0.4);
       }
 
       .plan-button:active {
-        transform: translateY(0);
+        transform: translateY(-1px) scale(1);
       }
 
-      /* Plan Variants */
+      /* Plan Variants - Enhanced Gradients */
       .plan-card.free {
-  --plan-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --plan-color: #10b981;
-}
+        --plan-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+        --plan-color: #10b981;
+        --plan-color-rgb: 16, 185, 129;
+      }
 
-.plan-card.starter {
-  --plan-gradient: linear-gradient(135deg, #64748b 0%, #475569 100%);
-  --plan-color: #64748b;
-}
+      .plan-card.starter {
+        --plan-gradient: linear-gradient(135deg, #64748b 0%, #475569 50%, #334155 100%);
+        --plan-color: #64748b;
+        --plan-color-rgb: 100, 116, 139;
+      }
 
-.plan-card.pro {
-  --plan-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  --plan-color: #f59e0b;
-}
+      .plan-card.pro {
+        --plan-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+        --plan-color: #f59e0b;
+        --plan-color-rgb: 245, 158, 11;
+      }
 
-.plan-card.enterprise {
-  --plan-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  --plan-color: #3b82f6;
-}
+      .plan-card.enterprise {
+        --plan-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+        --plan-color: #3b82f6;
+        --plan-color-rgb: 59, 130, 246;
+      }
 
-      /* Current/Selected Plan Styling */
+      /* Current/Selected Plan Styling - Premium Design */
       .plan-card.current-plan {
         border: 3px solid var(--plan-color);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(0, 0, 0, 0.15);
         position: relative;
-        transform: scale(1.02);
+        transform: scale(1.05);
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+        animation: currentPlanPulse 3s ease-in-out infinite;
+        z-index: 5;
       }
 
+      /* Plan-specific glow colors for current plan */
+      .plan-card.current-plan.free {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(16, 185, 129, 0.3);
+      }
+
+      .plan-card.current-plan.starter {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(100, 116, 139, 0.3);
+      }
+
+      .plan-card.current-plan.pro {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(245, 158, 11, 0.3);
+      }
+
+      .plan-card.current-plan.enterprise {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(59, 130, 246, 0.3);
+      }
+
+      /* Animated glow effect for current plan */
+      @keyframes currentPlanPulse {
+        0%, 100% {
+          filter: brightness(1);
+        }
+        50% {
+          filter: brightness(1.05);
+        }
+      }
+
+      /* Premium badge for current plan */
       .current-plan-badge {
         position: absolute;
         top: 1rem;
-        left: 1rem;
-        background: var(--plan-gradient);
+        right: 1rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: #ffffff;
-        padding: 0.4rem 0.8rem;
-        border-radius: 16px;
-        font-size: 0.7rem;
-        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        letter-spacing: 1px;
+        box-shadow: 
+          0 4px 15px rgba(16, 185, 129, 0.4),
+          0 0 0 2px rgba(255, 255, 255, 0.3) inset;
         z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: badgeShine 2s ease-in-out infinite;
+      }
+
+      .current-plan-badge::before {
+        content: '✓';
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 900;
+      }
+
+      @keyframes badgeShine {
+        0%, 100% {
+          transform: scale(1);
+          box-shadow: 
+            0 4px 15px rgba(16, 185, 129, 0.4),
+            0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+        }
+        50% {
+          transform: scale(1.05);
+          box-shadow: 
+            0 6px 20px rgba(16, 185, 129, 0.6),
+            0 0 0 2px rgba(255, 255, 255, 0.5) inset;
+        }
+      }
+
+      /* Premium ribbon effect */
+      .plan-card.current-plan::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 0 60px 60px 0;
+        border-color: transparent var(--plan-color) transparent transparent;
+        z-index: 5;
+      }
+
+      /* Enhanced icon glow for current plan */
+      .plan-card.current-plan .plan-icon {
+        box-shadow: 
+          0 8px 20px rgba(0, 0, 0, 0.15),
+          0 0 30px rgba(0, 0, 0, 0.2);
+        animation: iconGlow 2s ease-in-out infinite;
+        transform: scale(1.1);
+      }
+
+      .plan-card.current-plan.free .plan-icon {
+        box-shadow: 
+          0 8px 20px rgba(0, 0, 0, 0.15),
+          0 0 30px rgba(16, 185, 129, 0.4);
+      }
+
+      .plan-card.current-plan.starter .plan-icon {
+        box-shadow: 
+          0 8px 20px rgba(0, 0, 0, 0.15),
+          0 0 30px rgba(100, 116, 139, 0.4);
+      }
+
+      .plan-card.current-plan.pro .plan-icon {
+        box-shadow: 
+          0 8px 20px rgba(0, 0, 0, 0.15),
+          0 0 30px rgba(245, 158, 11, 0.4);
+      }
+
+      .plan-card.current-plan.enterprise .plan-icon {
+        box-shadow: 
+          0 8px 20px rgba(0, 0, 0, 0.15),
+          0 0 30px rgba(59, 130, 246, 0.4);
+      }
+
+      @keyframes iconGlow {
+        0%, 100% {
+          transform: scale(1.1);
+        }
+        50% {
+          transform: scale(1.15);
+        }
+      }
+
+      /* Premium top border accent */
+      .plan-card.current-plan::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, 
+          var(--plan-color) 0%, 
+          rgba(255, 255, 255, 0.8) 50%, 
+          var(--plan-color) 100%);
+        transform: scaleX(1);
+        animation: borderShimmer 3s ease-in-out infinite;
+      }
+
+      @keyframes borderShimmer {
+        0%, 100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
       }
 
       /* Hide existing badge if current plan */
@@ -289,47 +704,228 @@
         display: none;
       }
 
+      /* Premium button styling for current plan */
       .plan-card.current-plan .plan-button {
-        background: #6b7280;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         cursor: default;
-        opacity: 0.8;
+        opacity: 1;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        color: transparent;
+      }
+
+      .plan-card.current-plan .plan-button::after {
+        content: '✓ Active Plan';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: #ffffff;
+        white-space: nowrap;
       }
 
       .plan-card.current-plan .plan-button:hover {
         transform: none;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        opacity: 0.8;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        opacity: 1;
+      }
+
+      /* Enhanced pricing display for current plan */
+      .plan-card.current-plan .plan-price {
+        position: relative;
+      }
+
+      .plan-card.current-plan .plan-price::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: var(--plan-gradient);
+        border-radius: 2px;
+        animation: priceUnderline 2s ease-in-out infinite;
+      }
+
+      @keyframes priceUnderline {
+        0%, 100% {
+          width: 60px;
+          opacity: 0.8;
+        }
+        50% {
+          width: 80px;
+          opacity: 1;
+        }
+      }
+
+      /* Premium hover effect disabled for current plan */
+      .plan-card.current-plan:hover {
+        transform: scale(1.05);
+      }
+
+      .plan-card.current-plan.free:hover {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(16, 185, 129, 0.3);
+      }
+
+      .plan-card.current-plan.starter:hover {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(100, 116, 139, 0.3);
+      }
+
+      .plan-card.current-plan.pro:hover {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(245, 158, 11, 0.3);
+      }
+
+      .plan-card.current-plan.enterprise:hover {
+        box-shadow: 
+          0 20px 60px rgba(0, 0, 0, 0.25),
+          0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+          0 0 40px rgba(59, 130, 246, 0.3);
+      }
+
+      /* Additional premium styling for current plan name */
+      .plan-card.current-plan .plan-name {
+        background: var(--plan-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 800;
+        position: relative;
+      }
+
+      /* Premium feature highlight for current plan */
+      .plan-card.current-plan .feature-item {
+        font-weight: 600;
+      }
+
+      .plan-card.current-plan .feature-item i {
+        color: var(--plan-color);
+        font-size: 1rem;
+        animation: featureIconPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes featureIconPulse {
+        0%, 100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
       }
 
       /* Badge */
       .plan-badge {
         position: absolute;
-        top: 1rem;
-        right: 1rem;
+        top: 1.5rem;
+        right: 1.5rem;
         background: var(--plan-gradient);
         color: #ffffff;
-        padding: 0.4rem 0.8rem;
-        border-radius: 16px;
-        font-size: 0.7rem;
-        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        letter-spacing: 0.08em;
+        box-shadow: 
+          0 6px 20px rgba(0, 0, 0, 0.2),
+          0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+        z-index: 10;
+        animation: badgeFloat 3s ease-in-out infinite;
+      }
+
+      @keyframes badgeFloat {
+        0%, 100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      /* Smooth entrance animations */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .plan-card {
+        animation: fadeInUp 0.6s ease-out backwards;
+      }
+
+      .plan-card:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+
+      .plan-card:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .plan-card:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+
+      .plan-card:nth-child(4) {
+        animation-delay: 0.4s;
       }
 
       /* Responsive */
       @media (max-width: 768px) {
+        .plans-container {
+          padding: 2rem 0;
+        }
+
+        .plans-title {
+          font-size: 2rem;
+        }
+
+        .plans-title::before {
+          height: 2rem;
+        }
+
         .plans-grid {
           grid-template-columns: 1fr;
           gap: 1.5rem;
+          padding: 0 1rem;
+        }
+
+        .plan-card {
+          padding: 2rem 1.5rem;
         }
 
         .plan-card.featured {
           transform: scale(1);
         }
 
-        .plans-title {
-          font-size: 2rem;
+        .plan-card.current-plan {
+          transform: scale(1.02);
+        }
+
+        .plan-icon {
+          width: 70px;
+          height: 70px;
+          font-size: 2.2rem;
+        }
+
+        .plan-price {
+          font-size: 2.5rem;
         }
       }
 

@@ -2,6 +2,7 @@ import { User } from '../../models/User.js';
 import { buildTokenPair, hashToken } from '../../utils/token.util.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
+import { assignFreeTrialPlan } from '../../utils/plan.util.js';
 import axios from 'axios';
 
 /**
@@ -49,6 +50,14 @@ const handleSocialLoginCallback = async (req, res, profile, provider) => {
     user.refreshTokens = hashToken(refreshToken);
     user.refreshTokenExpiresAt = refreshExp ? new Date(refreshExp * 1000) : null;
     await user.save();
+
+    // Assign Free Trial plan to new user (if they don't have one)
+    try {
+      await assignFreeTrialPlan(user.id);
+    } catch (planError) {
+      console.error('Error assigning Free Trial plan during social login:', planError);
+      // Don't fail login if plan assignment fails
+    }
 
     // Set cookies
     const options = {

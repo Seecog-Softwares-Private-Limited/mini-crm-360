@@ -128,6 +128,7 @@ import noteRoutes from "./routes/note.routes.js";
 import reminderRoutes from "./routes/reminder.routes.js";
 import leadFormRoutes from "./routes/leadForm.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import { initBilling } from "./billing/index.js";
 
 // ---------- Frontend pages ----------
@@ -143,7 +144,12 @@ const getApiBase = () => {
   return `${developmentUrl}/api/v1`;
 };
 
-app.get('/', (req, res) => res.redirect('/login'));
+app.get('/', (req, res) => {
+  res.render('landing', { 
+    title: 'Mini CRM 360 - Powerful All-in-One CRM Solution',
+    layout: false
+  });
+});
 
 app.get('/login', (req, res) => {
   res.render('login', { 
@@ -151,6 +157,22 @@ app.get('/login', (req, res) => {
     apiBase: getApiBase(),
     layout: false // login.hbs is standalone, doesn't use main.hbs layout
   });
+});
+
+app.get('/activate/:token', async (req, res, next) => {
+  try {
+    const { activateAccount } = await import('./controllers/user/activateAccount.js');
+    // activateAccount is wrapped with asyncHandler, so it handles errors via next()
+    return activateAccount(req, res, next);
+  } catch (error) {
+    console.error('Activation route error:', error);
+    return res.status(500).render('activate-account', {
+      title: 'Activation Error',
+      success: false,
+      message: 'An error occurred while activating your account. Please try again or contact support.',
+      user: null
+    });
+  }
 });
 
 app.get('/register', (req, res) => {
@@ -302,6 +324,7 @@ app.use("/", noteRoutes);
 app.use("/", reminderRoutes);
 app.use("/", leadFormRoutes);
 app.use("/", profileRoutes);
+app.use("/", adminRoutes);
 app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/templates', templateRouter);
 app.use('/api/v1/campaigns', campaignRouter);
@@ -336,6 +359,52 @@ initBilling().then(billing => {
   console.log('✅ Billing routes mounted');
 }).catch(err => {
   console.error('❌ Failed to initialize billing module:', err.message);
+});
+
+// Global error handler - must be last
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  
+  // For API routes, always return JSON
+  if (req.path.startsWith('/api/')) {
+    return res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message || 'Internal server error',
+      error: err.message,
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
+  }
+  
+  // For HTML routes, render error page or redirect
+  if (req.accepts('html')) {
+    // For activation route, render activation error page
+    if (req.path.startsWith('/activate/')) {
+      return res.status(err.statusCode || 500).render('activate-account', {
+        title: 'Activation Error',
+        success: false,
+        message: err.message || 'An error occurred while activating your account. Please try again or contact support.',
+        user: null
+      });
+    }
+    
+    return res.status(err.statusCode || 500).send(`
+      <html>
+        <head><title>Error</title></head>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+          <h1 style="color: #dc2626;">Error ${err.statusCode || 500}</h1>
+          <p>${err.message || 'Internal server error'}</p>
+          <a href="/dashboard" style="color: #667eea; text-decoration: none;">Go to Dashboard</a>
+        </body>
+      </html>
+    `);
+  }
+  
+  // Default JSON response
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || 'Internal server error',
+    error: err.message
+  });
 });
 
 export { app };
