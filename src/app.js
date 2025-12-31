@@ -300,6 +300,7 @@ app.use(express.static('public'));
 // Serve static files from src/views/public (for CSS and JS files used by views)
 app.use('/css', express.static(path.join(__dirname, 'views/public/css')));
 app.use('/js', express.static(path.join(__dirname, 'views/public/js')));
+app.use('/images', express.static(path.join(__dirname, 'views/public/images')));
 // Serve assets from src/assets
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
