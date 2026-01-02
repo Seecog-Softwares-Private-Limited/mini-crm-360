@@ -1,0 +1,1811 @@
+{{! src/views/social-publisher.hbs - Complete Social Publisher Module }}
+<div class="container-fluid social-publisher-container">
+  <div class="row">
+    {{> sidebar}}
+
+    <div class="col-md-9 col-lg-10 main-content">
+      <div class="container-fluid p-0">
+        <style>
+          /* ============================================
+             SOCIAL PUBLISHER PREMIUM STYLING
+             ============================================ */
+          
+          .social-publisher-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+          }
+
+          .main-content {
+            background: transparent;
+            padding: 0;
+          }
+
+          /* Sticky Header */
+          .sp-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            color: white;
+          }
+
+          .sp-header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+          }
+
+          .sp-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex: 1;
+          }
+
+          .sp-header-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          .sp-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+          }
+
+          .sp-btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          .sp-btn-primary {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+          }
+
+          .sp-btn-primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+          }
+
+          .sp-btn-secondary {
+            background: white;
+            color: #667eea;
+          }
+
+          .sp-btn-secondary:hover {
+            background: #f0f0f0;
+          }
+
+          /* View Toggle */
+          .sp-view-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 0.25rem;
+            gap: 0.25rem;
+          }
+
+          .sp-view-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+          }
+
+          .sp-view-btn.active {
+            background: white;
+            color: #667eea;
+          }
+
+          /* Status Chips */
+          .sp-status-chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+          }
+
+          .sp-status-chip {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+          }
+
+          .sp-status-chip:hover {
+            background: rgba(255, 255, 255, 0.3);
+          }
+
+          .sp-status-chip.active {
+            background: white;
+            color: #667eea;
+          }
+
+          /* Connected Accounts Strip */
+          .sp-accounts-strip {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+          }
+
+          .sp-accounts-list {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+          }
+
+          .sp-account-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            border: 1px solid #e9ecef;
+          }
+
+          .sp-account-badge .platform-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+          }
+
+          /* Main Content Area */
+          .sp-main-area {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+            min-height: calc(100vh - 300px);
+          }
+
+          .sp-content-area {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+          }
+
+          .sp-sidebar {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+
+          .sp-sidebar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+          }
+
+          .sp-sidebar-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+            color: #2d3748;
+          }
+
+          /* Calendar View */
+          .sp-calendar {
+            display: none;
+          }
+
+          .sp-calendar.active {
+            display: block;
+          }
+
+          .sp-calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+          }
+
+          .sp-calendar-nav-btn {
+            background: #f8f9fa;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+          }
+
+          .sp-calendar-nav-btn:hover {
+            background: #e9ecef;
+          }
+
+          .sp-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+          }
+
+          .sp-calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+          }
+
+          .sp-calendar-day:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+          }
+
+          .sp-calendar-day.has-posts {
+            background: #e3f2fd;
+            border-color: #2196f3;
+          }
+
+          .sp-calendar-day-number {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #2d3748;
+          }
+
+          .sp-calendar-day.other-month .sp-calendar-day-number {
+            color: #cbd5e0;
+          }
+
+          .sp-calendar-day.today {
+            background: #667eea;
+            color: white;
+          }
+
+          .sp-calendar-day.today .sp-calendar-day-number {
+            color: white;
+          }
+
+          /* List View */
+          .sp-list-view {
+            display: none;
+          }
+
+          .sp-list-view.active {
+            display: block;
+          }
+
+          .sp-post-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s;
+          }
+
+          .sp-post-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+          }
+
+          .sp-post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+          }
+
+          .sp-post-status {
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
+
+          .sp-post-status.draft { background: #e9ecef; color: #495057; }
+          .sp-post-status.scheduled { background: #fff3cd; color: #856404; }
+          .sp-post-status.published { background: #d4edda; color: #155724; }
+          .sp-post-status.failed { background: #f8d7da; color: #721c24; }
+
+          .sp-post-content {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+          }
+
+          .sp-post-channels {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+          }
+
+          .sp-post-channel-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            background: white;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            border: 1px solid #e9ecef;
+          }
+
+          /* Drawers */
+          .sp-drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 480px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+          }
+
+          .sp-drawer.active {
+            right: 0;
+          }
+
+          .sp-drawer-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+          }
+
+          .sp-drawer-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+          }
+
+          .sp-drawer-close {
+            background: #f8f9fa;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+          }
+
+          .sp-drawer-close:hover {
+            background: #e9ecef;
+          }
+
+          .sp-drawer-body {
+            padding: 1.5rem;
+          }
+
+          /* Form Styles */
+          .sp-form-group {
+            margin-bottom: 1.5rem;
+          }
+
+          .sp-form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+            font-size: 0.875rem;
+          }
+
+          .sp-form-input,
+          .sp-form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.3s;
+          }
+
+          .sp-form-input:focus,
+          .sp-form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          }
+
+          .sp-form-textarea {
+            min-height: 120px;
+            resize: vertical;
+          }
+
+          .sp-char-counter {
+            font-size: 0.75rem;
+            color: #718096;
+            margin-top: 0.25rem;
+            text-align: right;
+          }
+
+          .sp-char-counter.warning {
+            color: #f59e0b;
+          }
+
+          .sp-char-counter.error {
+            color: #ef4444;
+          }
+
+          /* Account Selector */
+          .sp-account-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+          }
+
+          .sp-account-option {
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          .sp-account-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+          }
+
+          .sp-account-option.selected {
+            border-color: #667eea;
+            background: #eef2ff;
+          }
+
+          .sp-account-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+          }
+
+          /* Media Preview */
+          .sp-media-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+          }
+
+          .sp-media-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+          }
+
+          .sp-media-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .sp-media-remove {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+          }
+
+          /* Modal Overlay */
+          .sp-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+          }
+
+          .sp-modal-overlay.active {
+            display: flex;
+          }
+
+          .sp-modal {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          }
+
+          .sp-modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .sp-modal-body {
+            padding: 1.5rem;
+          }
+
+          /* Responsive */
+          @media (max-width: 1200px) {
+            .sp-sidebar {
+              width: 280px;
+            }
+          }
+
+          @media (max-width: 992px) {
+            .sp-main-area {
+              flex-direction: column;
+            }
+
+            .sp-sidebar {
+              width: 100%;
+            }
+
+            .sp-drawer {
+              width: 100%;
+            }
+          }
+
+          @media (max-width: 768px) {
+            .sp-header-content {
+              flex-direction: column;
+              align-items: flex-start;
+            }
+
+            .sp-header-actions {
+              width: 100%;
+              justify-content: space-between;
+            }
+          }
+        </style>
+
+        <!-- Sticky Header -->
+        <div class="sp-header">
+          <div class="sp-header-content">
+            <div class="sp-header-left">
+              <h1 class="sp-header-title">
+                <i class="fas fa-share-alt"></i>
+                Social Publisher
+              </h1>
+              <select id="businessSelector" class="sp-form-input" style="width: auto; min-width: 200px;">
+                <option value="">All Businesses</option>
+                {{#each businesses}}
+                <option value="{{id}}">{{name}}</option>
+                {{/each}}
+              </select>
+              <div class="sp-view-toggle">
+                <button class="sp-view-btn active" data-view="list" onclick="switchView('list')">
+                  <i class="fas fa-list"></i> List
+                </button>
+                <button class="sp-view-btn" data-view="calendar" onclick="switchView('calendar')">
+                  <i class="fas fa-calendar"></i> Calendar
+                </button>
+              </div>
+            </div>
+            <div class="sp-header-actions">
+              <div class="sp-status-chips">
+                <span class="sp-status-chip active" data-status="all" onclick="filterByStatus('all')">All</span>
+                <span class="sp-status-chip" data-status="draft" onclick="filterByStatus('draft')">Draft</span>
+                <span class="sp-status-chip" data-status="scheduled" onclick="filterByStatus('scheduled')">Scheduled</span>
+                <span class="sp-status-chip" data-status="published" onclick="filterByStatus('published')">Published</span>
+                <span class="sp-status-chip" data-status="failed" onclick="filterByStatus('failed')">Failed</span>
+              </div>
+              <button class="sp-btn sp-btn-secondary" onclick="openAccountsDrawer()">
+                <i class="fas fa-link"></i> Connect Accounts
+              </button>
+              <button class="sp-btn sp-btn-secondary" onclick="openTemplatesModal()">
+                <i class="fas fa-file-alt"></i> Templates
+              </button>
+              <button class="sp-btn sp-btn-secondary" onclick="openMediaDrawer()">
+                <i class="fas fa-images"></i> Media
+              </button>
+              <button class="sp-btn sp-btn-primary" onclick="openCreatePostDrawer()">
+                <i class="fas fa-plus"></i> Create Post
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connected Accounts Strip -->
+        <div class="sp-accounts-strip" id="accountsStrip" style="display: none;">
+          <div>
+            <strong>Connected Accounts:</strong>
+            <div class="sp-accounts-list" id="connectedAccountsList">
+              <!-- Accounts will be populated here -->
+            </div>
+          </div>
+          <button class="sp-btn sp-btn-secondary" onclick="openAccountsDrawer()" style="font-size: 0.875rem;">
+            <i class="fas fa-cog"></i> Manage
+          </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="sp-main-area">
+          <!-- Content Area -->
+          <div class="sp-content-area">
+            <!-- List View -->
+            <div class="sp-list-view active" id="listView">
+              <div id="postsList">
+                <div class="text-center p-5 text-muted">
+                  <i class="fas fa-share-alt" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+                  <p>No posts yet. Create your first post to get started!</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div class="sp-calendar" id="calendarView">
+              <div class="sp-calendar-header">
+                <button class="sp-calendar-nav-btn" onclick="changeMonth(-1)">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <h3 id="calendarMonthYear">January 2024</h3>
+                <button class="sp-calendar-nav-btn" onclick="changeMonth(1)">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+              <div class="sp-calendar-grid" id="calendarGrid">
+                <!-- Calendar will be generated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="sp-sidebar">
+            <div class="sp-sidebar-card">
+              <h3><i class="fas fa-clock me-2"></i>Upcoming</h3>
+              <div id="upcomingPosts">
+                <p class="text-muted small">No upcoming posts</p>
+              </div>
+            </div>
+            <div class="sp-sidebar-card">
+              <h3><i class="fas fa-exclamation-triangle me-2"></i>Failed</h3>
+              <div id="failedPosts">
+                <p class="text-muted small">No failed posts</p>
+              </div>
+            </div>
+            <div class="sp-sidebar-card">
+              <h3><i class="fas fa-magic me-2"></i>Quick Templates</h3>
+              <div id="quickTemplates">
+                <p class="text-muted small">Loading templates...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Create/Edit Post Drawer -->
+        <div class="sp-drawer" id="postDrawer">
+          <div class="sp-drawer-header">
+            <h3 class="sp-drawer-title" id="postDrawerTitle">Create Post</h3>
+            <button class="sp-drawer-close" onclick="closePostDrawer()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="sp-drawer-body">
+            <form id="postForm">
+              <input type="hidden" id="postId" name="postId">
+              
+              <div class="sp-form-group">
+                <label class="sp-form-label">Title (Optional)</label>
+                <input type="text" class="sp-form-input" id="postTitle" name="title" placeholder="Enter post title">
+              </div>
+
+              <div class="sp-form-group">
+                <label class="sp-form-label">Content <span class="text-danger">*</span></label>
+                <textarea class="sp-form-textarea" id="postContent" name="content" placeholder="What's on your mind?" required></textarea>
+                <div class="sp-char-counter" id="charCounter">0 characters</div>
+                <div id="platformWarnings" style="margin-top: 0.5rem;"></div>
+              </div>
+
+              <div class="sp-form-group">
+                <label class="sp-form-label">Select Accounts <span class="text-danger">*</span></label>
+                <div class="sp-account-selector" id="accountSelector">
+                  <!-- Accounts will be populated here -->
+                </div>
+              </div>
+
+              <div class="sp-form-group">
+                <label class="sp-form-label">Schedule</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <input type="datetime-local" class="sp-form-input" id="postScheduledAt" name="scheduledAt">
+                  <button type="button" class="sp-btn sp-btn-secondary" onclick="clearSchedule()" style="white-space: nowrap;">
+                    <i class="fas fa-times"></i> Clear
+                  </button>
+                </div>
+                <small class="text-muted">Leave empty to save as draft</small>
+              </div>
+
+              <div class="sp-form-group">
+                <label class="sp-form-label">Media</label>
+                <input type="file" class="sp-form-input" id="postMedia" multiple accept="image/*,video/*" onchange="handleMediaSelect(event)">
+                <div class="sp-media-preview" id="mediaPreview"></div>
+              </div>
+
+              <div class="sp-form-group" style="display: flex; gap: 0.75rem; margin-top: 2rem;">
+                <button type="submit" class="sp-btn sp-btn-primary" style="flex: 1;">
+                  <i class="fas fa-save"></i> Save Post
+                </button>
+                <button type="button" class="sp-btn sp-btn-secondary" onclick="closePostDrawer()">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Accounts Management Drawer -->
+        <div class="sp-drawer" id="accountsDrawer">
+          <div class="sp-drawer-header">
+            <h3 class="sp-drawer-title">Manage Accounts</h3>
+            <button class="sp-drawer-close" onclick="closeAccountsDrawer()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="sp-drawer-body">
+            <div id="accountsList">
+              <p class="text-muted">Loading accounts...</p>
+            </div>
+            <button class="sp-btn sp-btn-primary" onclick="showConnectAccountForm()" style="width: 100%; margin-top: 1rem;">
+              <i class="fas fa-plus"></i> Connect New Account
+            </button>
+            <div id="connectAccountForm" style="display: none; margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+              <h4 style="margin-bottom: 1rem;">Connect Account</h4>
+              <form id="connectAccountFormElement">
+                <div class="sp-form-group">
+                  <label class="sp-form-label">Platform</label>
+                  <select class="sp-form-input" name="platform" required>
+                    <option value="">Select Platform</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="linkedin">LinkedIn</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="whatsapp">WhatsApp</option>
+                  </select>
+                </div>
+                <div class="sp-form-group">
+                  <label class="sp-form-label">Account Name</label>
+                  <input type="text" class="sp-form-input" name="accountName" required>
+                </div>
+                <div class="sp-form-group">
+                  <label class="sp-form-label">Account ID</label>
+                  <input type="text" class="sp-form-input" name="accountId" required>
+                </div>
+                <div class="sp-form-group">
+                  <label class="sp-form-label">Access Token</label>
+                  <input type="text" class="sp-form-input" name="accessToken">
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                  <button type="submit" class="sp-btn sp-btn-primary" style="flex: 1;">Connect</button>
+                  <button type="button" class="sp-btn sp-btn-secondary" onclick="hideConnectAccountForm()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post Details Drawer -->
+        <div class="sp-drawer" id="postDetailsDrawer">
+          <div class="sp-drawer-header">
+            <h3 class="sp-drawer-title">Post Details</h3>
+            <button class="sp-drawer-close" onclick="closePostDetailsDrawer()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="sp-drawer-body" id="postDetailsContent">
+            <!-- Post details will be loaded here -->
+          </div>
+        </div>
+
+        <!-- Media Library Drawer -->
+        <div class="sp-drawer" id="mediaDrawer">
+          <div class="sp-drawer-header">
+            <h3 class="sp-drawer-title">Media Library</h3>
+            <button class="sp-drawer-close" onclick="closeMediaDrawer()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="sp-drawer-body">
+            <input type="file" class="sp-form-input" id="mediaUpload" multiple accept="image/*,video/*" onchange="uploadMediaFiles(event)">
+            <div id="mediaLibrary" style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+              <!-- Media items will be loaded here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates Modal -->
+        <div class="sp-modal-overlay" id="templatesModal" onclick="closeTemplatesModal(event)">
+          <div class="sp-modal" onclick="event.stopPropagation()">
+            <div class="sp-modal-header">
+              <h3 class="sp-drawer-title">Templates</h3>
+              <button class="sp-drawer-close" onclick="closeTemplatesModal()">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="sp-modal-body">
+              <div id="templatesList">
+                <!-- Templates will be loaded here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Overlay for Drawers -->
+        <div class="sp-modal-overlay" id="drawerOverlay" onclick="closeAllDrawers()"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // API_BASE is already declared in main layout (main.hbs) - use it directly
+  // No need to redeclare or check - just use API_BASE variable from layout
+  
+  let currentView = 'list';
+  let currentStatusFilter = 'all';
+  let currentBusinessId = null;
+  let currentMonth = new Date().getMonth();
+  let currentYear = new Date().getFullYear();
+  let posts = [];
+  let accounts = [];
+  let templates = [];
+  let selectedMedia = [];
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+    loadAccounts();
+    loadPosts();
+    loadTemplates();
+    setupEventListeners();
+  });
+
+  function setupEventListeners() {
+    document.getElementById('businessSelector').addEventListener('change', function(e) {
+      currentBusinessId = e.target.value || null;
+      loadPosts();
+    });
+
+    document.getElementById('postContent').addEventListener('input', function(e) {
+      updateCharCounter(e.target.value);
+      validateContentLength(e.target.value);
+    });
+
+    document.getElementById('postForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      savePost();
+    });
+
+    document.getElementById('connectAccountFormElement').addEventListener('submit', function(e) {
+      e.preventDefault();
+      connectAccount();
+    });
+  }
+
+  // View Management
+  function switchView(view) {
+    currentView = view;
+    document.querySelectorAll('.sp-view-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`[data-view="${view}"]`).classList.add('active');
+    
+    document.getElementById('listView').classList.toggle('active', view === 'list');
+    document.getElementById('calendarView').classList.toggle('active', view === 'calendar');
+    
+    if (view === 'calendar') {
+      renderCalendar();
+    }
+  }
+
+  function filterByStatus(status) {
+    currentStatusFilter = status;
+    document.querySelectorAll('.sp-status-chip').forEach(chip => {
+      chip.classList.remove('active');
+    });
+    document.querySelector(`[data-status="${status}"]`).classList.add('active');
+    renderPosts();
+  }
+
+  // Drawer Management
+  function openPostDrawer(postId = null) {
+    document.getElementById('postDrawer').classList.add('active');
+    document.getElementById('drawerOverlay').classList.add('active');
+    if (postId) {
+      loadPostForEdit(postId);
+      document.getElementById('postDrawerTitle').textContent = 'Edit Post';
+    } else {
+      resetPostForm();
+      document.getElementById('postDrawerTitle').textContent = 'Create Post';
+    }
+  }
+
+  function closePostDrawer() {
+    document.getElementById('postDrawer').classList.remove('active');
+    document.getElementById('drawerOverlay').classList.remove('active');
+  }
+
+  async function openAccountsDrawer() {
+    document.getElementById('accountsDrawer').classList.add('active');
+    document.getElementById('drawerOverlay').classList.add('active');
+    // Ensure accounts are loaded before rendering
+    await loadAccounts();
+    renderAccountsList();
+  }
+
+  function closeAccountsDrawer() {
+    document.getElementById('accountsDrawer').classList.remove('active');
+    document.getElementById('drawerOverlay').classList.remove('active');
+  }
+
+  function openPostDetailsDrawer(postId) {
+    document.getElementById('postDetailsDrawer').classList.add('active');
+    document.getElementById('drawerOverlay').classList.add('active');
+    loadPostDetails(postId);
+  }
+
+  function closePostDetailsDrawer() {
+    document.getElementById('postDetailsDrawer').classList.remove('active');
+    document.getElementById('drawerOverlay').classList.remove('active');
+  }
+
+  function openMediaDrawer() {
+    document.getElementById('mediaDrawer').classList.add('active');
+    document.getElementById('drawerOverlay').classList.add('active');
+    loadMediaLibrary();
+  }
+
+  function closeMediaDrawer() {
+    document.getElementById('mediaDrawer').classList.remove('active');
+    document.getElementById('drawerOverlay').classList.remove('active');
+  }
+
+  function openTemplatesModal() {
+    document.getElementById('templatesModal').classList.add('active');
+  }
+
+  function closeTemplatesModal(event) {
+    if (!event || event.target.id === 'templatesModal' || event.target.closest('.sp-drawer-close')) {
+      document.getElementById('templatesModal').classList.remove('active');
+    }
+  }
+
+  function closeAllDrawers() {
+    document.querySelectorAll('.sp-drawer').forEach(drawer => drawer.classList.remove('active'));
+    document.getElementById('drawerOverlay').classList.remove('active');
+    document.getElementById('templatesModal').classList.remove('active');
+  }
+
+  // API Calls
+  async function apiCall(endpoint, options = {}) {
+    const token = localStorage.getItem('accessToken');
+    const defaultOptions = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` }),
+        ...(options.headers || {})
+      },
+      credentials: 'include',
+      ...options
+    };
+
+    try {
+      // API_BASE is declared in main layout, use it directly
+      const apiBaseUrl = typeof API_BASE !== 'undefined' ? API_BASE : (window.API_BASE || '/api/v1');
+      const response = await fetch(`${apiBaseUrl}${endpoint}`, defaultOptions);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'API request failed');
+      }
+      
+      // Handle ApiResponse structure: { statusCode: 200, data: [...], message: "...", success: true }
+      // The actual data is in data.data property
+      if (data && typeof data === 'object') {
+        // Check for ApiResponse structure first
+        if (data.data !== undefined) {
+          // If data.data is an array, return it
+          if (Array.isArray(data.data)) {
+            return data.data;
+          }
+          // If data.data exists but is not an array, return it (for single objects)
+          return data.data;
+        }
+        // If data itself is an array, return it
+        if (Array.isArray(data)) {
+          return data;
+        }
+      }
+      // Fallback to empty array
+      return [];
+    } catch (error) {
+      console.error('API Error:', error);
+      showAlert(error.message || 'An error occurred', 'danger');
+      throw error;
+    }
+  }
+
+  function showAlert(message, type = 'info') {
+    // Simple alert - can be enhanced with toast notifications
+    alert(message);
+  }
+
+  // Load Data
+  async function loadAccounts() {
+    try {
+      const query = currentBusinessId ? `?businessId=${currentBusinessId}` : '';
+      const response = await apiCall(`/social/accounts${query}`);
+      console.log('Accounts API response:', response);
+      
+      // Ensure we have an array
+      if (Array.isArray(response)) {
+        accounts = response;
+      } else if (response && Array.isArray(response.data)) {
+        accounts = response.data;
+      } else if (response && response.data) {
+        accounts = Array.isArray(response.data) ? response.data : [];
+      } else {
+        accounts = [];
+      }
+      
+      console.log('Accounts after processing:', accounts);
+      renderAccountsStrip();
+      renderAccountSelector();
+    } catch (error) {
+      console.error('Error loading accounts:', error);
+      console.error('Error details:', error.message, error.stack);
+      accounts = []; // Set to empty array on error
+      renderAccountsStrip();
+    }
+  }
+
+  async function loadPosts() {
+    try {
+      let query = `?limit=100`;
+      if (currentBusinessId) query += `&businessId=${currentBusinessId}`;
+      if (currentStatusFilter !== 'all') query += `&status=${currentStatusFilter}`;
+      
+      const response = await apiCall(`/social/posts${query}`);
+      // Ensure we have an array
+      posts = Array.isArray(response) ? response : (response?.data || []);
+      renderPosts();
+      renderSidebarCards();
+    } catch (error) {
+      console.error('Error loading posts:', error);
+      posts = []; // Set to empty array on error
+      renderPosts();
+    }
+  }
+
+  async function loadTemplates() {
+    try {
+      const query = currentBusinessId ? `?businessId=${currentBusinessId}` : '';
+      const response = await apiCall(`/social/templates${query}`);
+      // Ensure we have an array
+      templates = Array.isArray(response) ? response : (response?.data || []);
+      renderQuickTemplates();
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      templates = []; // Set to empty array on error
+      renderQuickTemplates();
+    }
+  }
+
+  // Render Functions
+  function renderAccountsStrip() {
+    const strip = document.getElementById('accountsStrip');
+    const list = document.getElementById('connectedAccountsList');
+    
+    // Ensure accounts is an array
+    if (!Array.isArray(accounts)) {
+      accounts = [];
+    }
+    
+    if (accounts.length === 0) {
+      strip.style.display = 'none';
+      return;
+    }
+    
+    strip.style.display = 'flex';
+    list.innerHTML = accounts.map(account => `
+      <div class="sp-account-badge">
+        <span class="platform-icon" style="background: ${getPlatformColor(account.platform)};"></span>
+        <span>${account.accountName}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderAccountSelector() {
+    const selector = document.getElementById('accountSelector');
+    // Ensure accounts is an array
+    if (!Array.isArray(accounts)) {
+      accounts = [];
+    }
+    selector.innerHTML = accounts.map(account => `
+      <label class="sp-account-option">
+        <input type="checkbox" name="accountIds" value="${account.id}" onchange="updateAccountSelection(this)">
+        <span class="platform-icon" style="background: ${getPlatformColor(account.platform)};"></span>
+        <span>${account.accountName}</span>
+      </label>
+    `).join('');
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('postsList');
+    
+    // Ensure posts is an array
+    if (!Array.isArray(posts)) {
+      posts = [];
+    }
+    
+    if (posts.length === 0) {
+      container.innerHTML = `
+        <div class="text-center p-5 text-muted">
+          <i class="fas fa-share-alt" style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;"></i>
+          <p>No posts found.</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = posts.map(post => `
+      <div class="sp-post-item" onclick="openPostDetailsDrawer(${post.id})">
+        <div class="sp-post-header">
+          <div>
+            <strong>${post.title || 'Untitled Post'}</strong>
+            <div class="text-muted small" style="margin-top: 0.25rem;">
+              ${formatDate(post.scheduledAt || post.createdAt)}
+            </div>
+          </div>
+          <span class="sp-post-status ${post.status}">${post.status}</span>
+        </div>
+        <div class="sp-post-content">${truncateText(post.content, 150)}</div>
+        ${post.channels && post.channels.length > 0 ? `
+          <div class="sp-post-channels">
+            ${post.channels.map(ch => `
+              <span class="sp-post-channel-badge">
+                <span class="platform-icon" style="background: ${getPlatformColor(ch.account?.platform)};"></span>
+                <span>${ch.account?.accountName || 'Unknown'}</span>
+                ${ch.status === 'failed' ? '<i class="fas fa-exclamation-circle text-danger"></i>' : ''}
+              </span>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `).join('');
+  }
+
+  function renderSidebarCards() {
+    // Ensure posts is an array
+    if (!Array.isArray(posts)) {
+      posts = [];
+    }
+    const upcoming = posts.filter(p => p.status === 'scheduled').slice(0, 5);
+    const failed = posts.filter(p => p.status === 'failed').slice(0, 5);
+
+    document.getElementById('upcomingPosts').innerHTML = upcoming.length > 0
+      ? upcoming.map(p => `
+          <div style="padding: 0.75rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer;" onclick="openPostDetailsDrawer(${p.id})">
+            <div style="font-weight: 600; font-size: 0.875rem;">${truncateText(p.title || p.content, 30)}</div>
+            <div class="text-muted small">${formatDate(p.scheduledAt)}</div>
+          </div>
+        `).join('')
+      : '<p class="text-muted small">No upcoming posts</p>';
+
+    document.getElementById('failedPosts').innerHTML = failed.length > 0
+      ? failed.map(p => `
+          <div style="padding: 0.75rem; background: #fff3cd; border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer;" onclick="openPostDetailsDrawer(${p.id})">
+            <div style="font-weight: 600; font-size: 0.875rem;">${truncateText(p.title || p.content, 30)}</div>
+            <div class="text-danger small">Failed</div>
+          </div>
+        `).join('')
+      : '<p class="text-muted small">No failed posts</p>';
+  }
+
+  function renderQuickTemplates() {
+    // Ensure templates is an array
+    if (!Array.isArray(templates)) {
+      templates = [];
+    }
+    const quick = templates.slice(0, 5);
+    document.getElementById('quickTemplates').innerHTML = quick.length > 0
+      ? quick.map(t => `
+          <div style="padding: 0.75rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer;" onclick="useTemplate(${t.id})">
+            <div style="font-weight: 600; font-size: 0.875rem;">${t.name}</div>
+            <div class="text-muted small">${t.category || 'General'}</div>
+          </div>
+        `).join('')
+      : '<p class="text-muted small">No templates available</p>';
+  }
+
+  function renderCalendar() {
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const today = new Date();
+    
+    document.getElementById('calendarMonthYear').textContent = 
+      new Date(currentYear, currentMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    // Day headers
+    ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+      const header = document.createElement('div');
+      header.style.fontWeight = '600';
+      header.style.textAlign = 'center';
+      header.style.padding = '0.5rem';
+      header.textContent = day;
+      grid.appendChild(header);
+    });
+
+    // Empty cells for days before month starts
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement('div');
+      empty.classList.add('sp-calendar-day', 'other-month');
+      grid.appendChild(empty);
+    }
+
+    // Days of month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayEl = document.createElement('div');
+      const date = new Date(currentYear, currentMonth, day);
+      const isToday = date.toDateString() === today.toDateString();
+      const hasPosts = posts.some(p => {
+        const postDate = new Date(p.scheduledAt || p.createdAt);
+        return postDate.toDateString() === date.toDateString();
+      });
+
+      dayEl.classList.add('sp-calendar-day');
+      if (isToday) dayEl.classList.add('today');
+      if (hasPosts) dayEl.classList.add('has-posts');
+
+      dayEl.innerHTML = `<div class="sp-calendar-day-number">${day}</div>`;
+      dayEl.onclick = () => {
+        const dayPosts = posts.filter(p => {
+          const postDate = new Date(p.scheduledAt || p.createdAt);
+          return postDate.toDateString() === date.toDateString();
+        });
+        if (dayPosts.length > 0) {
+          // Show posts for this day
+          filterByDate(date);
+        }
+      };
+
+      grid.appendChild(dayEl);
+    }
+  }
+
+  function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear--;
+    } else if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear++;
+    }
+    renderCalendar();
+  }
+
+  // Post Management
+  function openCreatePostDrawer() {
+    if (accounts.length === 0) {
+      showAlert('Please connect at least one social account first.', 'warning');
+      openAccountsDrawer();
+      return;
+    }
+    openPostDrawer();
+  }
+
+  function resetPostForm() {
+    document.getElementById('postForm').reset();
+    document.getElementById('postId').value = '';
+    document.getElementById('mediaPreview').innerHTML = '';
+    selectedMedia = [];
+    updateCharCounter('');
+  }
+
+  async function savePost() {
+    try {
+      const formData = {
+        title: document.getElementById('postTitle').value,
+        content: document.getElementById('postContent').value,
+        scheduledAt: document.getElementById('postScheduledAt').value || null,
+        accountIds: Array.from(document.querySelectorAll('input[name="accountIds"]:checked')).map(cb => parseInt(cb.value)),
+        mediaUrls: selectedMedia.map(m => m.url)
+      };
+
+      const postId = document.getElementById('postId').value;
+      let result;
+
+      if (postId) {
+        result = await apiCall(`/social/posts/${postId}`, {
+          method: 'PUT',
+          body: JSON.stringify(formData)
+        });
+      } else {
+        if (currentBusinessId) formData.businessId = parseInt(currentBusinessId);
+        result = await apiCall('/social/posts', {
+          method: 'POST',
+          body: JSON.stringify(formData)
+        });
+      }
+
+      showAlert(postId ? 'Post updated successfully!' : 'Post created successfully!', 'success');
+      closePostDrawer();
+      loadPosts();
+    } catch (error) {
+      console.error('Error saving post:', error);
+    }
+  }
+
+  async function loadPostForEdit(postId) {
+    try {
+      const post = await apiCall(`/social/posts/${postId}`);
+      document.getElementById('postId').value = post.id;
+      document.getElementById('postTitle').value = post.title || '';
+      document.getElementById('postContent').value = post.content;
+      document.getElementById('postScheduledAt').value = post.scheduledAt ? new Date(post.scheduledAt).toISOString().slice(0, 16) : '';
+      
+      if (post.mediaUrls && post.mediaUrls.length > 0) {
+        selectedMedia = post.mediaUrls.map(url => ({ url }));
+        renderMediaPreview();
+      }
+
+      if (post.channels && post.channels.length > 0) {
+        post.channels.forEach(ch => {
+          const checkbox = document.querySelector(`input[name="accountIds"][value="${ch.accountId}"]`);
+          if (checkbox) checkbox.checked = true;
+        });
+      }
+
+      updateCharCounter(post.content);
+    } catch (error) {
+      console.error('Error loading post:', error);
+      showAlert('Failed to load post', 'danger');
+    }
+  }
+
+  async function loadPostDetails(postId) {
+    try {
+      const post = await apiCall(`/social/posts/${postId}`);
+      const content = document.getElementById('postDetailsContent');
+      
+      content.innerHTML = `
+        <div style="margin-bottom: 1.5rem;">
+          <h4>${post.title || 'Untitled Post'}</h4>
+          <div class="text-muted small">${formatDate(post.createdAt)}</div>
+          <span class="sp-post-status ${post.status}" style="margin-top: 0.5rem; display: inline-block;">${post.status}</span>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <strong>Content:</strong>
+          <div style="margin-top: 0.5rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; white-space: pre-wrap;">${post.content}</div>
+        </div>
+
+        ${post.scheduledAt ? `
+          <div style="margin-bottom: 1.5rem;">
+            <strong>Scheduled For:</strong>
+            <div>${formatDate(post.scheduledAt)}</div>
+          </div>
+        ` : ''}
+
+        ${post.channels && post.channels.length > 0 ? `
+          <div style="margin-bottom: 1.5rem;">
+            <strong>Channels:</strong>
+            <div style="margin-top: 0.5rem;">
+              ${post.channels.map(ch => `
+                <div style="padding: 0.75rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                      <span class="platform-icon" style="background: ${getPlatformColor(ch.account?.platform)};"></span>
+                      <strong>${ch.account?.accountName || 'Unknown'}</strong>
+                      <span class="sp-post-status ${ch.status}" style="margin-left: 0.5rem;">${ch.status}</span>
+                    </div>
+                    ${ch.status === 'failed' ? `
+                      <button class="sp-btn sp-btn-secondary" onclick="retryPost(${ch.id})" style="font-size: 0.75rem;">
+                        Retry
+                      </button>
+                    ` : ''}
+                  </div>
+                  ${ch.providerPostUrl ? `
+                    <div style="margin-top: 0.5rem;">
+                      <a href="${ch.providerPostUrl}" target="_blank" class="text-primary small">
+                        View on Platform <i class="fas fa-external-link-alt"></i>
+                      </a>
+                    </div>
+                  ` : ''}
+                  ${ch.errorMessage ? `
+                    <div class="text-danger small" style="margin-top: 0.5rem;">${ch.errorMessage}</div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 2rem;">
+          ${post.status === 'draft' || post.status === 'scheduled' ? `
+            <button class="sp-btn sp-btn-primary" onclick="openPostDrawer(${post.id})" style="flex: 1;">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+          ` : ''}
+          ${post.status === 'draft' || post.status === 'scheduled' ? `
+            <button class="sp-btn sp-btn-secondary" onclick="deletePost(${post.id})" style="flex: 1;">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          ` : ''}
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading post details:', error);
+      showAlert('Failed to load post details', 'danger');
+    }
+  }
+
+  async function deletePost(postId) {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    
+    try {
+      await apiCall(`/social/posts/${postId}`, { method: 'DELETE' });
+      showAlert('Post deleted successfully', 'success');
+      closePostDetailsDrawer();
+      loadPosts();
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  }
+
+  async function retryPost(postChannelId) {
+    try {
+      await apiCall(`/social/posts/channels/${postChannelId}/retry`, {
+        method: 'POST',
+        body: JSON.stringify({ maxAttempts: 3 })
+      });
+      showAlert('Post retry initiated', 'success');
+      loadPostDetails(document.getElementById('postId').value || posts.find(p => p.channels?.some(ch => ch.id === postChannelId))?.id);
+    } catch (error) {
+      console.error('Error retrying post:', error);
+    }
+  }
+
+  // Account Management
+  function showConnectAccountForm() {
+    document.getElementById('connectAccountForm').style.display = 'block';
+  }
+
+  function hideConnectAccountForm() {
+    document.getElementById('connectAccountForm').style.display = 'none';
+    document.getElementById('connectAccountFormElement').reset();
+  }
+
+  async function connectAccount() {
+    try {
+      const formData = {
+        platform: document.querySelector('[name="platform"]').value,
+        accountName: document.querySelector('[name="accountName"]').value,
+        accountId: document.querySelector('[name="accountId"]').value,
+        accessToken: document.querySelector('[name="accessToken"]').value,
+        accountType: 'profile'
+      };
+
+      if (currentBusinessId) formData.businessId = parseInt(currentBusinessId);
+
+      await apiCall('/social/accounts', {
+        method: 'POST',
+        body: JSON.stringify(formData)
+      });
+
+      showAlert('Account connected successfully!', 'success');
+      hideConnectAccountForm();
+      loadAccounts();
+    } catch (error) {
+      console.error('Error connecting account:', error);
+    }
+  }
+
+  async function renderAccountsList() {
+    const container = document.getElementById('accountsList');
+    
+    // Ensure accounts is an array
+    if (!Array.isArray(accounts)) {
+      accounts = [];
+    }
+    
+    // Show loading state while checking
+    if (accounts.length === 0) {
+      container.innerHTML = '<p class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading accounts...</p>';
+      // Try to load accounts if not already loaded
+      try {
+        await loadAccounts();
+      } catch (error) {
+        console.error('Error loading accounts in render:', error);
+      }
+    }
+    
+    // Check again after loading
+    if (!Array.isArray(accounts) || accounts.length === 0) {
+      container.innerHTML = '<p class="text-muted">No accounts connected. Connect your first account to get started!</p>';
+      return;
+    }
+
+    container.innerHTML = accounts.map(account => `
+      <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span class="platform-icon" style="background: ${getPlatformColor(account.platform)};"></span>
+          <div>
+            <strong>${account.accountName}</strong>
+            <div class="text-muted small">${account.platform} • ${account.accountType}</div>
+          </div>
+        </div>
+        <button class="sp-btn sp-btn-secondary" onclick="disconnectAccount(${account.id})" style="font-size: 0.75rem;">
+          <i class="fas fa-unlink"></i> Disconnect
+        </button>
+      </div>
+    `).join('');
+  }
+
+  async function disconnectAccount(accountId) {
+    if (!confirm('Are you sure you want to disconnect this account?')) return;
+    
+    try {
+      await apiCall(`/social/accounts/${accountId}`, { method: 'DELETE' });
+      showAlert('Account disconnected successfully', 'success');
+      loadAccounts();
+      renderAccountsList();
+    } catch (error) {
+      console.error('Error disconnecting account:', error);
+    }
+  }
+
+  // Template Management
+  function useTemplate(templateId) {
+    const template = templates.find(t => t.id === templateId);
+    if (!template) return;
+
+    document.getElementById('postContent').value = template.content;
+    if (template.mediaUrls && template.mediaUrls.length > 0) {
+      selectedMedia = template.mediaUrls.map(url => ({ url }));
+      renderMediaPreview();
+    }
+    updateCharCounter(template.content);
+    closeTemplatesModal();
+    openPostDrawer();
+  }
+
+  async function renderTemplatesList() {
+    const container = document.getElementById('templatesList');
+    container.innerHTML = templates.map(t => `
+      <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.75rem; cursor: pointer;" onclick="useTemplate(${t.id})">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <strong>${t.name}</strong>
+            <div class="text-muted small">${t.category || 'General'}</div>
+            <div style="margin-top: 0.5rem; font-size: 0.875rem; color: #495057;">${truncateText(t.content, 100)}</div>
+          </div>
+          <button class="sp-btn sp-btn-primary" onclick="event.stopPropagation(); useTemplate(${t.id})">
+            Use
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Media Management
+  function handleMediaSelect(event) {
+    const files = Array.from(event.target.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        selectedMedia.push({ url: e.target.result, file: file });
+        renderMediaPreview();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderMediaPreview() {
+    const container = document.getElementById('mediaPreview');
+    container.innerHTML = selectedMedia.map((media, index) => `
+      <div class="sp-media-item">
+        <img src="${media.url}" alt="Media ${index + 1}">
+        <button class="sp-media-remove" onclick="removeMedia(${index})">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `).join('');
+  }
+
+  function removeMedia(index) {
+    selectedMedia.splice(index, 1);
+    renderMediaPreview();
+  }
+
+  async function uploadMediaFiles(event) {
+    const files = Array.from(event.target.files);
+    // Implementation for uploading files to server
+    // This would use FormData and the upload endpoint
+  }
+
+  async function loadMediaLibrary() {
+    try {
+      const query = currentBusinessId ? `?businessId=${currentBusinessId}` : '';
+      const media = await apiCall(`/social/media${query}`);
+      const container = document.getElementById('mediaLibrary');
+      container.innerHTML = media.map(item => `
+        <div class="sp-media-item" onclick="selectMediaFromLibrary('${item.fileUrl}')">
+          <img src="${item.fileUrl}" alt="${item.fileName}">
+        </div>
+      `).join('');
+    } catch (error) {
+      console.error('Error loading media library:', error);
+    }
+  }
+
+  function selectMediaFromLibrary(url) {
+    selectedMedia.push({ url });
+    renderMediaPreview();
+    closeMediaDrawer();
+  }
+
+  // Utility Functions
+  function updateCharCounter(text) {
+    const counter = document.getElementById('charCounter');
+    const length = text.length;
+    counter.textContent = `${length} characters`;
+    counter.className = 'sp-char-counter';
+    
+    if (length > 2000) {
+      counter.classList.add('error');
+    } else if (length > 1500) {
+      counter.classList.add('warning');
+    }
+  }
+
+  async function validateContentLength(content) {
+    const selectedAccounts = Array.from(document.querySelectorAll('input[name="accountIds"]:checked'))
+      .map(cb => accounts.find(a => a.id === parseInt(cb.value)))
+      .filter(Boolean);
+
+    if (selectedAccounts.length === 0) return;
+
+    const platforms = [...new Set(selectedAccounts.map(a => a.platform))];
+    const limits = await apiCall('/social/platform-limits');
+    
+    const warnings = document.getElementById('platformWarnings');
+    warnings.innerHTML = platforms.map(platform => {
+      const limit = limits[platform];
+      const length = content.length;
+      if (length > limit.text) {
+        return `<div class="text-danger small">⚠ ${platform}: Exceeds ${limit.text} character limit</div>`;
+      } else if (length > limit.text * 0.9) {
+        return `<div class="text-warning small">⚠ ${platform}: Approaching ${limit.text} character limit</div>`;
+      }
+      return '';
+    }).filter(Boolean).join('');
+  }
+
+  function getPlatformColor(platform) {
+    const colors = {
+      facebook: '#1877f2',
+      linkedin: '#0077b5',
+      twitter: '#1da1f2',
+      instagram: '#e4405f',
+      whatsapp: '#25d366'
+    };
+    return colors[platform] || '#667eea';
+  }
+
+  function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  function truncateText(text, maxLength) {
+    if (!text) return '';
+    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+  }
+
+  function clearSchedule() {
+    document.getElementById('postScheduledAt').value = '';
+  }
+
+  function updateAccountSelection(checkbox) {
+    const option = checkbox.closest('.sp-account-option');
+    if (checkbox.checked) {
+      option.classList.add('selected');
+    } else {
+      option.classList.remove('selected');
+    }
+    validateContentLength(document.getElementById('postContent').value);
+  }
+
+  function filterByDate(date) {
+    // Filter posts by date - can be enhanced
+    console.log('Filter by date:', date);
+  }
+
+  // Initialize templates modal content
+  document.getElementById('templatesModal').addEventListener('click', function(e) {
+    if (e.target.id === 'templatesModal') {
+      closeTemplatesModal(e);
+    }
+  });
+
+  // Load templates when modal opens
+  const originalOpenTemplatesModal = openTemplatesModal;
+  openTemplatesModal = function() {
+    originalOpenTemplatesModal();
+    renderTemplatesList();
+  };
+</script>
+

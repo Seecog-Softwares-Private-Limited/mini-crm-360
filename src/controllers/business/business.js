@@ -273,15 +273,21 @@ export const transferOwnerShip_admin = asyncHandler(async (req, res) => {
 // New CRUD functions for frontend
 export const getAllMyBusinesses = asyncHandler(async (req, res) => {
     try {
+        // Ensure user is authenticated
+        if (!req.user || !req.user.id) {
+            return res.status(401).json(new ApiResponse(401, {}, "Authentication required"));
+        }
+
         const businesses = await Business.findAll({ 
             where: { ownerId: req.user.id },
             order: [['createdAt', 'DESC']]
         });
         
-        return res.status(200).json(businesses);
+        return res.status(200).json(new ApiResponse(200, { businesses }, "Businesses fetched successfully"));
     } catch (error) {
-        console.log("Error: ", error);
-        throw new ApiError(500, "Internal server error");
+        console.error("Error in getAllMyBusinesses: ", error);
+        console.error("Error stack: ", error.stack);
+        throw new ApiError(500, error.message || "Internal server error");
     }
 });
 

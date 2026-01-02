@@ -13,3 +13,4 @@ router.get("/api/v1/plans", verifyUser, getAllPlans);
 
 export default router;
 
+

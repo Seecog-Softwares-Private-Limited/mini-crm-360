@@ -26,6 +26,13 @@ import { UserSession } from './UserSession.js';
 import { ActivityLog } from './ActivityLog.js';
 import { MenuItem } from './MenuItem.js';
 import { PlanMenuItem } from './PlanMenuItem.js';
+import { SocialAccount } from './SocialAccount.js';
+import { SocialPost } from './SocialPost.js';
+import { SocialPostChannel } from './SocialPostChannel.js';
+import { SocialTemplate } from './SocialTemplate.js';
+import { MediaAsset } from './MediaAsset.js';
+import { PublishAttempt } from './PublishAttempt.js';
+import { SocialAuditLog } from './SocialAuditLog.js';
 
 // Billing models - define locally to avoid circular dependency
 // The actual models are in src/billing/store/SequelizeStore.js
@@ -260,6 +267,45 @@ User.hasMany(ActivityLog, { foreignKey: 'userId', as: 'activityLogs' });
 ActivityLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 /* =========================================================
+   SOCIAL PUBLISHER RELATIONS
+========================================================= */
+User.hasMany(SocialAccount, { foreignKey: 'userId', as: 'socialAccounts' });
+SocialAccount.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Business.hasMany(SocialAccount, { foreignKey: 'businessId', as: 'socialAccounts' });
+SocialAccount.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
+
+User.hasMany(SocialPost, { foreignKey: 'userId', as: 'socialPosts' });
+SocialPost.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Business.hasMany(SocialPost, { foreignKey: 'businessId', as: 'socialPosts' });
+SocialPost.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
+
+SocialPost.hasMany(SocialPostChannel, { foreignKey: 'postId', as: 'channels' });
+SocialPostChannel.belongsTo(SocialPost, { foreignKey: 'postId', as: 'post' });
+
+SocialAccount.hasMany(SocialPostChannel, { foreignKey: 'accountId', as: 'postChannels' });
+SocialPostChannel.belongsTo(SocialAccount, { foreignKey: 'accountId', as: 'account' });
+
+SocialPostChannel.hasMany(PublishAttempt, { foreignKey: 'postChannelId', as: 'attempts' });
+PublishAttempt.belongsTo(SocialPostChannel, { foreignKey: 'postChannelId', as: 'postChannel' });
+
+User.hasMany(SocialTemplate, { foreignKey: 'userId', as: 'socialTemplates' });
+SocialTemplate.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Business.hasMany(SocialTemplate, { foreignKey: 'businessId', as: 'socialTemplates' });
+SocialTemplate.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
+
+User.hasMany(MediaAsset, { foreignKey: 'userId', as: 'mediaAssets' });
+MediaAsset.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Business.hasMany(MediaAsset, { foreignKey: 'businessId', as: 'mediaAssets' });
+MediaAsset.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
+
+User.hasMany(SocialAuditLog, { foreignKey: 'userId', as: 'socialAuditLogs' });
+SocialAuditLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+/* =========================================================
    BILLING: USER ↔ INVOICE, PAYMENT LOG, SUBSCRIPTION
    (Only set up if billing models are available)
 ========================================================= */
@@ -317,6 +363,15 @@ export {
   ActivityLog,
   MenuItem,
   PlanMenuItem,
+  
+  // Social Publisher models
+  SocialAccount,
+  SocialPost,
+  SocialPostChannel,
+  SocialTemplate,
+  MediaAsset,
+  PublishAttempt,
+  SocialAuditLog,
   
   // Billing models
   PaymentLog,

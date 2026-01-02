@@ -933,22 +933,53 @@
     // Load businesses data
     async function loadBusinesses() {
         try {
-            const data = await apiCall('/business'); // <-- already JSON
-            businesses = Array.isArray(data) ? data : (data?.data || []);
+            console.log('Loading businesses...');
+            // apiCall is defined in main.hbs layout, returns full ApiResponse: { statusCode, data: { businesses: [...] }, message }
+            const response = await apiCall('/business');
+            console.log('Businesses API response:', response);
+            
+            // Extract businesses from ApiResponse structure: { statusCode: 200, data: { businesses: [...] }, message: "..." }
+            if (response && response.data) {
+                // Response is ApiResponse wrapper: { statusCode, data: { businesses: [...] }, message }
+                if (Array.isArray(response.data.businesses)) {
+                    businesses = response.data.businesses;
+                } else if (Array.isArray(response.data.business)) {
+                    businesses = response.data.business;
+                } else if (Array.isArray(response.data)) {
+                    businesses = response.data;
+                } else {
+                    businesses = [];
+                }
+            } else if (Array.isArray(response)) {
+                // Direct array response (fallback)
+                businesses = response;
+            } else if (response && Array.isArray(response.businesses)) {
+                // Response has businesses property directly
+                businesses = response.businesses;
+            } else {
+                businesses = [];
+            }
+            
+            console.log('Businesses loaded:', businesses.length, businesses);
             displayBusinesses(businesses);
         } catch (error) {
             console.error('Error loading businesses:', error);
-            document.getElementById('businessesGrid').innerHTML = `
-                <div class="col-12">
-                    <div class="empty-state">
-                        <div class="empty-state-icon text-danger">
-                            <i class="fas fa-exclamation-triangle"></i>
+            console.error('Error details:', error.message, error.stack);
+            businesses = [];
+            const grid = document.getElementById('businessesGrid');
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="col-12">
+                        <div class="empty-state">
+                            <div class="empty-state-icon text-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="empty-state-text text-danger">Error loading businesses</div>
+                            <div class="empty-state-subtext">${error.message || 'Please try refreshing the page'}</div>
                         </div>
-                        <div class="empty-state-text text-danger">Error loading businesses</div>
-                        <div class="empty-state-subtext">Please try refreshing the page</div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
     }
 
@@ -1123,23 +1154,21 @@
         };
 
         try {
-            const data = await apiCall('/business', {
+            const response = await apiCall('/business', {
                 method: 'POST',
                 body: JSON.stringify(businessData)
-            }); // <- already JSON
+            });
 
-            // success if no error field present
-            if (data && !data.error) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addBusinessModal'));
-                modal?.hide();
-                form.reset();
-                loadBusinesses();
-                showAlert('Business added successfully!', 'success');
-            } else {
-                showAlert((data && (data.message || data.error)) || 'Failed to add business', 'danger');
-            }
+            // apiCall throws on error, so if we're here, it succeeded
+            // Response format: { statusCode: 201, data: { business: {...} }, message: "..." }
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addBusinessModal'));
+            modal?.hide();
+            form.reset();
+            loadBusinesses();
+            showAlert(response?.message || 'Business added successfully!', 'success');
         } catch (error) {
-            showAlert('Network error. Please try again.', 'danger');
+            console.error('Error adding business:', error);
+            showAlert(error.message || 'Failed to add business. Please try again.', 'danger');
         }
     }
 
@@ -1182,21 +1211,20 @@
         const businessId = formData.get('id');
 
         try {
-            const data = await apiCall(`/business/${businessId}`, {
+            const response = await apiCall(`/business/${businessId}`, {
                 method: 'PUT',
                 body: JSON.stringify(businessData)
-            }); // <- already JSON
+            });
 
-            if (data && !data.error) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editBusinessModal'));
-                modal?.hide();
-                loadBusinesses();
-                showAlert('Business updated successfully!', 'success');
-            } else {
-                showAlert((data && (data.message || data.error)) || 'Failed to update business', 'danger');
-            }
+            // apiCall throws on error, so if we're here, it succeeded
+            // Response format: { statusCode: 200, data: { business: {...} }, message: "..." }
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editBusinessModal'));
+            modal?.hide();
+            loadBusinesses();
+            showAlert(response?.message || 'Business updated successfully!', 'success');
         } catch (error) {
-            showAlert('Network error. Please try again.', 'danger');
+            console.error('Error updating business:', error);
+            showAlert(error.message || 'Failed to update business. Please try again.', 'danger');
         }
     }
 
@@ -1212,28 +1240,26 @@
 
     // Confirm delete business function
     async function confirmDeleteBusiness() {
-    if (!currentDeleteId) return;
+        if (!currentDeleteId) return;
 
-    try {
-      const data = await apiCall(`/business/${currentDeleteId}`, {
-        method: 'DELETE'
-      }); // apiCall returns JSON or may be undefined on 204
+        try {
+            const response = await apiCall(`/business/${currentDeleteId}`, {
+                method: 'DELETE'
+            });
 
-      // Success if no error OR if server returned 204 (apiCall -> undefined)
-      if (data === undefined || (data && !data.error)) {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteBusinessModal'));
-        modal?.hide();
-        loadBusinesses();
-        showAlert('Business deleted successfully!', 'success');
-      } else {
-        showAlert((data.message || data.error) || 'Failed to delete business', 'danger');
-      }
-    } catch (error) {
-      showAlert('Network error. Please try again.', 'danger');
-    } finally {
-      currentDeleteId = null;
+            // apiCall throws on error, so if we're here, it succeeded
+            // Response format: { statusCode: 200, data: {}, message: "..." }
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteBusinessModal'));
+            modal?.hide();
+            loadBusinesses();
+            showAlert(response?.message || 'Business deleted successfully!', 'success');
+        } catch (error) {
+            console.error('Error deleting business:', error);
+            showAlert(error.message || 'Failed to delete business. Please try again.', 'danger');
+        } finally {
+            currentDeleteId = null;
+        }
     }
-  }
 
     function showAlert(message, type) {
         const alertDiv = document.createElement('div');

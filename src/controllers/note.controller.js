@@ -21,7 +21,7 @@ export const renderNotesPage = async (req, res) => {
     };
 
     res.render('notes', {
-      title: 'Notes & Timeline',
+      title: 'Activity Timeline',
       user,
       activePage: 'notes'
     });

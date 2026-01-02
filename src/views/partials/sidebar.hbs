@@ -36,20 +36,20 @@
 
     <!-- Navigation Menu -->
     <nav class="sidebar-nav">
-      <!-- Profile Menu Item -->
+      <!-- Account Settings Menu Item -->
       <div class="nav-item">
         <a class="nav-link {{#if (eq activePage 'profile')}}active{{/if}}" href="/profile">
           <i class="fas fa-user-circle"></i>
-          <span class="nav-text">Profile</span>
+          <span class="nav-text">Account Settings</span>
         </a>
       </div>
 
-      <!-- CRM Tools Section -->
+      <!-- Workspace Section -->
       <div class="nav-section">
         <div class="menu-toggle" onclick="toggleMenu('whatsapp-submenu')">
           <div class="nav-link">
             <i class="fas fa-briefcase"></i>
-            <span class="nav-text">CRM Tools</span>
+            <span class="nav-text">Workspace</span>
             <i class="fas fa-chevron-down nav-arrow"></i>
           </div>
         </div>
@@ -113,7 +113,7 @@
             </a>
             <a class="nav-link submenu-link {{#if (eq activePage 'business')}}active{{/if}}" href="/business">
               <i class="fas fa-building"></i>
-              <span class="nav-text">Business</span>
+              <span class="nav-text">Account</span>
             </a>
             <a class="nav-link submenu-link {{#if (eq activePage 'customers')}}active{{/if}}" href="/customers">
               <i class="fas fa-users"></i>
@@ -125,11 +125,11 @@
             </a>
             <a class="nav-link submenu-link {{#if (eq activePage 'tasks')}}active{{/if}}" href="/tasks">
               <i class="fas fa-tasks"></i>
-              <span class="nav-text">Tasks & Follow-ups</span>
+              <span class="nav-text">Activities</span>
             </a>
             <a class="nav-link submenu-link {{#if (eq activePage 'notes')}}active{{/if}}" href="/notes">
               <i class="fas fa-sticky-note"></i>
-              <span class="nav-text">Notes & Timeline</span>
+              <span class="nav-text">Activity Timeline</span>
             </a>
             <a class="nav-link submenu-link {{#if (eq activePage 'reminders')}}active{{/if}}" href="/reminders">
               <i class="fas fa-birthday-cake"></i>
@@ -138,6 +138,10 @@
             <a class="nav-link submenu-link {{#if (eq activePage 'leadForms')}}active{{/if}}" href="/lead-forms">
               <i class="fas fa-wpforms"></i>
               <span class="nav-text">Lead Capture Forms</span>
+            </a>
+            <a class="nav-link submenu-link {{#if (eq activePage 'social-publisher')}}active{{/if}}" href="/social-publisher">
+              <i class="fas fa-share-alt"></i>
+              <span class="nav-text">Social Publisher</span>
             </a>
             {{#if user.plan}}
               {{#if user.plan.hasInvoice}}
@@ -180,12 +184,12 @@
           Documents</a>
       </div> --}}
 
-      <!-- Utilities Section -->
+      <!-- Settings Section -->
       <div class="nav-section">
         <div class="menu-toggle collapsed" onclick="toggleMenu('utilities-submenu')">
           <div class="nav-link">
             <i class="fas fa-cog"></i>
-            <span class="nav-text">Utilities</span>
+            <span class="nav-text">Settings</span>
             <i class="fas fa-chevron-down nav-arrow"></i>
           </div>
         </div>
@@ -201,11 +205,11 @@
         </div>
       </div>
 
-      <!-- Plans Section -->
+      <!-- Subscription Section -->
       <div class="nav-item">
         <a class="nav-link {{#if (eq activePage 'plans')}}active{{/if}}" href="/plans">
           <i class="fas fa-crown"></i>
-          <span class="nav-text">Plans</span>
+          <span class="nav-text">Subscription</span>
         </a>
       </div>
 

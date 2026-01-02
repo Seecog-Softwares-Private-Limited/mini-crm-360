@@ -59,3 +59,4 @@ const UserPlan = sequelize.define('UserPlan', {
 
 export { UserPlan };
 
+

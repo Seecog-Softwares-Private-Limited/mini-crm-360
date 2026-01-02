@@ -116,3 +116,4 @@ const Plan = sequelize.define('Plan', {
 
 export { Plan };
 
+

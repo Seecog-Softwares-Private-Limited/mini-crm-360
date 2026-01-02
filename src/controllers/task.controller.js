@@ -22,7 +22,7 @@ export const renderTasksPage = async (req, res) => {
     };
 
     res.render('tasks', {
-      title: 'Tasks & Follow-ups',
+      title: 'Activities',
       user,
       activePage: 'tasks'
     });

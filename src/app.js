@@ -91,10 +91,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// Debug log
+// Debug log (only for non-GET requests to avoid noise)
 app.use((req, res, next) => {
-    console.log(`Received ${req.method} request with body:`, req.body);
-    console.log(`Received ${req.method} request with params:`, req.params);
+    if (req.method !== 'GET') {
+        console.log(`Received ${req.method} request with body:`, req.body);
+        console.log(`Received ${req.method} request with params:`, req.params);
+    }
     next();
 });
 
@@ -128,6 +130,7 @@ import noteRoutes from "./routes/note.routes.js";
 import reminderRoutes from "./routes/reminder.routes.js";
 import leadFormRoutes from "./routes/leadForm.routes.js";
 import profileRoutes from "./routes/profile.routes.js";
+import socialPublisherRoutes from "./routes/socialPublisher.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import { initBilling } from "./billing/index.js";
 
@@ -217,8 +220,9 @@ app.get('/business', verifyUser, (req, res) => {
       avatar: req.user.avatar || req.user.avatarUrl || null,
       plan: req.user.plan || null
     };
-    res.render('business', { title: 'Business', user, activePage: 'business' });
+    res.render('business', { title: 'Account', user, activePage: 'business' });
 });
+
 
 app.get('/templates', verifyUser, (req, res) => {
     const user = { 
@@ -325,6 +329,7 @@ app.use("/", noteRoutes);
 app.use("/", reminderRoutes);
 app.use("/", leadFormRoutes);
 app.use("/", profileRoutes);
+app.use("/", socialPublisherRoutes);
 app.use("/", adminRoutes);
 app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/templates', templateRouter);
