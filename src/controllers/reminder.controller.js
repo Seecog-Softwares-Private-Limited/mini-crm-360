@@ -9,6 +9,8 @@ import { sendTemplateMessage } from './service/whatsapp.service.js';
 import { sendDocumentEmail } from '../utils/emailService.js';
 import { autoLogEvent } from './note.controller.js';
 
+import { buildReminder } from '../utils/reminder.helper.js'
+
 // Render reminders page
 export const renderRemindersPage = async (req, res) => {
   try {
@@ -24,6 +26,7 @@ export const renderRemindersPage = async (req, res) => {
     };
 
     res.render('reminders', {
+      apiBase: "/api/v1",
       title: 'Birthday & Anniversary Reminders',
       user,
       activePage: 'reminders'
@@ -356,4 +359,61 @@ export const sendWish = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
+
+export const getReminders = async (req, res) => {
+  try {
+    const limitDays = parseInt(req.query.days || 30);
+
+    const customers = await Customer.findAll({
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "phoneE164",
+        "whatsappE164",
+        "dateOfBirth",
+        "anniversaryDate"
+      ]
+    });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const reminders = [];
+
+    for (const c of customers) {
+      if (c.dateOfBirth) {
+        const r = buildReminder(c, "birthday", c.dateOfBirth, today, limitDays);
+        if (r) reminders.push(r);
+      }
+
+      if (c.anniversaryDate) {
+        const r = buildReminder(c, "anniversary", c.anniversaryDate, today, limitDays);
+        if (r) reminders.push(r);
+      }
+    }
+
+    res.json({ data: reminders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to load reminders" });
+  }
+};
+
+
+export const updateCustomerDates = async (req, res) => {
+  const { customerId } = req.params;
+  const { dateOfBirth, anniversaryDate } = req.body;
+
+  await Customer.update(
+    { dateOfBirth, anniversaryDate },
+    { where: { id: customerId } }
+  );
+
+  res.json({ success: true });
+};
+
+
 
