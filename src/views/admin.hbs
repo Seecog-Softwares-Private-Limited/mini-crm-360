@@ -1,0 +1,1190 @@
+<div class="container-fluid">
+  <div class="row">
+    {{> sidebar}}
+
+    <div class="col-md-9 col-lg-10 main-content">
+      <div class="container-fluid p-4">
+        <style>
+          /* ============================================
+             PREMIUM ADMIN PAGE STYLING
+             ============================================ */
+          
+          .admin-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: calc(100vh - 2rem);
+            padding: 2rem 0;
+          }
+
+          .admin-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+          }
+
+          .admin-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+          }
+
+          .admin-subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+          }
+
+          /* Plans Table */
+          .plans-table-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+          }
+
+          .plans-table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          .plans-table-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+          }
+
+          .btn-add-plan {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+          }
+
+          .btn-add-plan:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          }
+
+          .table {
+            margin: 0;
+          }
+
+          .table thead {
+            background: #f8f9fa;
+          }
+
+          .table thead th {
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 700;
+            color: #1e293b;
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+          }
+
+          .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+          }
+
+          .table tbody tr:hover {
+            background: #f8f9ff;
+          }
+
+          .badge-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+          }
+
+          .badge-active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+          }
+
+          .badge-inactive {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+          }
+
+          .btn-action {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 0.5rem;
+          }
+
+          .btn-edit {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #ffffff;
+          }
+
+          .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+          }
+
+          .btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+          }
+
+          .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+          }
+
+          /* Modal Styles */
+          .plan-modal .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          }
+
+          .plan-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            border-bottom: none;
+            border-radius: 16px 16px 0 0;
+            padding: 1.5rem 2rem;
+          }
+
+          .plan-modal .modal-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+          }
+
+          .plan-modal .modal-body {
+            padding: 2rem;
+          }
+
+          .plan-modal .form-label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+          }
+
+          .plan-modal .form-control,
+          .plan-modal .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+          }
+
+          .plan-modal .form-control:focus,
+          .plan-modal .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+          }
+
+          .feature-checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+          }
+
+          .feature-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+          }
+
+          .feature-checkbox:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+          }
+
+          .feature-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+          }
+
+          .feature-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: #374151;
+          }
+
+          .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+          }
+
+          .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+          }
+
+          .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+          }
+
+          /* Toast Notifications */
+          .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+          }
+
+          .toast {
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: none;
+          }
+
+          .toast-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+          }
+
+          .toast-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+          }
+
+          /* Menu Items Management */
+          .menu-items-container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            margin-bottom: 2rem;
+          }
+
+          .menu-items-header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            padding: 1.5rem 2rem;
+          }
+
+          .menu-items-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+          }
+
+          .menu-item-card {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.3s ease;
+          }
+
+          .menu-item-card:hover {
+            background: #f8f9fa;
+          }
+
+          .menu-item-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+          }
+
+          .menu-item-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            text-align: center;
+            color: #667eea;
+          }
+
+          .menu-item-details {
+            flex: 1;
+          }
+
+          .menu-item-label {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+          }
+
+          .menu-item-meta {
+            font-size: 0.85rem;
+            color: #64748b;
+          }
+
+          .menu-item-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+
+          .form-switch .form-check-input {
+            width: 3rem;
+            height: 1.5rem;
+            cursor: pointer;
+          }
+
+          .menu-item-locked {
+            opacity: 0.6;
+          }
+
+          .menu-item-locked .menu-item-label {
+            text-decoration: line-through;
+          }
+        </style>
+
+        <div class="admin-container">
+          <div class="admin-header">
+            <h1 class="admin-title">
+              <i class="fas fa-shield-alt"></i>
+              Admin Panel - Plans Management
+            </h1>
+            <p class="admin-subtitle">Manage subscription plans, features, and pricing</p>
+          </div>
+
+          <div class="plans-table-container">
+            <div class="plans-table-header">
+              <h2 class="plans-table-title">All Plans</h2>
+              <button class="btn btn-add-plan" onclick="openPlanModal()">
+                <i class="fas fa-plus me-2"></i>Add New Plan
+              </button>
+            </div>
+
+            <div id="plansTableContainer">
+              <div class="loading-spinner">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading plans...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Menu Items Management Section -->
+          <div class="menu-items-container">
+            <div class="menu-items-header">
+              <h2 class="menu-items-title">
+                <i class="fas fa-list me-2"></i>CRM Tools Menu Management
+              </h2>
+              <p class="mb-0 mt-2" style="opacity: 0.9;">Lock or unlock menu items in the CRM Tools section</p>
+            </div>
+
+            <div id="menuItemsContainer">
+              <div class="loading-spinner">
+                <div class="spinner-border text-success" role="status">
+                  <span class="visually-hidden">Loading menu items...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Plan Modal -->
+<div class="modal fade plan-modal" id="planModal" tabindex="-1" aria-labelledby="planModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="planModalLabel">
+          <i class="fas fa-crown me-2"></i>
+          <span id="modalTitle">Add New Plan</span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="planForm">
+          <input type="hidden" id="planId" name="id">
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="planName" class="form-label">Plan Name *</label>
+              <input type="text" class="form-control" id="planName" name="name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="planSlug" class="form-label">Slug *</label>
+              <input type="text" class="form-control" id="planSlug" name="slug" required>
+              <small class="text-muted">e.g., free, starter, pro, enterprise</small>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="planDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="planDescription" name="description" rows="2"></textarea>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="planPrice" class="form-label">Monthly Price *</label>
+              <input type="number" class="form-control" id="planPrice" name="price" step="0.01" min="0" required>
+            </div>
+            <div class="col-md-4">
+              <label for="planYearlyPrice" class="form-label">Yearly Price</label>
+              <input type="number" class="form-control" id="planYearlyPrice" name="yearlyPrice" step="0.01" min="0">
+              <small class="text-muted">Leave empty if same as monthly × 12</small>
+            </div>
+            <div class="col-md-4">
+              <label for="planCurrency" class="form-label">Currency</label>
+              <select class="form-select" id="planCurrency" name="currency">
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="planBillingPeriod" class="form-label">Billing Period</label>
+              <select class="form-select" id="planBillingPeriod" name="billingPeriod">
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+                <option value="lifetime">Lifetime</option>
+                <option value="free">Free</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="planDisplayOrder" class="form-label">Display Order</label>
+              <input type="number" class="form-control" id="planDisplayOrder" name="displayOrder" value="0" min="0">
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <h5 class="mb-3">Feature Limits</h5>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="maxCustomers" class="form-label">Max Customers</label>
+              <input type="text" class="form-control" id="maxCustomers" name="maxCustomers" placeholder="unlimited or number">
+              <small class="text-muted">Enter "unlimited" or leave empty for unlimited</small>
+            </div>
+            <div class="col-md-6">
+              <label for="maxBusinesses" class="form-label">Max Businesses</label>
+              <input type="text" class="form-control" id="maxBusinesses" name="maxBusinesses" placeholder="unlimited or number">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="maxEmailsPerMonth" class="form-label">Max Emails/Month</label>
+              <input type="text" class="form-control" id="maxEmailsPerMonth" name="maxEmailsPerMonth" placeholder="unlimited or number">
+            </div>
+            <div class="col-md-6">
+              <label for="maxWhatsAppMessagesPerMonth" class="form-label">Max WhatsApp Messages/Month</label>
+              <input type="text" class="form-control" id="maxWhatsAppMessagesPerMonth" name="maxWhatsAppMessagesPerMonth" placeholder="unlimited or number">
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <h5 class="mb-3">Feature Flags</h5>
+          <div class="feature-checkbox-group">
+            <div class="feature-checkbox">
+              <input type="checkbox" id="hasEmailTemplates" name="hasEmailTemplates">
+              <label for="hasEmailTemplates">Email Templates</label>
+            </div>
+            <div class="feature-checkbox">
+              <input type="checkbox" id="hasWhatsAppTemplates" name="hasWhatsAppTemplates">
+              <label for="hasWhatsAppTemplates">WhatsApp Templates</label>
+            </div>
+            <div class="feature-checkbox">
+              <input type="checkbox" id="hasInvoice" name="hasInvoice">
+              <label for="hasInvoice">Invoice Generation</label>
+            </div>
+            <div class="feature-checkbox">
+              <input type="checkbox" id="hasAnalytics" name="hasAnalytics">
+              <label for="hasAnalytics">Advanced Analytics</label>
+            </div>
+            <div class="feature-checkbox">
+              <input type="checkbox" id="hasApiAccess" name="hasApiAccess">
+              <label for="hasApiAccess">API Access</label>
+            </div>
+            <div class="feature-checkbox">
+              <input type="checkbox" id="hasCustomIntegrations" name="hasCustomIntegrations">
+              <label for="hasCustomIntegrations">Custom Integrations</label>
+            </div>
+            <div class="feature-checkbox">
+              <input type="checkbox" id="hasPrioritySupport" name="hasPrioritySupport">
+              <label for="hasPrioritySupport">Priority Support</label>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+              <label class="form-check-label" for="isActive">
+                <strong>Plan is Active</strong>
+                <small class="d-block text-muted">Inactive plans won't be shown to users</small>
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="savePlan()">
+          <i class="fas fa-save me-2"></i>Save Plan
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // API Configuration
+  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+  let allPlans = [];
+  let editingPlanId = null;
+
+  // Load plans on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadPlans();
+  });
+
+  // Load all plans
+  async function loadPlans() {
+    try {
+      const response = await fetch(`${API_BASE}/admin/plans`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch plans: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      allPlans = result.data || result;
+
+      renderPlansTable(allPlans);
+    } catch (error) {
+      console.error('Error loading plans:', error);
+      document.getElementById('plansTableContainer').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle text-warning"></i>
+          <p>Failed to load plans. Please refresh the page.</p>
+          <button class="btn btn-primary" onclick="loadPlans()">Retry</button>
+        </div>
+      `;
+    }
+  }
+
+  // Render plans table
+  function renderPlansTable(plans) {
+    if (!plans || plans.length === 0) {
+      document.getElementById('plansTableContainer').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-crown"></i>
+          <p>No plans found. Click "Add New Plan" to create one.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const tableHtml = `
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Price</th>
+              <th>Yearly Price</th>
+              <th>Features</th>
+              <th>Status</th>
+              <th>Order</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${plans.map(plan => `
+              <tr>
+                <td><strong>${escapeHtml(plan.name)}</strong></td>
+                <td><code>${escapeHtml(plan.slug)}</code></td>
+                <td>
+                  ${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}
+                  ${formatNumber(plan.price)}
+                  <small class="text-muted d-block">/${plan.billingPeriod === 'monthly' ? 'mo' : plan.billingPeriod === 'yearly' ? 'yr' : plan.billingPeriod}</small>
+                </td>
+                <td>
+                  ${plan.yearlyPrice ? `${plan.currency === 'INR' ? '₹' : plan.currency === 'USD' ? '$' : plan.currency === 'EUR' ? '€' : plan.currency}${formatNumber(plan.yearlyPrice)}/yr` : '-'}
+                </td>
+                <td>
+                  <div class="d-flex flex-wrap gap-1">
+                    ${plan.hasEmailTemplates ? '<span class="badge bg-info">Email</span>' : ''}
+                    ${plan.hasWhatsAppTemplates ? '<span class="badge bg-success">WhatsApp</span>' : ''}
+                    ${plan.hasInvoice ? '<span class="badge bg-warning">Invoice</span>' : ''}
+                    ${plan.hasAnalytics ? '<span class="badge bg-primary">Analytics</span>' : ''}
+                    ${plan.hasApiAccess ? '<span class="badge bg-dark">API</span>' : ''}
+                    ${plan.hasPrioritySupport ? '<span class="badge bg-danger">Priority</span>' : ''}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge-status ${plan.isActive ? 'badge-active' : 'badge-inactive'}">
+                    ${plan.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td>${plan.displayOrder}</td>
+                <td>
+                  <button class="btn btn-action btn-edit" onclick="editPlan(${plan.id})">
+                    <i class="fas fa-edit"></i> Edit
+                  </button>
+                  <button class="btn btn-action btn-delete" onclick="deletePlan(${plan.id}, '${escapeHtml(plan.name)}')">
+                    <i class="fas fa-trash"></i> Delete
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    document.getElementById('plansTableContainer').innerHTML = tableHtml;
+  }
+
+  // Open plan modal for adding new plan
+  function openPlanModal(planId = null) {
+    editingPlanId = planId;
+    const modal = new bootstrap.Modal(document.getElementById('planModal'));
+    const form = document.getElementById('planForm');
+    
+    if (planId) {
+      document.getElementById('modalTitle').textContent = 'Edit Plan';
+      const plan = allPlans.find(p => p.id === planId);
+      if (plan) {
+        populateForm(plan);
+      }
+    } else {
+      document.getElementById('modalTitle').textContent = 'Add New Plan';
+      form.reset();
+      document.getElementById('planId').value = '';
+      document.getElementById('isActive').checked = true;
+    }
+    
+    modal.show();
+  }
+
+  // Populate form with plan data
+  function populateForm(plan) {
+    document.getElementById('planId').value = plan.id;
+    document.getElementById('planName').value = plan.name || '';
+    document.getElementById('planSlug').value = plan.slug || '';
+    document.getElementById('planDescription').value = plan.description || '';
+    document.getElementById('planPrice').value = plan.price || 0;
+    document.getElementById('planYearlyPrice').value = plan.yearlyPrice || '';
+    document.getElementById('planCurrency').value = plan.currency || 'INR';
+    document.getElementById('planBillingPeriod').value = plan.billingPeriod || 'monthly';
+    document.getElementById('planDisplayOrder').value = plan.displayOrder || 0;
+    
+    document.getElementById('maxCustomers').value = plan.maxCustomers === null ? 'unlimited' : plan.maxCustomers;
+    document.getElementById('maxBusinesses').value = plan.maxBusinesses === null ? 'unlimited' : plan.maxBusinesses;
+    document.getElementById('maxEmailsPerMonth').value = plan.maxEmailsPerMonth === null ? 'unlimited' : plan.maxEmailsPerMonth;
+    document.getElementById('maxWhatsAppMessagesPerMonth').value = plan.maxWhatsAppMessagesPerMonth === null ? 'unlimited' : plan.maxWhatsAppMessagesPerMonth;
+    
+    document.getElementById('hasEmailTemplates').checked = plan.hasEmailTemplates || false;
+    document.getElementById('hasWhatsAppTemplates').checked = plan.hasWhatsAppTemplates || false;
+    document.getElementById('hasInvoice').checked = plan.hasInvoice || false;
+    document.getElementById('hasAnalytics').checked = plan.hasAnalytics || false;
+    document.getElementById('hasApiAccess').checked = plan.hasApiAccess || false;
+    document.getElementById('hasCustomIntegrations').checked = plan.hasCustomIntegrations || false;
+    document.getElementById('hasPrioritySupport').checked = plan.hasPrioritySupport || false;
+    document.getElementById('isActive').checked = plan.isActive !== false;
+  }
+
+  // Edit plan
+  function editPlan(planId) {
+    openPlanModal(planId);
+  }
+
+  // Save plan (create or update)
+  async function savePlan() {
+    const form = document.getElementById('planForm');
+    const formData = new FormData(form);
+    
+    const planData = {
+      name: formData.get('name'),
+      slug: formData.get('slug'),
+      description: formData.get('description'),
+      price: parseFloat(formData.get('price')) || 0,
+      yearlyPrice: formData.get('yearlyPrice') ? parseFloat(formData.get('yearlyPrice')) : null,
+      currency: formData.get('currency') || 'INR',
+      billingPeriod: formData.get('billingPeriod') || 'monthly',
+      displayOrder: parseInt(formData.get('displayOrder')) || 0,
+      maxCustomers: formData.get('maxCustomers') === 'unlimited' || formData.get('maxCustomers') === '' ? null : parseInt(formData.get('maxCustomers')),
+      maxBusinesses: formData.get('maxBusinesses') === 'unlimited' || formData.get('maxBusinesses') === '' ? null : parseInt(formData.get('maxBusinesses')),
+      maxEmailsPerMonth: formData.get('maxEmailsPerMonth') === 'unlimited' || formData.get('maxEmailsPerMonth') === '' ? null : parseInt(formData.get('maxEmailsPerMonth')),
+      maxWhatsAppMessagesPerMonth: formData.get('maxWhatsAppMessagesPerMonth') === 'unlimited' || formData.get('maxWhatsAppMessagesPerMonth') === '' ? null : parseInt(formData.get('maxWhatsAppMessagesPerMonth')),
+      hasEmailTemplates: document.getElementById('hasEmailTemplates').checked,
+      hasWhatsAppTemplates: document.getElementById('hasWhatsAppTemplates').checked,
+      hasInvoice: document.getElementById('hasInvoice').checked,
+      hasAnalytics: document.getElementById('hasAnalytics').checked,
+      hasApiAccess: document.getElementById('hasApiAccess').checked,
+      hasCustomIntegrations: document.getElementById('hasCustomIntegrations').checked,
+      hasPrioritySupport: document.getElementById('hasPrioritySupport').checked,
+      isActive: document.getElementById('isActive').checked
+    };
+
+    try {
+      const planId = document.getElementById('planId').value;
+      const url = planId ? `${API_BASE}/admin/plans/${planId}` : `${API_BASE}/admin/plans`;
+      const method = planId ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(planData)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || result.error || 'Failed to save plan');
+      }
+
+      showToast('Plan saved successfully!', 'success');
+      
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('planModal'));
+      modal.hide();
+      
+      // Reload plans
+      await loadPlans();
+    } catch (error) {
+      console.error('Error saving plan:', error);
+      showToast(error.message || 'Failed to save plan', 'error');
+    }
+  }
+
+  // Delete plan
+  async function deletePlan(planId, planName) {
+    if (!confirm(`Are you sure you want to delete the plan "${planName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/admin/plans/${planId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || result.error || 'Failed to delete plan');
+      }
+
+      showToast('Plan deleted successfully!', 'success');
+      await loadPlans();
+    } catch (error) {
+      console.error('Error deleting plan:', error);
+      showToast(error.message || 'Failed to delete plan', 'error');
+    }
+  }
+
+  // Helper functions
+  function formatNumber(num) {
+    if (num === null || num === undefined) return '0';
+    return parseFloat(num).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function showToast(message, type = 'success') {
+    const toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    toastContainer.innerHTML = `
+      <div class="toast toast-${type} show" role="alert">
+        <div class="toast-body">
+          <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+          ${escapeHtml(message)}
+        </div>
+      </div>
+    `;
+    document.body.appendChild(toastContainer);
+
+    setTimeout(() => {
+      toastContainer.remove();
+    }, 3000);
+  }
+
+  // Auto-generate slug from name
+  document.getElementById('planName').addEventListener('input', function(e) {
+    if (!editingPlanId && !document.getElementById('planSlug').value) {
+      const slug = e.target.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      document.getElementById('planSlug').value = slug;
+    }
+  });
+
+  // ============================================
+  // MENU ITEMS MANAGEMENT
+  // ============================================
+  let menuItems = [];
+
+  // Load menu items on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    loadMenuItems();
+  });
+
+  // Load all menu items
+  async function loadMenuItems() {
+    try {
+      const response = await fetch(`${API_BASE}/admin/menu-items?category=crm_tools`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to fetch menu items: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      const data = result.data || result;
+      
+      // Handle new response structure with menuItems and plans
+      if (data.menuItems && data.plans) {
+        menuItems = data.menuItems;
+        window.allPlans = data.plans;
+        renderMenuItemsTable(menuItems, data.plans);
+      } else if (Array.isArray(data)) {
+        // Fallback for old response format
+        menuItems = data;
+        renderMenuItems(menuItems);
+      } else {
+        menuItems = [];
+        window.allPlans = [];
+        
+        // Check if result message indicates table doesn't exist
+        if (result.message && result.message.includes('not found')) {
+          document.getElementById('menuItemsContainer').innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-database text-info"></i>
+              <h5>Menu Items Table Not Found</h5>
+              <p>${result.message}</p>
+              <p class="text-muted mt-2">Run this command in your terminal:</p>
+              <code class="d-block p-2 bg-light rounded mb-3">npm run migrate:menu-items</code>
+              <button class="btn btn-primary" onclick="loadMenuItems()">Retry After Migration</button>
+            </div>
+          `;
+          return;
+        }
+        
+        renderMenuItems(menuItems);
+      }
+    } catch (error) {
+      console.error('Error loading menu items:', error);
+      const errorMessage = error.message || 'Failed to load menu items. Please refresh the page.';
+      
+      document.getElementById('menuItemsContainer').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle text-warning"></i>
+          <h5>Error Loading Menu Items</h5>
+          <p>${escapeHtml(errorMessage)}</p>
+          ${errorMessage.includes('not found') || errorMessage.includes('migrate') ? `
+            <p class="text-muted mt-2">Run this command in your terminal:</p>
+            <code class="d-block p-2 bg-light rounded mb-3">npm run migrate:menu-items</code>
+          ` : ''}
+          <button class="btn btn-primary" onclick="loadMenuItems()">Retry</button>
+        </div>
+      `;
+    }
+  }
+
+  // Render menu items table with plan-specific locks
+  function renderMenuItemsTable(items, plans) {
+    if (!items || items.length === 0) {
+      document.getElementById('menuItemsContainer').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-list"></i>
+          <p>No menu items found.</p>
+        </div>
+      `;
+      return;
+    }
+
+    if (!plans || plans.length === 0) {
+      document.getElementById('menuItemsContainer').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-crown"></i>
+          <p>No plans found. Please create plans first.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const tableHtml = `
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th style="min-width: 250px;">Menu Item</th>
+              ${plans.map(plan => `
+                <th class="text-center" style="min-width: 120px;">
+                  <div class="d-flex flex-column align-items-center">
+                    <strong>${escapeHtml(plan.name)}</strong>
+                    <small class="text-muted">${escapeHtml(plan.slug)}</small>
+                  </div>
+                </th>
+              `).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(item => `
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="menu-item-icon me-2">
+                      <i class="${item.icon || 'fas fa-circle'}"></i>
+                    </div>
+                    <div>
+                      <div class="menu-item-label fw-bold">${escapeHtml(item.label)}</div>
+                      <div class="menu-item-meta small text-muted">
+                        <code>${escapeHtml(item.key)}</code>
+                        ${item.route ? ` • ${escapeHtml(item.route)}` : ''}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                ${plans.map(plan => {
+                  const planLock = item.planLocks && item.planLocks[plan.id];
+                  const isLocked = planLock ? planLock.isLocked : false;
+                  return `
+                    <td class="text-center">
+                      <div class="form-check form-switch d-inline-block">
+                        <input 
+                          class="form-check-input" 
+                          type="checkbox" 
+                          id="menu-toggle-${item.id}-${plan.id}"
+                          ${isLocked ? '' : 'checked'}
+                          onchange="togglePlanMenuItem(${item.id}, ${plan.id}, this.checked)"
+                          style="cursor: pointer;"
+                        >
+                        <label class="form-check-label" for="menu-toggle-${item.id}-${plan.id}">
+                          <span class="badge ${isLocked ? 'bg-danger' : 'bg-success'}">
+                            ${isLocked ? 'Locked' : 'Unlocked'}
+                          </span>
+                        </label>
+                      </div>
+                    </td>
+                  `;
+                }).join('')}
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    document.getElementById('menuItemsContainer').innerHTML = tableHtml;
+  }
+
+  // Render menu items (fallback for old format)
+  function renderMenuItems(items) {
+    if (!items || items.length === 0) {
+      document.getElementById('menuItemsContainer').innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-list"></i>
+          <p>No menu items found.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const itemsHtml = items.map(item => `
+      <div class="menu-item-card ${item.isLocked ? 'menu-item-locked' : ''}">
+        <div class="menu-item-info">
+          <div class="menu-item-icon">
+            <i class="${item.icon || 'fas fa-circle'}"></i>
+          </div>
+          <div class="menu-item-details">
+            <div class="menu-item-label">${escapeHtml(item.label)}</div>
+            <div class="menu-item-meta">
+              <code>${escapeHtml(item.key)}</code>
+              ${item.route ? ` • ${escapeHtml(item.route)}` : ''}
+              ${item.requiresPlan ? ` • Requires: ${escapeHtml(item.requiresPlan)} plan` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="menu-item-toggle">
+          <div class="form-check form-switch">
+            <input 
+              class="form-check-input" 
+              type="checkbox" 
+              id="menu-toggle-${item.id}"
+              ${item.isLocked ? '' : 'checked'}
+              onchange="toggleMenuItem(${item.id}, this.checked)"
+            >
+            <label class="form-check-label" for="menu-toggle-${item.id}">
+              ${item.isLocked ? '<span class="text-danger">Locked</span>' : '<span class="text-success">Unlocked</span>'}
+            </label>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    document.getElementById('menuItemsContainer').innerHTML = itemsHtml;
+  }
+
+  // Toggle plan-specific menu item lock status
+  async function togglePlanMenuItem(menuItemId, planId, isUnlocked) {
+    const isLocked = !isUnlocked;
+
+    try {
+      const response = await fetch(`${API_BASE}/admin/menu-items/${menuItemId}/plan/${planId}/lock`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isLocked })
+      });
+
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type');
+      let result;
+      
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Non-JSON response received:', text.substring(0, 500));
+        
+        // If it's an HTML error page, try to extract error message
+        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+          throw new Error(`Server returned HTML instead of JSON. This usually means the API endpoint failed or the PlanMenuItem table doesn't exist. Please run: npm run migrate:plan-menu-items`);
+        }
+        
+        throw new Error(`Server returned non-JSON response. Status: ${response.status}`);
+      }
+
+      result = await response.json();
+
+      if (!response.ok) {
+        const errorMsg = result.message || result.error || result.data?.message || 'Failed to update menu item';
+        throw new Error(errorMsg);
+      }
+
+      // Update local state
+      const item = menuItems.find(m => m.id === menuItemId);
+      if (item && item.planLocks && item.planLocks[planId]) {
+        item.planLocks[planId].isLocked = isLocked;
+      }
+
+      const plan = window.allPlans.find(p => p.id === planId);
+      const planName = plan ? plan.name : 'plan';
+      
+      showToast(`Menu item ${isLocked ? 'locked' : 'unlocked'} for ${planName} successfully!`, 'success');
+      
+      // Update the badge
+      const label = document.querySelector(`label[for="menu-toggle-${menuItemId}-${planId}"] span`);
+      if (label) {
+        label.className = `badge ${isLocked ? 'bg-danger' : 'bg-success'}`;
+        label.textContent = isLocked ? 'Locked' : 'Unlocked';
+      }
+    } catch (error) {
+      console.error('Error toggling menu item:', error);
+      showToast(error.message || 'Failed to update menu item', 'error');
+      
+      // Revert checkbox state
+      const checkbox = document.getElementById(`menu-toggle-${menuItemId}-${planId}`);
+      if (checkbox) {
+        checkbox.checked = !isLocked;
+      }
+    }
+  }
+
+  // Toggle menu item lock status (fallback for old format)
+  async function toggleMenuItem(itemId, isUnlocked) {
+    const isLocked = !isUnlocked;
+
+    try {
+      const response = await fetch(`${API_BASE}/admin/menu-items/${itemId}/lock`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ isLocked })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || result.error || 'Failed to update menu item');
+      }
+
+      // Update local state
+      const item = menuItems.find(m => m.id === itemId);
+      if (item) {
+        item.isLocked = isLocked;
+      }
+
+      showToast(`Menu item ${isLocked ? 'locked' : 'unlocked'} successfully!`, 'success');
+      
+      // Re-render to update UI
+      renderMenuItems(menuItems);
+    } catch (error) {
+      console.error('Error toggling menu item:', error);
+      showToast(error.message || 'Failed to update menu item', 'error');
+      
+      // Revert checkbox state
+      const checkbox = document.getElementById(`menu-toggle-${itemId}`);
+      if (checkbox) {
+        checkbox.checked = !isLocked;
+      }
+    }
+  }
+</script>
+

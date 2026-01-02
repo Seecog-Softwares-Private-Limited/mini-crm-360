@@ -17,3 +17,4 @@ SET `yearlyPrice` = CASE
 END
 WHERE `slug` IN ('silver', 'gold');
 
+

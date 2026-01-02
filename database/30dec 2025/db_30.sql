@@ -615,6 +615,50 @@ INSERT INTO `employees` VALUES (2,6,'Mukesh',NULL,'Kumhar','EMP0001','Permanent'
 UNLOCK TABLES;
 
 --
+-- Table structure for table `invoices`
+--
+
+DROP TABLE IF EXISTS `invoices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `invoices` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userId` int NOT NULL,
+  `planId` int NOT NULL,
+  `userPlanId` int DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `currency` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'INR',
+  `razorpayOrderId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `razorpayPaymentId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `razorpayInvoiceId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('issued','paid','failed','refunded') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'issued',
+  `billingCycle` enum('monthly','yearly') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `paidAt` datetime DEFAULT NULL,
+  `dueDate` datetime DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `planId` (`planId`),
+  KEY `invoices_user_id` (`userId`),
+  KEY `invoices_razorpay_order_id` (`razorpayOrderId`),
+  KEY `invoices_razorpay_payment_id` (`razorpayPaymentId`),
+  CONSTRAINT `invoices_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `invoices_ibfk_2` FOREIGN KEY (`planId`) REFERENCES `plans` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `invoices`
+--
+
+LOCK TABLES `invoices` WRITE;
+/*!40000 ALTER TABLE `invoices` DISABLE KEYS */;
+INSERT INTO `invoices` VALUES (9,6,2,9,499.00,'INR','order_Rxp9vy9gitk8iv','pay_RxpAXXNzOxbKzP',NULL,'paid','monthly','Starter - monthly subscription','2025-12-30 18:03:37','2026-01-30 18:03:37','2025-12-30 18:03:37','2025-12-30 18:03:37'),(10,8,2,10,499.00,'INR','order_Ry6TRrI8m4zLpq','pay_Ry6TiOzSB0kO1T',NULL,'paid','monthly','Starter - monthly subscription','2025-12-31 10:59:31','2026-01-31 10:59:31','2025-12-31 10:59:31','2025-12-31 10:59:31');
+/*!40000 ALTER TABLE `invoices` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `leave_requests`
 --
 
@@ -739,6 +783,47 @@ INSERT INTO `message_logs` VALUES (7,5,4,'+916206992612','wamid.HBgMOTE2MjA2OTky
 UNLOCK TABLES;
 
 --
+-- Table structure for table `payment_logs`
+--
+
+DROP TABLE IF EXISTS `payment_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `payment_logs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userId` int NOT NULL,
+  `planId` int NOT NULL,
+  `razorpayOrderId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `razorpayPaymentId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `currency` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'INR',
+  `billingCycle` enum('monthly','yearly') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'monthly',
+  `status` enum('pending','completed','failed','refunded') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `errorMessage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `metadata` json DEFAULT NULL,
+  `paidAt` datetime DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `razorpayOrderId` (`razorpayOrderId`),
+  KEY `payment_logs_user_id` (`userId`),
+  KEY `payment_logs_razorpay_order_id` (`razorpayOrderId`),
+  KEY `payment_logs_status` (`status`),
+  CONSTRAINT `payment_logs_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `payment_logs`
+--
+
+LOCK TABLES `payment_logs` WRITE;
+/*!40000 ALTER TABLE `payment_logs` DISABLE KEYS */;
+INSERT INTO `payment_logs` VALUES (10,6,2,'order_Rxp9vy9gitk8iv','pay_RxpAXXNzOxbKzP',499.00,'INR','monthly','completed',NULL,'{\"gstin\": \"\", \"billingEmail\": \"nikhil@seecogsoftwares.com\"}','2025-12-30 18:03:37','2025-12-30 18:02:50','2025-12-30 18:03:37'),(11,8,2,'order_Ry6TAW43qzyigr',NULL,499.00,'INR','monthly','pending',NULL,'{\"gstin\": \"\", \"billingEmail\": \"\"}',NULL,'2025-12-31 10:58:47','2025-12-31 10:58:47'),(12,8,2,'order_Ry6TRrI8m4zLpq','pay_Ry6TiOzSB0kO1T',499.00,'INR','monthly','completed',NULL,'{\"gstin\": \"\", \"billingEmail\": \"\"}','2025-12-31 10:59:31','2025-12-31 10:59:02','2025-12-31 10:59:31');
+/*!40000 ALTER TABLE `payment_logs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `plans`
 --
 
@@ -783,6 +868,35 @@ LOCK TABLES `plans` WRITE;
 /*!40000 ALTER TABLE `plans` DISABLE KEYS */;
 INSERT INTO `plans` VALUES (1,'Free','free','For trying out the CRM basics',0.00,NULL,'INR','free',50,1,100,0,1,0,0,0,0,0,0,1,1,'2025-12-24 12:35:46','2025-12-24 12:35:46'),(2,'Starter','starter','For small shops and teams',499.00,4990.00,'INR','monthly',500,1,2000,5000,1,1,0,1,0,0,0,1,2,'2025-12-24 12:35:46','2025-12-24 12:35:46'),(3,'Pro','pro','For growing businesses with analytics',999.00,9990.00,'INR','monthly',NULL,3,10000,20000,1,1,1,1,1,0,1,1,3,'2025-12-24 12:35:46','2025-12-24 12:35:46'),(4,'Enterprise','enterprise','For large organizations with custom needs',2499.00,24990.00,'INR','monthly',NULL,NULL,NULL,NULL,1,1,1,1,1,1,1,1,4,'2025-12-24 12:35:46','2025-12-24 12:35:46');
 /*!40000 ALTER TABLE `plans` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `razorpay_plan_mappings`
+--
+
+DROP TABLE IF EXISTS `razorpay_plan_mappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `razorpay_plan_mappings` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `planId` int NOT NULL,
+  `razorpayPlanId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `planId` (`planId`),
+  CONSTRAINT `razorpay_plan_mappings_ibfk_1` FOREIGN KEY (`planId`) REFERENCES `plans` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `razorpay_plan_mappings`
+--
+
+LOCK TABLES `razorpay_plan_mappings` WRITE;
+/*!40000 ALTER TABLE `razorpay_plan_mappings` DISABLE KEYS */;
+INSERT INTO `razorpay_plan_mappings` VALUES (6,2,'plan_starter_monthly','2025-12-30 18:03:37','2025-12-31 10:59:31');
+/*!40000 ALTER TABLE `razorpay_plan_mappings` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -864,6 +978,48 @@ INSERT INTO `states` VALUES (1,1,'Andaman and Nicobar Islands','AN','ACTIVE','20
 UNLOCK TABLES;
 
 --
+-- Table structure for table `subscriptions`
+--
+
+DROP TABLE IF EXISTS `subscriptions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `subscriptions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userId` int NOT NULL,
+  `planId` int NOT NULL,
+  `razorpaySubscriptionId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('pending','active','past_due','cancelled','expired') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `totalCount` int DEFAULT '12',
+  `billedCount` int DEFAULT '0',
+  `currentCycleStart` datetime DEFAULT NULL,
+  `currentCycleEnd` datetime DEFAULT NULL,
+  `cancelAtPeriodEnd` tinyint(1) NOT NULL DEFAULT '0',
+  `cancelledAt` datetime DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `razorpaySubscriptionId` (`razorpaySubscriptionId`),
+  KEY `planId` (`planId`),
+  KEY `subscriptions_user_id` (`userId`),
+  KEY `subscriptions_razorpay_subscription_id` (`razorpaySubscriptionId`),
+  KEY `subscriptions_status` (`status`),
+  CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `subscriptions_ibfk_2` FOREIGN KEY (`planId`) REFERENCES `plans` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subscriptions`
+--
+
+LOCK TABLES `subscriptions` WRITE;
+/*!40000 ALTER TABLE `subscriptions` DISABLE KEYS */;
+INSERT INTO `subscriptions` VALUES (6,6,2,'manual_order_Rxp9vy9gitk8iv','active',12,0,'2025-12-30 18:03:37','2026-01-30 18:03:37',0,NULL,'2025-12-30 18:03:37','2025-12-30 18:03:37'),(7,8,2,'manual_order_Ry6TRrI8m4zLpq','active',12,0,'2025-12-31 10:59:31','2026-01-31 10:59:31',0,NULL,'2025-12-31 10:59:31','2025-12-31 10:59:31');
+/*!40000 ALTER TABLE `subscriptions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `templates`
 --
 
@@ -901,6 +1057,42 @@ INSERT INTO `templates` VALUES (1,1,NULL,'puja_offer1','en_US','marketing','[]',
 UNLOCK TABLES;
 
 --
+-- Table structure for table `user_plans`
+--
+
+DROP TABLE IF EXISTS `user_plans`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_plans` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `userId` int NOT NULL,
+  `planId` int NOT NULL,
+  `status` enum('active','expired','cancelled','trial') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'trial',
+  `startDate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `endDate` datetime DEFAULT NULL,
+  `isCurrent` tinyint(1) NOT NULL DEFAULT '1',
+  `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_plans_userId` (`userId`),
+  KEY `idx_user_plans_planId` (`planId`),
+  KEY `idx_user_plans_userId_isCurrent` (`userId`,`isCurrent`),
+  CONSTRAINT `user_plans_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `user_plans_ibfk_2` FOREIGN KEY (`planId`) REFERENCES `plans` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_plans`
+--
+
+LOCK TABLES `user_plans` WRITE;
+/*!40000 ALTER TABLE `user_plans` DISABLE KEYS */;
+INSERT INTO `user_plans` VALUES (1,6,2,'active','2025-12-30 11:48:43','2026-01-30 11:48:43',0,'2025-12-30 11:48:43','2025-12-30 17:29:53'),(2,6,3,'active','2025-12-30 17:29:53','2026-01-30 17:29:53',0,'2025-12-30 17:29:53','2025-12-30 17:31:44'),(3,6,2,'active','2025-12-30 17:31:44','2026-12-30 17:31:44',0,'2025-12-30 17:31:44','2025-12-30 17:40:09'),(4,6,3,'active','2025-12-30 17:40:09','2026-01-30 17:40:09',0,'2025-12-30 17:40:09','2025-12-30 17:41:54'),(5,6,4,'active','2025-12-30 17:41:54','2026-12-30 17:41:54',0,'2025-12-30 17:41:54','2025-12-30 17:45:55'),(6,6,3,'active','2025-12-30 17:45:55','2026-12-30 17:45:55',0,'2025-12-30 17:45:55','2025-12-30 17:51:50'),(7,6,2,'active','2025-12-30 17:51:50','2026-01-30 17:51:50',0,'2025-12-30 17:51:50','2025-12-30 17:54:28'),(8,6,3,'active','2025-12-30 17:54:28','2026-12-30 17:54:28',0,'2025-12-30 17:54:28','2025-12-30 18:03:37'),(9,6,2,'active','2025-12-30 18:03:37','2026-01-30 18:03:37',1,'2025-12-30 18:03:37','2025-12-30 18:03:37'),(10,8,2,'active','2025-12-31 10:59:31','2026-01-31 10:59:31',1,'2025-12-31 10:59:31','2025-12-31 10:59:31');
+/*!40000 ALTER TABLE `user_plans` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `users`
 --
 
@@ -909,7 +1101,7 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `avatarUrl` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatarURL` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `firstName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lastName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phoneNo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -925,7 +1117,7 @@ CREATE TABLE `users` (
   `Provider` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `passwordResetToken` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `passwordResetExpires` datetime DEFAULT NULL,
-  `avatar` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` varchar(2048) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `timezone` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Asia/Kolkata',
   `language` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
@@ -934,7 +1126,7 @@ CREATE TABLE `users` (
   `twoFactorSecret` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -943,8 +1135,41 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,NULL,'Mukesh','Kumar','+919064784636','mukesh@gmail.com','$2b$10$a3W0zGIwr2Qn2Xr/7CQYiOLpzqDSne8F/pvQ6LI1nv/xMU56Rllrm','shop_owner','active','da5d5fc2c80054d0792bf7042a383ccbfb516060639cf8e83858b545f8fe7af3','2025-11-28 09:34:06','2025-10-12 04:51:58','2025-11-21 09:34:06',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(3,NULL,'Sonam','Agarwal','+916206992612','sonamagarwal878@gmail.com','$2b$10$XSQEUkG9XQlzXFGBFjTkKeR5D154fSwajAQPNq2oK.UvwGoYKOD4a','shop_owner','active','9a600714e14ea7077f411a48ea8f008cb224f3ca9d4b7b8f4ffc1d20d97b957e','2025-10-22 08:13:43','2025-10-14 03:54:45','2025-10-15 08:13:43',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(6,NULL,'Test','1','+916786786374','test@gmail.com','$2b$10$kf1KHLAn5SOZn17kUuweEODVVIryVCR3tTmgDauft9AVzfBfC3iW.','shop_owner','active','63e010412afc36c784712621ce205e4604af98fc205286390e03418b3019f8ee','2026-01-05 13:11:49','2025-11-16 14:11:35','2025-12-29 13:11:49',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(7,NULL,'pavan','chandu','+919346032495','pavachandu218@gmail.com','$2b$10$HyJYLJmfafrZQENmOEujHu2dnFZSo5ILqLra8a9lnM5bnnCLvpDnO','shop_owner','active','a98c421460266dfe5c27f5445eb577c374407a3ff2296b85e34dfa6432f6ce23','2025-12-30 05:21:50','2025-12-20 09:42:08','2025-12-23 05:21:50',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(8,NULL,'Aman','Tyagi','+911234567890','aman@gmail.com','$2b$10$Nr69v4wX55.a7yBmmIZUq.yUftJLUK84mStNJVBXpRLNL8XxgVlgW','shop_owner','active','2f8426617a8378705554ecb719a70706d7df23371120a04ffe85a8bfbf439d6a','2026-01-06 05:16:06','2025-12-29 13:13:00','2025-12-30 05:16:06',NULL,'local',NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(10,'https://lh3.googleusercontent.com/a/ACg8ocLKPjR6bsT01ixTbRY5JsCXUZ96FzbrZyQt9xkE--wCF1SotQ=s96-c','Amandeep','Seecog',NULL,'amandeep@seecogsoftwares.com',NULL,'shop_owner','active','cd7d623343820a21330dcc8549e84c9370df42d27a0caed109001d7798ff4b06','2026-01-06 05:20:59','2025-12-30 05:20:59','2025-12-30 05:20:59','101136192276143131397','google',NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL);
+INSERT INTO `users` VALUES (1,NULL,'Mukesh','Kumar','+919064784636','mukesh@gmail.com','$2b$10$a3W0zGIwr2Qn2Xr/7CQYiOLpzqDSne8F/pvQ6LI1nv/xMU56Rllrm','shop_owner','active','da5d5fc2c80054d0792bf7042a383ccbfb516060639cf8e83858b545f8fe7af3','2025-11-28 09:34:06','2025-10-12 04:51:58','2025-11-21 09:34:06',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(3,NULL,'Sonam','Agarwal','+916206992612','sonamagarwal878@gmail.com','$2b$10$XSQEUkG9XQlzXFGBFjTkKeR5D154fSwajAQPNq2oK.UvwGoYKOD4a','shop_owner','active','9a600714e14ea7077f411a48ea8f008cb224f3ca9d4b7b8f4ffc1d20d97b957e','2025-10-22 08:13:43','2025-10-14 03:54:45','2025-10-15 08:13:43',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(6,NULL,'Test','1','+916786786374','test@gmail.com','$2b$10$kf1KHLAn5SOZn17kUuweEODVVIryVCR3tTmgDauft9AVzfBfC3iW.','shop_owner','active','63e010412afc36c784712621ce205e4604af98fc205286390e03418b3019f8ee','2026-01-05 13:11:49','2025-11-16 14:11:35','2025-12-29 13:11:49',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(7,NULL,'pavan','chandu','+919346032495','pavachandu218@gmail.com','$2b$10$HyJYLJmfafrZQENmOEujHu2dnFZSo5ILqLra8a9lnM5bnnCLvpDnO','shop_owner','active','a98c421460266dfe5c27f5445eb577c374407a3ff2296b85e34dfa6432f6ce23','2025-12-30 05:21:50','2025-12-20 09:42:08','2025-12-23 05:21:50',NULL,NULL,NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(8,NULL,'Aman','Tyagi','+911234567890','aman@gmail.com','$2b$10$Nr69v4wX55.a7yBmmIZUq.yUftJLUK84mStNJVBXpRLNL8XxgVlgW','shop_owner','active','791e5cbdeca3c788936ace09919a551df021377a279ddd355d8eba4d37840198','2026-01-07 11:01:44','2025-12-29 13:13:00','2025-12-31 11:01:44',NULL,'local',NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(10,'https://lh3.googleusercontent.com/a/ACg8ocLKPjR6bsT01ixTbRY5JsCXUZ96FzbrZyQt9xkE--wCF1SotQ=s96-c','Amandeep','Seecog',NULL,'amandeep@seecogsoftwares.com',NULL,'shop_owner','active','112f56c5c688b8a6f1cc2b9ab93edd68c3924ae6c31b68720683c239eb5467e7','2026-01-07 11:01:21','2025-12-30 05:20:59','2025-12-31 11:01:21','101136192276143131397','google',NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL),(11,'https://scontent.fdel25-2.fna.fbcdn.net/v/t1.30497-1/84628273_176159830277856_972693363922829312_n.jpg?stp=c379.0.1290.1290a_dst-jpg_s200x200_tt6&_nc_cat=1&ccb=1-7&_nc_sid=7565cd&_nc_ohc=2sMfw6QbhjAQ7kNvwHk2pMe&_nc_oc=AdkGQzWAzvGiESu4f6JZovYpNShprmC2UZzzIUEDzhpZAb5QcCtahk7TAsVyQfqzkFuORz3FlGgKYC2HUeV17J1W&_nc_zt=24&_nc_ht=scontent.fdel25-2.fna&edm=AP4hL3IEAAAA&oh=00_AfnTLu5K4ADIRhEQ6eN-0VdVD6ETH7PNTJoJSN6c6F4YWQ&oe=697C3ED9','Pankaj','Agrawal',NULL,'info@seecogsoftwares.com',NULL,'shop_owner','active','cb30296160e19c12578410a0d048b716b5f3756bed7bba30f71addbdd3305437','2026-01-07 11:01:37','2025-12-31 11:01:37','2025-12-31 11:01:37','122097959223192900','facebook',NULL,NULL,NULL,NULL,'Asia/Kolkata','en',NULL,0,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `webhook_logs`
+--
+
+DROP TABLE IF EXISTS `webhook_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `webhook_logs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `eventId` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `eventType` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data` json DEFAULT NULL,
+  `processed` tinyint(1) NOT NULL DEFAULT '0',
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `eventId` (`eventId`),
+  KEY `webhook_logs_event_id` (`eventId`),
+  KEY `webhook_logs_event_type` (`eventType`),
+  KEY `webhook_logs_processed` (`processed`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `webhook_logs`
+--
+
+LOCK TABLES `webhook_logs` WRITE;
+/*!40000 ALTER TABLE `webhook_logs` DISABLE KEYS */;
+INSERT INTO `webhook_logs` VALUES (6,'payment_pay_RxpAXXNzOxbKzP','payment.captured','{\"amount\": 499, \"planId\": 2, \"userId\": 6, \"orderId\": \"order_Rxp9vy9gitk8iv\", \"paymentId\": \"pay_RxpAXXNzOxbKzP\", \"timestamp\": \"2025-12-30T12:33:37.268Z\", \"billingCycle\": \"monthly\"}',1,'2025-12-30 18:03:37','2025-12-30 18:03:37'),(7,'payment_pay_Ry6TiOzSB0kO1T','payment.captured','{\"amount\": 499, \"planId\": 2, \"userId\": 8, \"orderId\": \"order_Ry6TRrI8m4zLpq\", \"paymentId\": \"pay_Ry6TiOzSB0kO1T\", \"timestamp\": \"2025-12-31T05:29:31.469Z\", \"billingCycle\": \"monthly\"}',1,'2025-12-31 10:59:31','2025-12-31 10:59:31');
+/*!40000 ALTER TABLE `webhook_logs` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -955,5 +1180,3 @@ UNLOCK TABLES;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2025-12-30 11:03:24

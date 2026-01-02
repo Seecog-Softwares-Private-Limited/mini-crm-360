@@ -67,3 +67,4 @@ const Note = sequelize.define('Note', {
 
 export { Note };
 
+
