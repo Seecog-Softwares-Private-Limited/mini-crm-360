@@ -4,7 +4,8 @@ import {
   renderRemindersPage,
   getUpcomingReminders,
   updateCustomerReminders,
-  sendWish
+  sendWish,
+  bulkSendWishes
 } from "../controllers/reminder.controller.js";
 import { verifyUser } from "../middleware/authMiddleware.js";
 
@@ -14,6 +15,7 @@ router.get("/reminders", verifyUser, renderRemindersPage); // Frontend page
 router.get("/api/v1/reminders", verifyUser, getUpcomingReminders); // Get upcoming reminders
 router.put("/api/v1/reminders/customer/:customerId", verifyUser, updateCustomerReminders); // Update customer DOB/Anniversary
 router.post("/api/v1/reminders/send-wish", verifyUser, sendWish); // Send wish
+router.post("/api/v1/reminders/bulk-send", verifyUser, bulkSendWishes); // Bulk send
 
 export default router;
 

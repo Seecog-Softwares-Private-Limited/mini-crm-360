@@ -1,5 +1,135 @@
+<style>
+  /* ============================================
+     PREMIUM CAMPAIGNS PAGE STYLING
+     ============================================ */
+  
+  .campaigns-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  .main-content {
+    background: transparent;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-title::before {
+    content: '';
+    width: 4px;
+    height: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+  }
+
+  .page-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Premium Button */
+  .btn-premium {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  /* Search and Filter Section */
+  .search-filter-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .search-filter-section .form-control,
+  .search-filter-section .form-select {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .search-filter-section .form-control:focus,
+  .search-filter-section .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .search-filter-section .input-group-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .search-filter-section .btn-outline-secondary {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .search-filter-section .btn-outline-secondary:hover {
+    background: #f1f5f9;
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .search-filter-section {
+      padding: 1rem;
+    }
+
+    .btn-premium {
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+    }
+  }
+</style>
+
 <!-- Campaigns.hbs (Meta templates enabled) -->
-<div class="container-fluid">
+<div class="container-fluid campaigns-container">
   <div class="row">
     <!-- Sidebar -->
     {{> sidebar}}
@@ -7,40 +137,50 @@
     <!-- Main Content -->
     <div class="col-md-9 col-lg-10">
       <div class="main-content p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2><i class="fas fa-bullhorn me-2"></i>Campaigns</h2>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCampaignModal">
-            <i class="fas fa-plus me-1"></i>Create Campaign
-          </button>
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+              <h1 class="page-title">Campaigns</h1>
+              <p class="page-subtitle">Create and manage your marketing campaigns across multiple channels</p>
+            </div>
+            <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#createCampaignModal">
+              <i class="fas fa-plus me-2"></i>Create Campaign
+            </button>
+          </div>
         </div>
 
-        <!-- Search and Filter -->
-        <div class="row mb-4">
-          <div class="col-md-4">
-            <div class="input-group">
-              <span class="input-group-text"><i class="fas fa-search"></i></span>
-              <input type="text" class="form-control" id="searchCampaigns" placeholder="Search campaigns..." />
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchCampaigns" placeholder="Search campaigns..." />
+              </div>
             </div>
-          </div>
-          <div class="col-md-3">
-            <select class="form-select" id="statusFilter">
-              <option value="">All Status</option>
-              <option value="draft">Draft</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="running">Running</option>
-              <option value="completed">Completed</option>
-              <option value="paused">Paused</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <select class="form-select" id="businessFilter">
-              <option value="">All Businesses</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-              <i class="fas fa-times me-1"></i>Clear
-            </button>
+            <div class="col-md-3">
+              <select class="form-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="draft">Draft</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="running">Running</option>
+                <option value="completed">Completed</option>
+                <option value="paused">Paused</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" id="businessFilter">
+                <option value="">All Businesses</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                <i class="fas fa-times me-2"></i>Clear
+              </button>
+            </div>
           </div>
         </div>
 
@@ -860,20 +1000,63 @@
 
   async function loadBusinesses() {
     try {
-      businesses = await unwrap(await apiCall('/business')) || [];
+      console.log('Loading businesses for campaigns...');
+      const response = await apiCall('/business');
+      console.log('Businesses API response:', response);
+      
+      // Handle ApiResponse format: { statusCode: 200, data: { businesses: [...] }, message: "..." }
+      // or direct array format
+      if (Array.isArray(response)) {
+        businesses = response;
+      } else if (response && response.data) {
+        if (Array.isArray(response.data.businesses)) {
+          businesses = response.data.businesses;
+        } else if (Array.isArray(response.data.business)) {
+          businesses = response.data.business;
+        } else if (Array.isArray(response.data)) {
+          businesses = response.data;
+        } else {
+          businesses = [];
+        }
+      } else if (response && Array.isArray(response.businesses)) {
+        businesses = response.businesses;
+      } else {
+        businesses = [];
+      }
+      
+      console.log(`Loaded ${businesses.length} businesses`);
       populateBusinessDropdowns();
-    } catch (e) { console.error('loadBusinesses', e); }
+    } catch (e) { 
+      console.error('loadBusinesses error:', e);
+      businesses = [];
+      populateBusinessDropdowns();
+    }
   }
 
   // Load from Meta (NOT local)
   async function loadMetaTemplates() {
     try {
-      const resp = await unwrap(await apiCall('/templates/meta'));
-      const rows = (resp && (resp.data || resp.templates || resp.items)) || [];
+      console.log('Loading Meta templates for campaigns...');
+      const resp = await apiCall('/templates/meta');
+      console.log('Meta templates API response:', resp);
+      
+      let rows = [];
+      // Handle ApiResponse format or direct array
+      if (Array.isArray(resp)) {
+        rows = resp;
+      } else if (resp && resp.data) {
+        rows = resp.data || resp.templates || resp.items || [];
+      } else if (resp && (resp.templates || resp.items)) {
+        rows = resp.templates || resp.items || [];
+      } else {
+        rows = [];
+      }
+      
       metaTemplates = normalizeMetaTemplates(rows);
+      console.log(`Loaded ${metaTemplates.length} Meta templates`);
       populateMetaTemplateDropdowns();
     } catch (e) {
-      console.error('loadMetaTemplates', e);
+      console.error('loadMetaTemplates error:', e);
       metaTemplates = [];
       populateMetaTemplateDropdowns();
     }
@@ -882,15 +1065,31 @@
   // Load Email Templates
   async function loadEmailTemplates() {
     try {
-      const resp = await unwrap(await apiCall('/email-templates'));
-      const templates = Array.isArray(resp) ? resp : (resp?.data || []);
+      console.log('Loading email templates for campaigns...');
+      const resp = await apiCall('/email-templates');
+      console.log('Email templates API response:', resp);
+      
+      let templates = [];
+      // Handle ApiResponse format or direct array
+      if (Array.isArray(resp)) {
+        templates = resp;
+      } else if (resp && resp.data) {
+        templates = Array.isArray(resp.data) ? resp.data : [];
+      } else {
+        templates = [];
+      }
+      
+      // Filter out deleted templates
+      templates = templates.filter(t => !t.deleted);
+      
+      console.log(`Loaded ${templates.length} email templates`);
       const select = document.getElementById('campaignEmailTemplate');
       if (select) {
         select.innerHTML = '<option value="">Select Email Template</option>' +
           templates.map(t => `<option value="${getId(t)}">${escapeHtml(t.templateName || t.name || 'Untitled')}</option>`).join('');
       }
     } catch (e) {
-      console.error('loadEmailTemplates', e);
+      console.error('loadEmailTemplates error:', e);
       const select = document.getElementById('campaignEmailTemplate');
       if (select) {
         select.innerHTML = '<option value="">Error loading email templates</option>';
@@ -1439,13 +1638,30 @@
       document.querySelectorAll('#editCustomersList input[type="checkbox"]').forEach(cb => cb.checked = this.checked);
     });
 
-    document.getElementById('createCampaignModal').addEventListener('shown.bs.modal', () => {
-      const val = document.getElementById('campaignBusiness').value;
-      if (val) loadCustomersForBusiness(val, 'customersList');
-      // Initialize channel type
-      const channelType = document.getElementById('campaignChannel').value || 'whatsapp';
-      onChannelTypeChange(channelType);
-    });
+    const createModal = document.getElementById('createCampaignModal');
+    if (createModal) {
+      // Reload dropdowns when modal is about to show
+      createModal.addEventListener('show.bs.modal', () => {
+        // Reload dropdowns when modal opens (in case data wasn't loaded yet)
+        if (!businesses || businesses.length === 0) {
+          loadBusinesses();
+        }
+        if (!metaTemplates || metaTemplates.length === 0) {
+          loadMetaTemplates();
+        }
+        // Always reload email templates to ensure they're fresh
+        loadEmailTemplates();
+      });
+      
+      // After modal is shown, load customers if business is selected
+      createModal.addEventListener('shown.bs.modal', () => {
+        const val = document.getElementById('campaignBusiness').value;
+        if (val) loadCustomersForBusiness(val, 'customersList');
+        // Initialize channel type
+        const channelType = document.getElementById('campaignChannel').value || 'whatsapp';
+        onChannelTypeChange(channelType);
+      });
+    }
     document.getElementById('editCampaignModal').addEventListener('shown.bs.modal', () => {
       const val = document.getElementById('editCampaignBusiness').value;
       if (val) loadCustomersForBusiness(val, 'editCustomersList');
@@ -1532,5 +1748,4 @@
     actionBtn.onclick = createAndSendCampaign;
   }
 }
-
 </script>

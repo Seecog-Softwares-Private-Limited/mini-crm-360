@@ -1,37 +1,23 @@
-<div class="container-fluid">
+<div class="container-fluid notes-container">
   <div class="row">
     {{> sidebar}}
 
-    <div class="col-md-9 col-lg-10 main-content">
-      <div class="container-fluid p-4">
+    <div class="col-md-9 col-lg-10">
+      <div class="main-content p-4">
         <style>
           /* ============================================
              WORLD-CLASS PREMIUM NOTES & TIMELINE PAGE STYLING
              ============================================ */
           
-          /* Page Background with Subtle Pattern */
-          .main-content {
+          /* Page Background */
+          .notes-container {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            position: relative;
+            padding: 2rem 0;
           }
 
-          .main-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-              radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
-          }
-
-          .container-fluid.p-4 {
-            position: relative;
+          .main-content {
+            background: transparent;
           }
 
           /* Ensure modal is always on top */
@@ -70,54 +56,68 @@
             backdrop-filter: blur(4px);
           }
 
-          /* Premium Header */
-          .notes-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 24px;
-            padding: 3rem 2.5rem;
-            margin-bottom: 2.5rem;
-            color: white;
-            box-shadow: 
-              0 20px 60px rgba(102, 126, 234, 0.4),
-              0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
+          /* Page Header */
+          .page-header {
+            margin-bottom: 2rem;
           }
 
-          .notes-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: shimmer 8s infinite;
-          }
-
-          @keyframes shimmer {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
-          }
-
-          .notes-header h2 {
+          .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
             margin: 0;
-            font-weight: 800;
-            font-size: 2.5rem;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
           }
 
-          .notes-header p {
-            margin: 0.75rem 0 0 0;
-            opacity: 0.95;
-            font-size: 1.1rem;
-            font-weight: 400;
-            position: relative;
-            z-index: 1;
+          .page-title::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+          }
+
+          .page-subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+          }
+
+          /* Premium Button */
+          .btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+          }
+
+          .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+            color: white;
+          }
+
+          /* Responsive */
+          @media (max-width: 768px) {
+            .page-title {
+              font-size: 1.5rem;
+            }
+
+            .page-header {
+              margin-bottom: 1.5rem;
+            }
+
+            .btn-premium {
+              padding: 0.625rem 1.25rem;
+              font-size: 0.875rem;
+            }
           }
 
           /* Customer Selection Card */
@@ -745,12 +745,12 @@
           }
         </style>
 
-        <!-- Header -->
-        <div class="notes-header">
-          <div class="d-flex justify-content-between align-items-center">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
             <div>
-              <h2><i class="fas fa-sticky-note me-2"></i>Activity Timeline</h2>
-              <p class="mb-0 mt-2 opacity-90">Track customer activity history and add notes</p>
+              <h1 class="page-title">Activity Timeline</h1>
+              <p class="page-subtitle">Track customer activity history and add notes</p>
             </div>
           </div>
         </div>

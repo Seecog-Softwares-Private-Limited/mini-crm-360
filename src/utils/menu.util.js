@@ -110,10 +110,15 @@ export async function getAvailableMenuItems(userId, category = 'crm_tools') {
       }
 
       // Special handling for invoice - check hasInvoice feature
+      // Note: Invoice is now enabled for all plans, but we keep this check for backward compatibility
       if (itemData.key === 'invoice' && userPlan) {
         const toBool = (val) => val === true || val === 1 || val === '1';
-        if (!toBool(userPlan.hasInvoice)) {
+        // If hasInvoice is explicitly false, lock it; otherwise allow it
+        if (userPlan.hasInvoice === false || userPlan.hasInvoice === 0) {
           featureNotAvailable = true;
+        } else {
+          // Invoice is enabled - don't lock it
+          featureNotAvailable = false;
         }
       }
       

@@ -1,4 +1,682 @@
-<div class="container-fluid">
+<!-- FullCalendar CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
+
+<style>
+  /* ============================================
+     PREMIUM CUSTOMERS PAGE STYLING
+     ============================================ */
+  
+  .customers-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  .main-content {
+    background: transparent;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-title::before {
+    content: '';
+    width: 4px;
+    height: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+  }
+
+  .page-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Premium Button */
+  .btn-premium {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  /* Search and Filter Section */
+  .search-filter-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .search-filter-section .form-control,
+  .search-filter-section .form-select {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .search-filter-section .form-control:focus,
+  .search-filter-section .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .search-filter-section .input-group-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .search-filter-section .btn-outline-secondary {
+    border-radius: 10px;
+    border: 2px solid rgba(226, 232, 240, 0.8);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .search-filter-section .btn-outline-secondary:hover {
+    background: #f1f5f9;
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .search-filter-section .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .search-filter-section {
+      padding: 1rem;
+    }
+
+    .btn-premium {
+      padding: 0.625rem 1.25rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  /* FullCalendar Premium Styling */
+  #customersCalendar {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .fc {
+    font-family: inherit;
+  }
+
+  .fc-header-toolbar {
+    margin-bottom: 1.5rem !important;
+    padding: 1rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  .fc-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2) !important;
+  }
+
+  .fc-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3) !important;
+  }
+
+  .fc-button:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+
+  .fc-button-primary:not(:disabled):active,
+  .fc-button-primary:not(:disabled).fc-button-active {
+    background: linear-gradient(135deg, #5a6ad0 0%, #6a3fa0 100%) !important;
+    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.4) !important;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .fc-daygrid-day {
+    border-color: rgba(226, 232, 240, 0.8) !important;
+  }
+
+  .fc-daygrid-day:hover {
+    background-color: #f8fafc !important;
+  }
+
+  .fc-day-today {
+    background-color: rgba(102, 126, 234, 0.05) !important;
+  }
+
+  .fc-event {
+    border-radius: 6px !important;
+    padding: 4px 8px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .fc-event:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .fc-event-birthday {
+    background-color: #10b981 !important;
+    border-color: #059669 !important;
+  }
+
+  .fc-event-anniversary {
+    background-color: #ef4444 !important;
+    border-color: #dc2626 !important;
+  }
+
+  .fc-event-new-customer {
+    background-color: #3b82f6 !important;
+    border-color: #2563eb !important;
+  }
+
+  .view-toggle-btn {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .view-toggle-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-color: #667eea !important;
+  }
+
+  .view-toggle-btn:hover:not(.active) {
+    background-color: #f1f5f9 !important;
+    border-color: #667eea !important;
+    color: #667eea !important;
+  }
+
+  /* ============================================
+     PREMIUM HTML5 DATE INPUT STYLING
+     Date of Birth & Anniversary Date Fields
+     ============================================ */
+  
+  /* Premium Date Input Wrapper */
+  .premium-date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Custom Calendar Icon Inside Input */
+  .premium-date-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #667eea;
+    font-size: 1.15rem;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0.5rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    box-shadow: 
+      0 2px 4px rgba(0, 0, 0, 0.05),
+      inset 0 1px 2px rgba(255, 255, 255, 0.8);
+  }
+
+  .premium-date-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+  }
+
+  .premium-date-icon:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: translateY(-50%) scale(1.15) rotate(5deg);
+    box-shadow: 
+      0 6px 16px rgba(102, 126, 234, 0.4),
+      0 0 0 3px rgba(102, 126, 234, 0.15),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  }
+
+  .premium-date-icon:hover::before {
+    opacity: 1;
+  }
+
+  .premium-date-icon:active {
+    transform: translateY(-50%) scale(1.05) rotate(0deg);
+    box-shadow: 
+      0 3px 8px rgba(102, 126, 234, 0.3),
+      0 0 0 2px rgba(102, 126, 234, 0.2);
+  }
+
+  /* Icon animation when input is focused */
+  .premium-date-input:focus ~ .premium-date-icon,
+  .premium-date-input-wrapper:hover .premium-date-icon {
+    color: #764ba2;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    box-shadow: 
+      0 4px 12px rgba(102, 126, 234, 0.2),
+      0 0 0 2px rgba(102, 126, 234, 0.1);
+  }
+
+  .premium-date-input:focus ~ .premium-date-icon {
+    animation: iconPulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes iconPulse {
+    0%, 100% {
+      transform: translateY(-50%) scale(1);
+    }
+    50% {
+      transform: translateY(-50%) scale(1.1);
+    }
+  }
+
+  /* Hide native calendar picker indicator when using custom icon */
+  .premium-date-input-with-icon::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  .premium-date-input-with-icon::-moz-calendar-picker-indicator {
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1;
+  }
+
+  /* Premium Date Input Container */
+  .mb-3:has(.premium-date-input-wrapper) {
+    position: relative;
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Premium Label Styling */
+  .mb-3:has(.premium-date-input-wrapper) .form-label,
+  .mb-3:has(.premium-date-input) .form-label {
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    color: #1e293b !important;
+    margin-bottom: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    position: relative !important;
+    padding-left: 0.25rem !important;
+  }
+
+  .mb-3:has(.premium-date-input-wrapper) .form-label i,
+  .mb-3:has(.premium-date-input) .form-label i {
+    color: #667eea !important;
+    font-size: 1rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .mb-3:has(.premium-date-input-wrapper:hover) .form-label i,
+  .mb-3:has(.premium-date-input:focus) .form-label i {
+    color: #764ba2 !important;
+    transform: scale(1.1) rotate(5deg) !important;
+  }
+
+  /* Premium Date Input Field */
+  .premium-date-input {
+    width: 100% !important;
+    border-radius: 12px !important;
+    border: 2px solid rgba(226, 232, 240, 0.8) !important;
+    padding: 0.875rem 1.125rem !important;
+    padding-right: 3rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    color: #1e293b !important;
+    position: relative !important;
+    box-shadow: 
+      0 1px 3px rgba(0, 0, 0, 0.05),
+      inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+  }
+
+  .premium-date-input::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .premium-date-input:hover {
+    border-color: #cbd5e1 !important;
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(102, 126, 234, 0.1),
+      inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px) !important;
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%) !important;
+  }
+
+  .premium-date-input:hover::before {
+    opacity: 1;
+  }
+
+  .premium-date-input:focus {
+    border-color: #667eea !important;
+    box-shadow: 
+      0 0 0 4px rgba(102, 126, 234, 0.15),
+      0 8px 20px rgba(102, 126, 234, 0.2),
+      0 0 0 1px rgba(102, 126, 234, 0.3),
+      inset 0 1px 2px rgba(255, 255, 255, 1) !important;
+    outline: none !important;
+    background: #ffffff !important;
+    transform: translateY(-2px) scale(1.01) !important;
+  }
+
+  .premium-date-input:focus::before {
+    opacity: 0;
+  }
+
+  .premium-date-input:active {
+    border-color: #764ba2 !important;
+    transform: translateY(0) scale(0.99) !important;
+  }
+
+  /* Premium Calendar Icon (Webkit/Chrome) */
+  .premium-date-input::-webkit-calendar-picker-indicator {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2.5' ry='2.5'%3E%3C/path%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    background-size: 22px 22px;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    padding: 0.625rem;
+    margin-left: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.75;
+    position: relative;
+  }
+
+  .premium-date-input::-webkit-calendar-picker-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .premium-date-input:hover::-webkit-calendar-picker-indicator {
+    opacity: 1;
+    transform: scale(1.15) rotate(5deg);
+  }
+
+  .premium-date-input:hover::-webkit-calendar-picker-indicator::before {
+    opacity: 1;
+  }
+
+  .premium-date-input:focus::-webkit-calendar-picker-indicator {
+    opacity: 1;
+    transform: scale(1.2) rotate(0deg);
+    background-color: rgba(102, 126, 234, 0.15);
+  }
+
+  /* Firefox Date Picker Icon */
+  .premium-date-input::-moz-calendar-picker-indicator {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2.5' ry='2.5'%3E%3C/path%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    background-size: 22px 22px;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    padding: 0.625rem;
+    border-radius: 8px;
+    opacity: 0.75;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .premium-date-input:hover::-moz-calendar-picker-indicator {
+    opacity: 1;
+    transform: scale(1.15);
+    background-color: rgba(102, 126, 234, 0.1);
+  }
+
+  .premium-date-input:focus::-moz-calendar-picker-indicator {
+    opacity: 1;
+    transform: scale(1.2);
+    background-color: rgba(102, 126, 234, 0.15);
+  }
+
+  /* Date Input Value Styling */
+  .premium-date-input::placeholder {
+    color: #94a3b8 !important;
+    font-weight: 400 !important;
+    font-style: italic !important;
+  }
+
+  .premium-date-input:invalid {
+    border-color: rgba(226, 232, 240, 0.8) !important;
+  }
+
+  .premium-date-input:valid {
+    border-color: rgba(102, 126, 234, 0.4) !important;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%) !important;
+  }
+
+  .premium-date-input:valid:hover {
+    border-color: rgba(102, 126, 234, 0.5) !important;
+  }
+
+  /* Helper Text Styling */
+  .mb-3:has(.premium-date-input-wrapper) .form-text,
+  .mb-3:has(.premium-date-input) .form-text {
+    font-size: 0.8rem !important;
+    color: #64748b !important;
+    margin-top: 0.5rem !important;
+    padding-left: 0.25rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.375rem !important;
+    font-style: italic !important;
+  }
+
+  .mb-3:has(.premium-date-input-wrapper:hover) .form-text,
+  .mb-3:has(.premium-date-input:focus) .form-text {
+    color: #667eea !important;
+    font-weight: 500 !important;
+  }
+
+  /* Animated Underline Effect */
+  .mb-3:has(.premium-date-input-wrapper)::after,
+  .mb-3:has(.premium-date-input)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(102, 126, 234, 0.3) 20%, 
+      rgba(118, 75, 162, 0.5) 50%, 
+      rgba(102, 126, 234, 0.3) 80%, 
+      transparent 100%);
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 0 12px 12px;
+  }
+
+  .mb-3:has(.premium-date-input-wrapper:hover)::after,
+  .mb-3:has(.premium-date-input:hover)::after {
+    opacity: 0.5;
+  }
+
+  .mb-3:has(.premium-date-input-wrapper:hover .premium-date-input:focus)::after,
+  .mb-3:has(.premium-date-input:focus)::after {
+    opacity: 1;
+    height: 3px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(102, 126, 234, 0.6) 20%, 
+      rgba(118, 75, 162, 0.8) 50%, 
+      rgba(102, 126, 234, 0.6) 80%, 
+      transparent 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Glow Effect on Focus */
+  .mb-3:has(.premium-date-input-wrapper:hover .premium-date-input:focus),
+  .mb-3:has(.premium-date-input:focus) {
+    animation: premiumDateGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes premiumDateGlow {
+    0%, 100% {
+      filter: drop-shadow(0 0 0 rgba(102, 126, 234, 0));
+    }
+    50% {
+      filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.3));
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .premium-date-input {
+      padding: 0.75rem 1rem !important;
+      padding-right: 2.5rem !important;
+      font-size: 0.9rem !important;
+    }
+
+    .mb-3:has(.premium-date-input) .form-label {
+      font-size: 0.9rem !important;
+    }
+
+    .premium-date-input::-webkit-calendar-picker-indicator {
+      background-size: 20px 20px;
+      padding: 0.5rem;
+    }
+  }
+
+  /* Special Styling for Date of Birth Field */
+  #editCustomerDateOfBirth {
+    background-image: 
+      linear-gradient(135deg, rgba(255, 192, 203, 0.05) 0%, rgba(255, 182, 193, 0.05) 100%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  }
+
+  #editCustomerDateOfBirth:focus {
+    background-image: 
+      linear-gradient(135deg, rgba(255, 192, 203, 0.1) 0%, rgba(255, 182, 193, 0.1) 100%),
+      linear-gradient(135deg, #ffffff 0%, #ffffff 100%) !important;
+  }
+
+  /* Special Styling for Anniversary Date Field */
+  #editCustomerAnniversaryDate {
+    background-image: 
+      linear-gradient(135deg, rgba(255, 20, 147, 0.05) 0%, rgba(255, 105, 180, 0.05) 100%),
+      linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  }
+
+  #editCustomerAnniversaryDate:focus {
+    background-image: 
+      linear-gradient(135deg, rgba(255, 20, 147, 0.1) 0%, rgba(255, 105, 180, 0.1) 100%),
+      linear-gradient(135deg, #ffffff 0%, #ffffff 100%) !important;
+  }
+
+</style>
+
+<div class="container-fluid customers-container">
   <div class="row">
     <!-- Sidebar -->
     {{> sidebar}}
@@ -6,64 +684,77 @@
     <!-- Main Content -->
     <div class="col-md-9 col-lg-10">
       <div class="main-content p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2>Customers</h2>
-
-          <div class="d-flex gap-2 ms-auto">
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
-            <i class="fas fa-plus me-2"></i>Bulk Upload
-          </button>
-          <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
-            <i class="fas fa-plus me-2"></i>Add Customer
-          </button>
-          </div>
-        </div>
-
-        <!-- Enhanced Search and Filter -->
-        <div class="card shadow-sm mb-4">
-          <div class="card-body p-3">
-            <div class="row g-3 align-items-end">
-              <div class="col-md-4">
-                <label class="form-label small text-muted mb-1">Search</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-white">
-                    <i class="fas fa-search text-muted"></i>
-                  </span>
-                  <input type="text" class="form-control" id="searchInput" placeholder="Search by name, email, phone..." />
-                </div>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small text-muted mb-1">Business</label>
-                <select class="form-select" id="businessFilter" onchange="applyFilters()">
-                  <option value="">All Businesses</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small text-muted mb-1">Tags</label>
-                <select class="form-select" id="tagFilter" onchange="applyFilters()">
-                  <option value="">All Tags</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <label class="form-label small text-muted mb-1">Page Size</label>
-                <select class="form-select" id="pageSizeSelect" onchange="changePageSize()">
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                  <option value="100">100</option>
-                </select>
-              </div>
-              <div class="col-md-2">
-                <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
-                  <i class="fas fa-times me-2"></i>Clear
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+              <h1 class="page-title">Customers</h1>
+              <p class="page-subtitle">Manage and organize all your customer contacts in one place</p>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <!-- View Toggle Buttons -->
+              <div class="btn-group" role="group" aria-label="View toggle">
+                <button type="button" class="btn btn-outline-secondary view-toggle-btn active" id="listViewBtn" onclick="switchView('list')">
+                  <i class="fas fa-list me-2"></i>List
+                </button>
+                <button type="button" class="btn btn-outline-secondary view-toggle-btn" id="calendarViewBtn" onclick="switchView('calendar')">
+                  <i class="fas fa-calendar me-2"></i>Calendar
                 </button>
               </div>
+              <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#csvUploadModal">
+                <i class="fas fa-upload me-2"></i>Bulk Upload
+              </button>
+              <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                <i class="fas fa-plus me-2"></i>Add Customer
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Customers Table -->
-        <div class="card shadow-sm">
+        <!-- Search and Filter Section -->
+        <div class="search-filter-section">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Search</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control" id="searchInput" placeholder="Search by name, email, phone..." />
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Business</label>
+              <select class="form-select" id="businessFilter" onchange="applyFilters()">
+                <option value="">All Businesses</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Tags</label>
+              <select class="form-select" id="tagFilter" onchange="applyFilters()">
+                <option value="">All Tags</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Page Size</label>
+              <select class="form-select" id="pageSizeSelect" onchange="changePageSize()">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">&nbsp;</label>
+              <button class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                <i class="fas fa-times me-2"></i>Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customers Table View -->
+        <div class="card shadow-sm" id="listViewContainer">
           <div class="card-header bg-white border-bottom">
             <div class="d-flex justify-content-between align-items-center">
               <h5 class="mb-0 fw-semibold">Customer List</h5>
@@ -121,6 +812,31 @@
                 </ul>
               </nav>
             </div>
+          </div>
+        </div>
+
+        <!-- Calendar View -->
+        <div class="card shadow-sm" id="calendarViewContainer" style="display: none;">
+          <div class="card-header bg-white border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="mb-0 fw-semibold">
+                <i class="fas fa-calendar-alt me-2"></i>Customer Calendar
+              </h5>
+              <div class="d-flex gap-2 align-items-center">
+                <span class="badge bg-success me-2">
+                  <i class="fas fa-birthday-cake me-1"></i>Birthdays
+                </span>
+                <span class="badge bg-danger me-2">
+                  <i class="fas fa-heart me-1"></i>Anniversaries
+                </span>
+                <span class="badge bg-primary">
+                  <i class="fas fa-user-plus me-1"></i>New Customers
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="card-body p-4">
+            <div id="customersCalendar"></div>
           </div>
         </div>
 
@@ -797,6 +1513,40 @@
             <label for="editCustomerTags" class="form-label">Tags (comma separated)</label>
             <input type="text" class="form-control" id="editCustomerTags" name="tags" placeholder="vip, regular, premium" />
           </div>
+
+          <div class="mb-3">
+            <label for="editCustomerDateOfBirth" class="form-label">
+              <i class="fas fa-birthday-cake me-1"></i>Date of Birth
+            </label>
+            <div class="premium-date-input-wrapper">
+              <input 
+                type="date" 
+                class="form-control premium-date-input premium-date-input-with-icon" 
+                id="editCustomerDateOfBirth" 
+                name="dateOfBirth" 
+                max="" 
+              />
+              <i class="fas fa-calendar-alt premium-date-icon" onclick="document.getElementById('editCustomerDateOfBirth').showPicker()"></i>
+            </div>
+            <small class="form-text text-muted">Optional - Used for birthday reminders</small>
+          </div>
+
+          <div class="mb-3">
+            <label for="editCustomerAnniversaryDate" class="form-label">
+              <i class="fas fa-heart me-1"></i>Anniversary Date
+            </label>
+            <div class="premium-date-input-wrapper">
+              <input 
+                type="date" 
+                class="form-control premium-date-input premium-date-input-with-icon" 
+                id="editCustomerAnniversaryDate" 
+                name="anniversaryDate" 
+                max="" 
+              />
+              <i class="fas fa-calendar-alt premium-date-icon" onclick="document.getElementById('editCustomerAnniversaryDate').showPicker()"></i>
+            </div>
+            <small class="form-text text-muted">Optional - Used for anniversary reminders</small>
+          </div>
         </form>
       </div>
 
@@ -1026,11 +1776,36 @@
 
   async function loadBusinesses() {
     try {
-      const data = await apiCall('/business');
-      businesses = Array.isArray(data) ? data : (data && (data.data || data.items)) || [];
+      console.log('Loading businesses...');
+      // apiCall is defined in main.hbs layout, returns full ApiResponse: { statusCode, data: { businesses: [...] }, message }
+      const response = await apiCall('/business');
+      console.log('Businesses API response:', response);
+
+      // Extract businesses from ApiResponse structure: { statusCode: 200, data: { businesses: [...] }, message: "..." }
+      if (response && response.data) {
+        // Response is ApiResponse wrapper: { statusCode, data: { businesses: [...] }, message }
+        if (Array.isArray(response.data.businesses)) {
+          businesses = response.data.businesses;
+        } else if (Array.isArray(response.data.business)) {
+          businesses = response.data.business;
+        } else if (Array.isArray(response.data)) {
+          businesses = response.data;
+        } else {
+          businesses = [];
+        }
+      } else if (Array.isArray(response)) {
+        // Direct array response (fallback)
+        businesses = response;
+      } else {
+        businesses = [];
+      }
+
+      console.log('Loaded businesses:', businesses.length);
       updateBusinessFilters();
     } catch (err) {
       console.error('Error loading businesses:', err);
+      businesses = [];
+      updateBusinessFilters();
     }
   }
 
@@ -1333,8 +2108,54 @@
     document.getElementById('editCustomerPhone').value = (c.phoneE164 || '').replace(/^\+91/, '');
     document.getElementById('editCustomerWhatsApp').value = (c.whatsappE164 || '').replace(/^\+91/, '');
     document.getElementById('editCustomerTags').value = (c.tags || []).join(', ');
+    
+    // Set date fields - format date for HTML date input (YYYY-MM-DD)
+    const dateOfBirth = c.dateOfBirth ? new Date(c.dateOfBirth).toISOString().split('T')[0] : '';
+    const anniversaryDate = c.anniversaryDate ? new Date(c.anniversaryDate).toISOString().split('T')[0] : '';
+    document.getElementById('editCustomerDateOfBirth').value = dateOfBirth;
+    document.getElementById('editCustomerAnniversaryDate').value = anniversaryDate;
 
-    new bootstrap.Modal(document.getElementById('editCustomerModal')).show();
+    const modal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+    modal.show();
+    
+    // Set max date to today for HTML5 date inputs
+    const today = new Date().toISOString().split('T')[0];
+    const dobInput = document.getElementById('editCustomerDateOfBirth');
+    const annInput = document.getElementById('editCustomerAnniversaryDate');
+    
+    if (dobInput) {
+      dobInput.setAttribute('max', today);
+      // Make the entire input clickable to open calendar
+      dobInput.addEventListener('click', function() {
+        if (this.showPicker) {
+          try {
+            this.showPicker();
+          } catch (e) {
+            // Fallback for browsers that don't support showPicker
+            this.focus();
+          }
+        } else {
+          this.focus();
+        }
+      });
+    }
+    
+    if (annInput) {
+      annInput.setAttribute('max', today);
+      // Make the entire input clickable to open calendar
+      annInput.addEventListener('click', function() {
+        if (this.showPicker) {
+          try {
+            this.showPicker();
+          } catch (e) {
+            // Fallback for browsers that don't support showPicker
+            this.focus();
+          }
+        } else {
+          this.focus();
+        }
+      });
+    }
   }
 
 
@@ -1353,6 +2174,8 @@
       whatsappE164,
       businessId: coerceId(fd.get('businessId')),
       tags: fd.get('tags') ? fd.get('tags').split(',').map((t) => t.trim()).filter(Boolean) : [],
+      dateOfBirth: fd.get('dateOfBirth') || null,
+      anniversaryDate: fd.get('anniversaryDate') || null,
     };
 
     try {
@@ -1839,7 +2662,258 @@
         applyFilters();
       }, 500); // Wait 500ms after user stops typing
     });
+
+    // Initialize calendar view
+    initializeCalendar();
   });
+
+  // ============================================
+  // FULLCALENDAR INTEGRATION
+  // ============================================
+  let calendar = null;
+  let currentView = 'list'; // 'list' or 'calendar'
+
+  // Switch between list and calendar views
+  async function switchView(view) {
+    currentView = view;
+    const listViewContainer = document.getElementById('listViewContainer');
+    const calendarViewContainer = document.getElementById('calendarViewContainer');
+    const listViewBtn = document.getElementById('listViewBtn');
+    const calendarViewBtn = document.getElementById('calendarViewBtn');
+
+    if (view === 'list') {
+      listViewContainer.style.display = 'block';
+      calendarViewContainer.style.display = 'none';
+      listViewBtn.classList.add('active');
+      calendarViewBtn.classList.remove('active');
+    } else {
+      listViewContainer.style.display = 'none';
+      calendarViewContainer.style.display = 'block';
+      calendarViewBtn.classList.add('active');
+      listViewBtn.classList.remove('active');
+      
+      // Initialize calendar if not already initialized
+      if (!calendar) {
+        initializeCalendar();
+      } else {
+        // Refresh calendar events when switching to calendar view
+        await loadCalendarEvents();
+      }
+    }
+  }
+
+  // Initialize FullCalendar
+  function initializeCalendar() {
+    // Check if FullCalendar is loaded
+    if (typeof FullCalendar === 'undefined') {
+      console.warn('FullCalendar not loaded, waiting for script...');
+      setTimeout(initializeCalendar, 100);
+      return;
+    }
+
+    const calendarEl = document.getElementById('customersCalendar');
+    if (!calendarEl) return;
+
+    try {
+      calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,listWeek'
+        },
+        height: 'auto',
+        events: [],
+        eventClick: function(info) {
+          // Handle event click - open customer edit modal
+          const customerId = info.event.extendedProps.customerId;
+          if (customerId) {
+            editCustomer(customerId);
+          }
+        },
+        eventContent: function(arg) {
+          // Custom event rendering with icons
+          const event = arg.event;
+          const title = event.title;
+          const type = event.extendedProps.type;
+          
+          let icon = '';
+          if (type === 'birthday') {
+            icon = '<i class="fas fa-birthday-cake me-1"></i>';
+          } else if (type === 'anniversary') {
+            icon = '<i class="fas fa-heart me-1"></i>';
+          } else if (type === 'new-customer') {
+            icon = '<i class="fas fa-user-plus me-1"></i>';
+          }
+
+          return {
+            html: `<div class="fc-event-title">${icon}${title}</div>`
+          };
+        },
+        dayMaxEvents: 3,
+        moreLinkClick: 'popover'
+      });
+
+      calendar.render();
+      
+      // Load events when calendar is ready
+      loadCalendarEvents();
+    } catch (error) {
+      console.error('Error initializing FullCalendar:', error);
+      showAlert('Failed to initialize calendar. Please refresh the page.', 'danger');
+    }
+  }
+
+  // Convert customer data to calendar events
+  async function loadCalendarEvents() {
+    if (!calendar) return;
+
+    try {
+      // Load all customers for calendar (not paginated)
+      const allCustomersData = await apiCall('/customers?pageSize=1000');
+      const allCustomers = allCustomersData?.data || allCustomersData || [];
+
+      const events = [];
+      const today = new Date();
+      const currentYear = today.getFullYear();
+
+      allCustomers.forEach(customer => {
+      // Birthday events (recurring yearly)
+      if (customer.dateOfBirth) {
+        const dob = new Date(customer.dateOfBirth);
+        const birthdayThisYear = new Date(currentYear, dob.getMonth(), dob.getDate());
+        
+        // Add birthday for current year
+        events.push({
+          title: `${customer.name || 'Customer'}'s Birthday`,
+          start: birthdayThisYear.toISOString().split('T')[0],
+          allDay: true,
+          backgroundColor: '#10b981',
+          borderColor: '#059669',
+          textColor: '#ffffff',
+          classNames: ['fc-event-birthday'],
+          extendedProps: {
+            type: 'birthday',
+            customerId: customer.id || customer._id,
+            customerName: customer.name
+          }
+        });
+
+        // Add birthday for next year if current year's birthday has passed
+        if (birthdayThisYear < today) {
+          const birthdayNextYear = new Date(currentYear + 1, dob.getMonth(), dob.getDate());
+          events.push({
+            title: `${customer.name || 'Customer'}'s Birthday`,
+            start: birthdayNextYear.toISOString().split('T')[0],
+            allDay: true,
+            backgroundColor: '#10b981',
+            borderColor: '#059669',
+            textColor: '#ffffff',
+            classNames: ['fc-event-birthday'],
+            extendedProps: {
+              type: 'birthday',
+              customerId: customer.id || customer._id,
+              customerName: customer.name
+            }
+          });
+        }
+      }
+
+      // Anniversary events (recurring yearly)
+      if (customer.anniversaryDate) {
+        const anniv = new Date(customer.anniversaryDate);
+        const annivThisYear = new Date(currentYear, anniv.getMonth(), anniv.getDate());
+        
+        // Add anniversary for current year
+        events.push({
+          title: `${customer.name || 'Customer'}'s Anniversary`,
+          start: annivThisYear.toISOString().split('T')[0],
+          allDay: true,
+          backgroundColor: '#ef4444',
+          borderColor: '#dc2626',
+          textColor: '#ffffff',
+          classNames: ['fc-event-anniversary'],
+          extendedProps: {
+            type: 'anniversary',
+            customerId: customer.id || customer._id,
+            customerName: customer.name
+          }
+        });
+
+        // Add anniversary for next year if current year's anniversary has passed
+        if (annivThisYear < today) {
+          const annivNextYear = new Date(currentYear + 1, anniv.getMonth(), anniv.getDate());
+          events.push({
+            title: `${customer.name || 'Customer'}'s Anniversary`,
+            start: annivNextYear.toISOString().split('T')[0],
+            allDay: true,
+            backgroundColor: '#ef4444',
+            borderColor: '#dc2626',
+            textColor: '#ffffff',
+            classNames: ['fc-event-anniversary'],
+            extendedProps: {
+              type: 'anniversary',
+              customerId: customer.id || customer._id,
+              customerName: customer.name
+            }
+          });
+        }
+      }
+
+      // Customer creation date (one-time event)
+      if (customer.createdAt) {
+        const createdDate = new Date(customer.createdAt);
+        events.push({
+          title: `New Customer: ${customer.name || 'Unnamed'}`,
+          start: createdDate.toISOString().split('T')[0],
+          allDay: true,
+          backgroundColor: '#3b82f6',
+          borderColor: '#2563eb',
+          textColor: '#ffffff',
+          classNames: ['fc-event-new-customer'],
+          extendedProps: {
+            type: 'new-customer',
+            customerId: customer.id || customer._id,
+            customerName: customer.name
+          }
+        });
+      }
+    });
+
+      // Remove existing events and add new ones
+      calendar.removeAllEvents();
+      calendar.addEventSource(events);
+    } catch (error) {
+      console.error('Error loading calendar events:', error);
+      showAlert('Failed to load calendar events', 'danger');
+    }
+  }
+
+  // Override loadCustomers to also update calendar when data loads
+  const originalLoadCustomers = loadCustomers;
+  loadCustomers = async function() {
+    await originalLoadCustomers();
+    if (calendar && currentView === 'calendar') {
+      loadCalendarEvents();
+    }
+  };
+</script>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script>
+  // Wait for FullCalendar to load, then initialize
+  if (typeof FullCalendar !== 'undefined') {
+    // FullCalendar already loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initializeCalendar, 100);
+    });
+  } else {
+    // Wait for script to load
+    window.addEventListener('load', function() {
+      setTimeout(initializeCalendar, 500);
+    });
+  }
 </script>
 
 <style>
@@ -2006,5 +3080,139 @@
   /* Ensure modal backdrop is properly removed */
   body:not(.modal-open) .modal-backdrop {
     display: none !important;
+  }
+
+  .file-icon {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  .modal-header.bg-gradient-primary {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .progress {
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #e9ecef;
+  }
+
+  .progress-bar {
+    transition: width 0.3s ease;
+  }
+
+  .btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  .alert {
+    border-radius: 0.75rem;
+  }
+
+  #fileSelectedInfo {
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card {
+    border-radius: 0.75rem;
+  }
+
+  /* Sortable table headers */
+  .sortable {
+    user-select: none;
+    position: relative;
+  }
+
+  .sortable:hover {
+    background-color: #f8f9fa;
+  }
+
+  .sortable i {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    transition: all 0.2s;
+  }
+
+  .sortable:hover i {
+    opacity: 1;
+  }
+
+  /* Pagination styling */
+  .pagination .page-link {
+    border-radius: 0.375rem;
+    margin: 0 2px;
+    color: #667eea;
+    border-color: #dee2e6;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+
+  .pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #667eea;
+  }
+
+  /* Table row hover */
+  .table tbody tr {
+    transition: background-color 0.15s ease;
+  }
+
+  .table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Ensure table rows maintain proper colors after modal closes */
+  body:not(.modal-open) .table tbody tr {
+    background-color: transparent !important;
+  }
+
+  body:not(.modal-open) .table tbody tr:hover {
+    background-color: #f8f9fa !important;
+  }
+
+  /* Remove any dark overlay effects when modal is closed */
+  body:not(.modal-open) {
+    background-color: #ffffff !important;
   }
 </style>

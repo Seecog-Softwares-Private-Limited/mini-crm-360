@@ -172,7 +172,10 @@ export const listCustomers = async (req, res) => {
     console.log('Query params:', { tag, businessId, search, page, pageSize, sortBy, sortOrder });
 
     // Build where clause properly
-    const whereConditions = [{ userId }];
+    const whereConditions = [];
+
+    // Always filter by userId
+    whereConditions.push({ userId });
 
     // If businessId filter is provided, validate and apply it
     if (businessId) {
@@ -200,7 +203,7 @@ export const listCustomers = async (req, res) => {
       whereConditions.push({ tags: { [Op.like]: `%${tag}%` } });
     }
 
-    // Search functionality - combine with userId using Op.and
+    // Search functionality
     if (search && search.trim()) {
       const searchTerm = `%${search.trim()}%`;
       whereConditions.push({
@@ -213,15 +216,10 @@ export const listCustomers = async (req, res) => {
       });
     }
 
-    // Combine all conditions with Op.and (only if multiple conditions)
-    let where;
-    if (whereConditions.length === 1) {
-      where = whereConditions[0];
-    } else if (whereConditions.length > 1) {
-      where = { [Op.and]: whereConditions };
-    } else {
-      where = {};
-    }
+    // Combine all conditions with Op.and
+    const where = whereConditions.length > 0 
+      ? (whereConditions.length === 1 ? whereConditions[0] : { [Op.and]: whereConditions })
+      : {};
     
     console.log('Where clause:', JSON.stringify(where, null, 2));
 
@@ -308,7 +306,7 @@ export const updateCustomer = async (req, res) => {
     const userId = req.user.id;
     const customerId = req.params.id;
 
-    const { name, email, phoneE164, whatsappE164, tags, businessId } = req.body;
+    const { name, email, phoneE164, whatsappE164, tags, businessId, dateOfBirth, anniversaryDate } = req.body;
 
     if (email && !isEmail(email)) {
       return res.status(400).json({ error: "Invalid email format" });
@@ -348,6 +346,8 @@ export const updateCustomer = async (req, res) => {
       whatsappE164: whatsappE164 ?? customer.whatsappE164,
       tags: Array.isArray(tags) ? tags : customer.tags,
       businessId: businessId ?? customer.businessId,
+      dateOfBirth: dateOfBirth !== undefined ? (dateOfBirth || null) : customer.dateOfBirth,
+      anniversaryDate: anniversaryDate !== undefined ? (anniversaryDate || null) : customer.anniversaryDate,
     });
 
     return res.json(customer);

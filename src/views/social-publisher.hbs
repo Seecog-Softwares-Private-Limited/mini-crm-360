@@ -13,6 +13,7 @@
           .social-publisher-container {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
+            padding: 0;
           }
 
           .main-content {
@@ -20,48 +21,91 @@
             padding: 0;
           }
 
-          /* Sticky Header */
-          .sp-header {
+          /* Page Header - Sticky for Social Publisher */
+          .page-header {
+            margin-bottom: 2rem;
+          }
+
+          .page-header.sticky {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 1.5rem 2rem;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
-            color: white;
+            border-radius: 0;
+            margin-bottom: 0;
           }
 
-          .sp-header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-          }
-
-          .sp-header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex: 1;
-          }
-
-          .sp-header-title {
-            font-size: 1.75rem;
+          .page-title {
+            font-size: 2rem;
             font-weight: 700;
+            color: #1e293b;
             margin: 0;
             display: flex;
             align-items: center;
             gap: 0.75rem;
           }
 
-          .sp-header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
+          .page-header.sticky .page-title {
+            color: white;
+            font-size: 1.75rem;
           }
 
+          .page-title::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+          }
+
+          .page-header.sticky .page-title::before {
+            background: rgba(255, 255, 255, 0.3);
+          }
+
+          .page-subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+          }
+
+          .page-header.sticky .page-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+          }
+
+          /* Premium Button */
+          .btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+          }
+
+          .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+            color: white;
+          }
+
+          .page-header.sticky .btn-premium {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+          }
+
+          .page-header.sticky .btn-premium:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+          }
+
+          /* Social Publisher specific buttons */
           .sp-btn {
             padding: 0.625rem 1.25rem;
             border-radius: 8px;
@@ -610,27 +654,35 @@
           }
 
           @media (max-width: 768px) {
-            .sp-header-content {
-              flex-direction: column;
-              align-items: flex-start;
+            .page-title {
+              font-size: 1.5rem;
             }
 
-            .sp-header-actions {
+            .page-header.sticky {
+              padding: 1rem 1.5rem;
+            }
+
+            .page-header .d-flex {
+              flex-direction: column;
+              align-items: flex-start !important;
+            }
+
+            .sp-status-chips {
               width: 100%;
-              justify-content: space-between;
+              justify-content: flex-start;
             }
           }
         </style>
 
-        <!-- Sticky Header -->
-        <div class="sp-header">
-          <div class="sp-header-content">
-            <div class="sp-header-left">
-              <h1 class="sp-header-title">
-                <i class="fas fa-share-alt"></i>
-                Social Publisher
-              </h1>
-              <select id="businessSelector" class="sp-form-input" style="width: auto; min-width: 200px;">
+        <!-- Page Header - Sticky for Social Publisher -->
+        <div class="page-header sticky">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3 flex-wrap flex-grow-1">
+              <div>
+                <h1 class="page-title">Social Publisher</h1>
+                <p class="page-subtitle">Schedule and publish content to social media platforms</p>
+              </div>
+              <select id="businessSelector" class="form-select" style="width: auto; min-width: 200px; background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.3); color: white;">
                 <option value="">All Businesses</option>
                 {{#each businesses}}
                 <option value="{{id}}">{{name}}</option>
@@ -645,7 +697,7 @@
                 </button>
               </div>
             </div>
-            <div class="sp-header-actions">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
               <div class="sp-status-chips">
                 <span class="sp-status-chip active" data-status="all" onclick="filterByStatus('all')">All</span>
                 <span class="sp-status-chip" data-status="draft" onclick="filterByStatus('draft')">Draft</span>
@@ -662,7 +714,7 @@
               <button class="sp-btn sp-btn-secondary" onclick="openMediaDrawer()">
                 <i class="fas fa-images"></i> Media
               </button>
-              <button class="sp-btn sp-btn-primary" onclick="openCreatePostDrawer()">
+              <button class="btn btn-premium" onclick="openCreatePostDrawer()">
                 <i class="fas fa-plus"></i> Create Post
               </button>
             </div>
@@ -912,9 +964,11 @@
   let accounts = [];
   let templates = [];
   let selectedMedia = [];
+  let businesses = [];
 
   // Initialize
   document.addEventListener('DOMContentLoaded', function() {
+    loadBusinesses();
     loadAccounts();
     loadPosts();
     loadTemplates();
@@ -1091,6 +1145,53 @@
     alert(message);
   }
 
+  // Load businesses dynamically
+  async function loadBusinesses() {
+    try {
+      console.log('Loading businesses...');
+      const response = await apiCall('/business');
+      console.log('Businesses API response:', response);
+      
+      // Extract businesses from ApiResponse structure
+      if (response && response.data) {
+        if (Array.isArray(response.data.businesses)) {
+          businesses = response.data.businesses;
+        } else if (Array.isArray(response.data.business)) {
+          businesses = response.data.business;
+        } else if (Array.isArray(response.data)) {
+          businesses = response.data;
+        } else {
+          businesses = [];
+        }
+      } else if (Array.isArray(response)) {
+        businesses = response;
+      } else if (response && Array.isArray(response.businesses)) {
+        businesses = response.businesses;
+      } else {
+        businesses = [];
+      }
+      
+      console.log(`Businesses loaded: ${businesses.length} businesses`);
+      
+      // Populate business selector dropdown
+      const businessSelector = document.getElementById('businessSelector');
+      if (businessSelector) {
+        // Keep the "All Businesses" option and add businesses
+        businessSelector.innerHTML = '<option value="">All Businesses</option>';
+        businesses.forEach(business => {
+          const option = document.createElement('option');
+          option.value = business.id;
+          option.textContent = business.businessName || business.name || 'Unnamed Business';
+          businessSelector.appendChild(option);
+        });
+        console.log('Business selector populated with', businesses.length, 'businesses');
+      }
+    } catch (error) {
+      console.error('Error loading businesses:', error);
+      businesses = [];
+    }
+  }
+
   // Load Data
   async function loadAccounts() {
     try {
@@ -1098,18 +1199,24 @@
       const response = await apiCall(`/social/accounts${query}`);
       console.log('Accounts API response:', response);
       
-      // Ensure we have an array
+      // Handle ApiResponse format: { statusCode: 200, data: [...], message: "..." }
+      // or direct array format
       if (Array.isArray(response)) {
         accounts = response;
-      } else if (response && Array.isArray(response.data)) {
-        accounts = response.data;
       } else if (response && response.data) {
-        accounts = Array.isArray(response.data) ? response.data : [];
+        // ApiResponse format: response.data contains the accounts array
+        if (Array.isArray(response.data)) {
+          accounts = response.data;
+        } else if (response.data.accounts && Array.isArray(response.data.accounts)) {
+          accounts = response.data.accounts;
+        } else {
+          accounts = [];
+        }
       } else {
         accounts = [];
       }
       
-      console.log('Accounts after processing:', accounts);
+      console.log(`Accounts after processing: ${accounts.length} accounts`);
       renderAccountsStrip();
       renderAccountSelector();
     } catch (error) {
@@ -1587,7 +1694,16 @@
     
     // Check again after loading
     if (!Array.isArray(accounts) || accounts.length === 0) {
-      container.innerHTML = '<p class="text-muted">No accounts connected. Connect your first account to get started!</p>';
+      container.innerHTML = `
+        <div class="text-center p-4">
+          <i class="fas fa-link fa-2x text-muted mb-3" style="opacity: 0.5;"></i>
+          <p class="text-muted mb-2"><strong>No accounts connected</strong></p>
+          <p class="text-muted small mb-3">Connect your social media accounts to start publishing content.</p>
+          <button class="sp-btn sp-btn-primary" onclick="openAccountsDrawer()">
+            <i class="fas fa-plus me-2"></i>Connect Account
+          </button>
+        </div>
+      `;
       return;
     }
 

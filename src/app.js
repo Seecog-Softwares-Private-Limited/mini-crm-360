@@ -121,7 +121,7 @@ import stateRoutes from './routes/state.routes.js';
 import countryRoutes from './routes/country.routes.js';
 import businessAddressRoutes from './routes/businessAddress.routes.js';
 import emailTemplateRoutes from './routes/emailTemplate.routes.js';
-import { renderEmailTemplatesPage } from './controllers/emailTemplate.controller.js';
+import { renderUnifiedTemplatesPage } from './controllers/unifiedTemplates.controller.js';
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import plansRoutes from "./routes/plans.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
@@ -224,15 +224,8 @@ app.get('/business', verifyUser, (req, res) => {
 });
 
 
-app.get('/templates', verifyUser, (req, res) => {
-    const user = { 
-      firstName: req.user.firstName, 
-      lastName: req.user.lastName,
-      avatar: req.user.avatar || req.user.avatarUrl || null,
-      plan: req.user.plan || null
-    };
-    res.render('templates', { title: 'Templates', user, activePage: 'templates' });
-});
+// Unified Templates page - combines Email and WhatsApp templates
+app.get('/templates', verifyUser, renderUnifiedTemplatesPage);
 
 app.get('/campaigns', verifyUser, (req, res) => {
     const user = { 
@@ -351,7 +344,8 @@ app.use(documentTypesRoutes);
 app.use('/api/v1/countries', countryRoutes);
 app.use('/api/v1/states', stateRoutes);
 app.use('/api/v1/business-addresses', businessAddressRoutes);
-app.get('/email-templates', verifyUser, renderEmailTemplatesPage);
+// Redirect old email-templates route to unified templates page
+app.get('/email-templates', verifyUser, renderUnifiedTemplatesPage);
 
 // API routes under /api/v1/email-templates
 app.use('/', emailTemplateRoutes);

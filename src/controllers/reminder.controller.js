@@ -1,5 +1,6 @@
 // src/controllers/reminder.controller.js
 import { Customer } from '../models/Customer.js';
+import { Business } from '../models/Business.js';
 import { Template } from '../models/Template.js';
 import EmailTemplate from '../models/EmailTemplate.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -54,13 +55,13 @@ export const getUpcomingReminders = asyncHandler(async (req, res) => {
           { anniversaryDate: { [Op.ne]: null } }
         ]
       },
-      attributes: ['id', 'name', 'firstName', 'lastName', 'email', 'phoneE164', 'dateOfBirth', 'anniversaryDate']
+      attributes: ['id', 'name', 'email', 'phoneE164', 'dateOfBirth', 'anniversaryDate']
     });
 
     const reminders = [];
 
     customers.forEach(customer => {
-      const customerName = customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Unnamed Customer';
+      const customerName = customer.name || 'Unnamed Customer';
 
       // Process birthday
       if (customer.dateOfBirth) {
@@ -120,8 +121,9 @@ export const getUpcomingReminders = asyncHandler(async (req, res) => {
       return a.daysUntil - b.daysUntil;
     });
 
+    console.log(`✅ Found ${reminders.length} reminders for user ${userId}`);
     return res.status(200).json(
-      new ApiResponse(200, reminders, 'Reminders fetched successfully')
+      new ApiResponse(200, { reminders }, 'Reminders fetched successfully')
     );
   } catch (error) {
     console.error('Error fetching reminders:', error);
@@ -204,7 +206,7 @@ export const sendWish = asyncHandler(async (req, res) => {
       });
     }
 
-    const customerName = customer.name || `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'Valued Customer';
+    const customerName = customer.name || 'Valued Customer';
     let messageSent = false;
     let errorMessage = null;
 
@@ -354,6 +356,148 @@ export const sendWish = asyncHandler(async (req, res) => {
       message: 'Failed to send wish',
       error: error.message
     });
+  }
+});
+
+// Bulk send wishes (WhatsApp or Email)
+export const bulkSendWishes = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { channel, customerIds, message, templateId, emailTemplateId, filter } = req.body;
+
+    if (!channel || !customerIds || !Array.isArray(customerIds) || customerIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'channel and customerIds array are required'
+      });
+    }
+
+    // Fetch customers with business info
+    const customers = await Customer.findAll({
+      where: { id: customerIds, userId },
+      include: [{
+        model: Business,
+        as: 'business',
+        attributes: ['id', 'businessName'],
+        required: false
+      }],
+      attributes: ['id', 'name', 'email', 'phoneE164', 'dateOfBirth', 'anniversaryDate']
+    });
+
+    if (!customers.length) {
+      return res.status(404).json({ success: false, message: 'No customers found' });
+    }
+
+    // Fallback company name
+    let companyName = 'Company';
+    const userBusiness = await Business.findOne({
+      where: { ownerId: userId },
+      order: [['createdAt', 'ASC']],
+      attributes: ['id', 'businessName']
+    });
+    if (userBusiness?.businessName) companyName = userBusiness.businessName;
+
+    const results = {
+      total: customers.length,
+      sent: 0,
+      failed: 0,
+      skipped: 0,
+      details: []
+    };
+
+    // Prefetch templates if provided
+    let waTemplate = null;
+    let emailTpl = null;
+    if (channel === 'whatsapp' && templateId) {
+      waTemplate = await Template.findOne({ where: { id: templateId, userId } });
+    }
+    if (channel === 'email' && emailTemplateId) {
+      emailTpl = await EmailTemplate.findOne({ where: { id: emailTemplateId, deleted: false } });
+    }
+
+    for (const customer of customers) {
+      const customerName = customer.name || 'Valued Customer';
+      const businessName = customer.business?.businessName || companyName;
+
+      try {
+        if (channel === 'whatsapp') {
+          if (!customer.phoneE164) {
+            results.skipped++;
+            results.details.push({ customerId: customer.id, status: 'skipped', reason: 'Missing WhatsApp number' });
+            continue;
+          }
+
+          if (!waTemplate) {
+            results.failed++;
+            results.details.push({ customerId: customer.id, status: 'failed', reason: 'WhatsApp template required' });
+            continue;
+          }
+
+          const response = await sendTemplateMessage({
+            to: customer.phoneE164,
+            templateName: waTemplate.waName,
+            language: waTemplate.language || 'en_US',
+            components: waTemplate.components || []
+          });
+
+          if (response?.messages?.[0]?.id) {
+            results.sent++;
+            await autoLogEvent(userId, customer.id, 'whatsapp_sent', `Bulk wish sent`, response.messages[0].id);
+          } else {
+            results.failed++;
+            results.details.push({ customerId: customer.id, status: 'failed', reason: 'No message ID returned' });
+          }
+        } else if (channel === 'email') {
+          if (!customer.email) {
+            results.skipped++;
+            results.details.push({ customerId: customer.id, status: 'skipped', reason: 'Missing email' });
+            continue;
+          }
+
+          let subject = `Happy Wish`;
+          let htmlContent = message || `Happy day, ${customerName}!`;
+
+          if (emailTpl) {
+            subject = emailTpl.subject || subject;
+            htmlContent = emailTpl.bodyHtml || htmlContent;
+          }
+
+          const placeholders = {
+            '{{customerName}}': customerName,
+            '{{customer_name}}': customerName,
+            '{{name}}': customerName,
+            '{{companyName}}': businessName,
+            '{{company_name}}': businessName,
+            '{{company}}': businessName,
+          };
+          Object.keys(placeholders).forEach(key => {
+            const regex = new RegExp(key.replace(/[{}]/g, '\\$&'), 'gi');
+            subject = subject.replace(regex, placeholders[key]);
+            htmlContent = htmlContent.replace(regex, placeholders[key]);
+          });
+
+          const emailSent = await sendDocumentEmail({ to: customer.email, subject, html: htmlContent });
+          if (emailSent) {
+            results.sent++;
+            await autoLogEvent(userId, customer.id, 'email_sent', `Bulk email wish sent`, emailTemplateId || null);
+          } else {
+            results.failed++;
+            results.details.push({ customerId: customer.id, status: 'failed', reason: 'Email service failed' });
+          }
+        }
+
+        // small delay
+        await new Promise(r => setTimeout(r, 100));
+      } catch (err) {
+        results.failed++;
+        results.details.push({ customerId: customer.id, status: 'failed', reason: err.message || 'Unknown error' });
+      }
+    }
+
+    return res.status(200).json({ success: true, message: 'Bulk send processed', results });
+  } catch (error) {
+    console.error('Error in bulkSendWishes:', error);
+    return res.status(500).json({ success: false, message: 'Failed to process bulk send', error: error.message });
   }
 });
 

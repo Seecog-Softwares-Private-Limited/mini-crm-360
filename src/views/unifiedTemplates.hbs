@@ -1,0 +1,1470 @@
+<style>
+  /* ============================================
+     PREMIUM EMAIL TEMPLATES STYLING
+     ============================================ */
+  
+  .unified-templates-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  /* Tabs */
+  .template-tabs {
+    background: white;
+    border-radius: 12px;
+    padding: 0.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .template-tab {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .template-tab:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+  }
+
+  .template-tab.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .template-tab-content {
+    display: none;
+  }
+
+  .template-tab-content.active {
+    display: block;
+  }
+
+  .main-content {
+    background: transparent;
+  }
+
+  /* Page Header */
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .page-title::before {
+    content: '';
+    width: 4px;
+    height: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+  }
+
+  .page-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Premium Button */
+  .btn-premium {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  /* Premium Template Cards */
+  .template-card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .template-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+  }
+
+  .template-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+
+  .template-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .template-card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  }
+
+  .template-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+  }
+
+  .template-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .template-key {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-family: 'Courier New', monospace;
+    background: rgba(102, 126, 234, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  .template-card-body {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .template-info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .template-info-label {
+    font-weight: 600;
+    color: #475569;
+    min-width: 120px;
+    margin-right: 0.5rem;
+  }
+
+  .template-info-value {
+    color: #334155;
+    flex: 1;
+  }
+
+  .template-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+  }
+
+  .template-badge.default {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+
+  .template-badge.not-default {
+    background: rgba(148, 163, 184, 0.2);
+    color: #64748b;
+  }
+
+  .template-card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    background: rgba(248, 250, 252, 0.5);
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-template {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .btn-template-view {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+  }
+
+  .btn-template-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+    color: white;
+  }
+
+  .btn-template-edit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .btn-template-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  .btn-template-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+  }
+
+  .btn-template-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+    color: white;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed rgba(226, 232, 240, 0.8);
+  }
+
+  .empty-state-icon {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state-text {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state-subtext {
+    color: #94a3b8;
+    font-size: 0.9rem;
+  }
+
+  /* Loading State */
+  .loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .loading-spinner {
+    display: inline-block;
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid rgba(102, 126, 234, 0.2);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Premium Modal */
+  .premium-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .premium-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 1.5rem;
+    border-bottom: none;
+  }
+
+  .premium-modal .modal-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .premium-modal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+  }
+
+  .premium-modal .btn-close:hover {
+    opacity: 1;
+  }
+
+  .premium-modal .modal-body {
+    padding: 2rem;
+  }
+
+  .premium-modal .form-label {
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.5rem;
+  }
+
+  .premium-modal .form-control,
+  .premium-modal .form-select {
+    border-radius: 8px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+  }
+
+  .premium-modal .form-control:focus,
+  .premium-modal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .premium-modal .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+  }
+
+  .premium-modal .modal-footer {
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 1.5rem;
+  }
+
+  .premium-modal .btn-secondary {
+    background: #e2e8f0;
+    border: none;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+  }
+
+  .premium-modal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+  }
+
+  .premium-modal .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  }
+
+  /* View Modal */
+  .view-modal-body {
+    padding: 2rem;
+  }
+
+  .view-template-preview {
+    background: #f8fafc;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+    min-height: 200px;
+  }
+
+  /* Premium Delete Confirmation Modal */
+  .premium-delete-modal .modal-dialog {
+    max-width: 500px;
+  }
+
+  .premium-delete-modal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  .premium-delete-modal .modal-header {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border-radius: 16px 16px 0 0;
+    padding: 1.75rem 2rem;
+    border-bottom: none;
+  }
+
+  .premium-delete-modal .modal-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+  }
+
+  .premium-delete-modal .modal-title i {
+    font-size: 1.25rem;
+  }
+
+  .premium-delete-modal .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+
+  .premium-delete-modal .btn-close:hover {
+    opacity: 1;
+  }
+
+  .premium-delete-modal .modal-body {
+    padding: 2rem;
+    background: #ffffff;
+    text-align: center;
+  }
+
+  .delete-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .delete-icon-wrapper i {
+    font-size: 2.5rem;
+    color: #ef4444;
+  }
+
+  .delete-confirmation-text {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+  }
+
+  .delete-warning-text {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+  }
+
+  .delete-template-info {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 2px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+
+  .delete-template-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .delete-template-info-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .delete-template-info-label {
+    font-weight: 600;
+    color: #475569;
+    min-width: 100px;
+    font-size: 0.9rem;
+  }
+
+  .delete-template-info-value {
+    color: #1e293b;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .premium-delete-modal .modal-footer {
+    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .premium-delete-modal .btn-secondary {
+    background: #e2e8f0;
+    border: none;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+  }
+
+  .premium-delete-modal .btn-secondary:hover {
+    background: #cbd5e1;
+    transform: translateY(-1px);
+  }
+
+  .premium-delete-modal .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+  }
+
+  .premium-delete-modal .btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(239, 68, 68, 0.3);
+    color: white;
+  }
+
+  .premium-delete-modal .btn-danger:active {
+    transform: translateY(0);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .template-card-footer {
+      flex-direction: column;
+    }
+
+    .btn-template {
+      width: 100%;
+    }
+
+    .premium-delete-modal .modal-footer {
+      flex-direction: column-reverse;
+    }
+
+    .premium-delete-modal .btn-secondary,
+    .premium-delete-modal .btn-danger {
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="container-fluid unified-templates-container">
+  <div class="row">
+    <!-- Sidebar -->
+    {{> sidebar}}
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10">
+      <div class="main-content p-4">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+              <h1 class="page-title">Templates</h1>
+              <p class="page-subtitle">Create and manage email and WhatsApp templates for your business communications</p>
+            </div>
+            <button
+              class="btn btn-premium"
+              id="newTemplateBtn"
+              onclick="openCreateTemplateModal()"
+            >
+              <i class="fas fa-plus me-2"></i>New Template
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="template-tabs">
+          <button class="template-tab active" onclick="switchTab('email')" data-tab="email">
+            <i class="fas fa-envelope"></i>
+            <span>Email Templates</span>
+          </button>
+          <button class="template-tab" onclick="switchTab('whatsapp')" data-tab="whatsapp">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp Templates</span>
+          </button>
+        </div>
+
+        <!-- Email Templates Tab Content -->
+        <div id="emailTabContent" class="template-tab-content active">
+          <div id="emailTemplatesContainer" class="row g-4">
+            <div class="col-12">
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p class="mt-3 mb-0 text-muted">Loading email templates...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Templates Tab Content -->
+        <div id="whatsappTabContent" class="template-tab-content">
+          <!-- Search and Filter -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="input-group">
+                <input type="text" class="form-control" id="whatsappSearchInput" placeholder="Search WhatsApp templates..." />
+                <button class="btn btn-outline-secondary" type="button" onclick="searchWhatsAppTemplates()">
+                  <i class="fas fa-search"></i>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" id="whatsappCategoryFilter" onchange="filterWhatsAppByCategory()">
+                <option value="">All Categories</option>
+                <option value="marketing">Marketing</option>
+                <option value="utility">Utility</option>
+                <option value="authentication">Authentication</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <div class="btn-group w-100" role="group">
+                <input type="radio" class="btn-check" name="whatsappSource" id="srcMeta" autocomplete="off" checked />
+                <label class="btn btn-outline-primary" for="srcMeta">Meta</label>
+                <input type="radio" class="btn-check" name="whatsappSource" id="srcLocal" autocomplete="off" />
+                <label class="btn btn-outline-secondary" for="srcLocal">Local</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- WhatsApp Templates Grid -->
+          <div id="whatsappTemplatesContainer" class="row g-4">
+            <div class="col-12">
+              <div class="loading-state">
+                <div class="loading-spinner"></div>
+                <p class="mt-3 mb-0 text-muted">Loading WhatsApp templates...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create / Edit Modal -->
+<div class="modal fade premium-modal" id="emailTemplateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="emailTemplateModalTitle">
+          <i class="fas fa-envelope-open-text me-2"></i>Add Email Template
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="emailTemplateForm">
+          <input type="hidden" id="emailTemplateId" />
+
+          <div class="mb-4">
+            <label class="form-label" for="templateName">
+              <i class="fas fa-tag me-2 text-primary"></i>Template Name
+            </label>
+            <input type="text" id="templateName" class="form-control" placeholder="Birthday Bash" required />
+            <small class="text-muted mt-1 d-block">
+              <i class="fas fa-info-circle me-1"></i>Template Key will be auto-generated from this name (e.g., "Birthday Bash" → "BIRTHDAY_BASH")
+            </small>
+            <small class="text-muted d-block" id="templateKeyPreview" style="display: none; margin-top: 0.5rem;">
+              <i class="fas fa-key me-1"></i><strong>Generated Key:</strong> <code id="generatedKeyPreview" style="background: rgba(102, 126, 234, 0.1); padding: 0.25rem 0.5rem; border-radius: 4px;"></code>
+            </small>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="subject">
+              <i class="fas fa-heading me-2 text-primary"></i>Email Subject
+            </label>
+            <input type="text" id="subject" class="form-control" placeholder="Birthday Bash" required />
+            <small class="text-muted mt-1 d-block">
+              <i class="fas fa-code me-1"></i>Placeholders: {{'{{employeeName}}'}}, {{'{{monthYear}}'}}, {{'{{companyName}}'}}
+            </small>
+          </div>
+
+          <div class="mb-4">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="isDefault" />
+              <label class="form-check-label" for="isDefault">
+                <i class="fas fa-star me-2 text-warning"></i>Set as default template
+              </label>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="bodyHtml">
+              <i class="fas fa-code me-2 text-primary"></i>Email Body (HTML)
+            </label>
+            <textarea id="bodyHtml" class="form-control" rows="12" placeholder="<html>...</html>" required></textarea>
+            <small class="text-muted mt-1 d-block">
+              <i class="fas fa-lightbulb me-1"></i>Use HTML to format your email. Placeholders will be replaced with actual values.
+            </small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button class="btn btn-primary" onclick="saveEmailTemplate()">
+          <i class="fas fa-save me-2"></i>Save Template
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal fade premium-modal" id="viewEmailTemplateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-eye me-2"></i>View Email Template
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="view-modal-body">
+        <div class="mb-4">
+          <h4 class="mb-3" id="viewTemplateName" style="color: #1e293b;"></h4>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="template-info-item">
+                <span class="template-info-label">
+                  <i class="fas fa-key me-2 text-primary"></i>Template Key:
+                </span>
+                <span class="template-info-value">
+                  <code id="viewTemplateKey" style="background: rgba(102, 126, 234, 0.1); padding: 0.25rem 0.5rem; border-radius: 4px;"></code>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="template-info-item">
+                <span class="template-info-label">
+                  <i class="fas fa-file-alt me-2 text-primary"></i>Document Type:
+                </span>
+                <span class="template-info-value" id="viewDocumentType"></span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="template-info-item">
+                <span class="template-info-label">
+                  <i class="fas fa-heading me-2 text-primary"></i>Subject:
+                </span>
+                <span class="template-info-value" id="viewSubject" style="font-weight: 600;"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div>
+          <h6 class="mb-3" style="color: #475569; font-weight: 600;">
+            <i class="fas fa-eye me-2 text-primary"></i>Email Body Preview
+          </h6>
+          <div id="viewBodyHtml" class="view-template-preview"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade premium-delete-modal" id="deleteEmailTemplateModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          Delete Email Template
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-icon-wrapper">
+          <i class="fas fa-trash-alt"></i>
+        </div>
+        <div class="delete-confirmation-text">
+          Are you sure you want to delete this template?
+        </div>
+        <div class="delete-warning-text">
+          This action cannot be undone. The template will be permanently removed.
+        </div>
+        <div class="delete-template-info">
+          <div class="delete-template-info-item">
+            <span class="delete-template-info-label">
+              <i class="fas fa-tag me-2"></i>Template Name:
+            </span>
+            <span class="delete-template-info-value" id="deleteTemplateName">—</span>
+          </div>
+          <div class="delete-template-info-item">
+            <span class="delete-template-info-label">
+              <i class="fas fa-key me-2"></i>Template Key:
+            </span>
+            <span class="delete-template-info-value" id="deleteTemplateKey">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-2"></i>Cancel
+        </button>
+        <button type="button" class="btn btn-danger" onclick="confirmDeleteEmailTemplate()">
+          <i class="fas fa-trash-alt me-2"></i>Delete Template
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // NOTE: We use the global apiCall() defined in main.hbs
+  // which automatically adds API_BASE + Authorization header
+  // and returns parsed JSON (or throws on error).
+
+  let emailTemplates = [];
+  let currentEditingId = null;
+  let currentDeleteId = null;
+
+  // ---------- Load document types for dropdown ----------
+  async function loadDocumentTypesForSelect() {
+    const select = document.getElementById('documentTypeId');
+    if (!select) return;
+
+    // reset options
+    select.innerHTML = '<option value="">-- None --</option>';
+
+    try {
+      const list = await apiCall('/document-types');
+      (list || []).forEach(function (dt) {
+        const opt = document.createElement('option');
+        opt.value = dt.id;
+        opt.textContent =
+          dt.documentName ||
+          dt.document_name ||
+          dt.name ||
+          ('#' + dt.id);
+        select.appendChild(opt);
+      });
+    } catch (err) {
+      console.error('Error loading document types:', err);
+    }
+  }
+
+  // ---------- Render email templates in card view ----------
+  function renderEmailTemplates() {
+    const container = document.getElementById('emailTemplatesContainer');
+    if (!container) return;
+
+    if (!emailTemplates.length) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <i class="fas fa-envelope-open-text"></i>
+            </div>
+            <div class="empty-state-text">No email templates found</div>
+            <div class="empty-state-subtext">Click "New Template" to create your first email template</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const cardsHtml = emailTemplates
+      .map(function (t) {
+        const defaultBadge = t.isDefault 
+          ? '<span class="template-badge default"><i class="fas fa-star me-1"></i>Default</span>'
+          : '<span class="template-badge not-default">Not Default</span>';
+
+        return `
+          <div class="col-md-6 col-lg-4">
+            <div class="template-card">
+              <div class="template-card-header">
+                <div class="template-icon">
+                  <i class="fas fa-envelope"></i>
+                </div>
+                <h5 class="template-title">${escapeHtml(t.templateName || 'Untitled')}</h5>
+                <div class="template-key">${escapeHtml(t.templateKey || '')}</div>
+              </div>
+              <div class="template-card-body">
+                <div class="template-info-item">
+                  <span class="template-info-label">Subject:</span>
+                  <span class="template-info-value">${escapeHtml(t.subject || '-')}</span>
+                </div>
+                <div class="template-info-item">
+                  <span class="template-info-label">Status:</span>
+                  <span class="template-info-value">${defaultBadge}</span>
+                </div>
+              </div>
+              <div class="template-card-footer">
+                <button class="btn-template btn-template-view" onclick="viewTemplate(${t.id})">
+                  <i class="fas fa-eye me-1"></i>View
+                </button>
+                <button class="btn-template btn-template-edit" onclick="editTemplate(${t.id})">
+                  <i class="fas fa-edit me-1"></i>Edit
+                </button>
+                <button class="btn-template btn-template-delete" onclick="deleteTemplate(${t.id})">
+                  <i class="fas fa-trash me-1"></i>Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    container.innerHTML = cardsHtml;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ---------- Load from API ----------
+  async function loadEmailTemplates() {
+    const container = document.getElementById('emailTemplatesContainer');
+    if (container) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="mt-3 mb-0 text-muted">Loading templates...</p>
+          </div>
+        </div>
+      `;
+    }
+
+    try {
+      const list = await apiCall('/email-templates'); // returns JSON array
+      emailTemplates = Array.isArray(list) ? list : [];
+      renderEmailTemplates();
+    } catch (err) {
+      console.error('Error fetching email templates:', err);
+      if (container) {
+        container.innerHTML = `
+          <div class="col-12">
+            <div class="empty-state">
+              <div class="empty-state-icon text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="empty-state-text text-danger">Failed to load email templates</div>
+              <div class="empty-state-subtext">Please try refreshing the page</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  // ---------- Update Template Key Preview ----------
+  function updateTemplateKeyPreview() {
+    var templateName = document.getElementById('templateName').value.trim();
+    var previewEl = document.getElementById('templateKeyPreview');
+    var previewKeyEl = document.getElementById('generatedKeyPreview');
+    
+    if (templateName) {
+      var generatedKey = generateTemplateKey(templateName);
+      previewKeyEl.textContent = generatedKey || '(Enter template name)';
+      previewEl.style.display = 'block';
+    } else {
+      previewEl.style.display = 'none';
+    }
+  }
+
+  // ---------- Open create modal ----------
+  function openCreateTemplateModal() {
+    currentEditingId = null;
+    document.getElementById('emailTemplateModalTitle').textContent =
+      'Add Email Template';
+    document.getElementById('emailTemplateForm').reset();
+    document.getElementById('emailTemplateId').value = '';
+    document.getElementById('isDefault').checked = false;
+    document.getElementById('templateKeyPreview').style.display = 'none';
+
+    var modalEl = document.getElementById('emailTemplateModal');
+    var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+
+  // ---------- Generate Template Key from Template Name ----------
+  function generateTemplateKey(templateName) {
+    if (!templateName) return '';
+    // Convert to uppercase, replace spaces and special characters with underscores
+    return templateName
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9_]/g, '_')  // Replace non-alphanumeric (except underscore) with underscore
+      .replace(/_+/g, '_')           // Replace multiple underscores with single underscore
+      .replace(/^_+|_+$/g, '');      // Remove leading/trailing underscores
+  }
+
+  // ---------- Edit template ----------
+  function editTemplate(id) {
+    var t = emailTemplates.find(function (x) { return x.id === id; });
+    if (!t) return;
+
+    currentEditingId = id;
+    document.getElementById('emailTemplateModalTitle').textContent =
+      'Edit Email Template';
+    document.getElementById('emailTemplateId').value = t.id;
+    document.getElementById('templateName').value = t.templateName || '';
+    document.getElementById('subject').value = t.subject || '';
+    document.getElementById('bodyHtml').value = t.bodyHtml || '';
+    document.getElementById('isDefault').checked = !!t.isDefault;
+
+    // Update preview based on current template name
+    updateTemplateKeyPreview();
+
+    var modalEl = document.getElementById('emailTemplateModal');
+    var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+
+  // ---------- View template ----------
+  function viewTemplate(id) {
+    var t = emailTemplates.find(function (x) { return x.id === id; });
+    if (!t) return;
+
+    var docType = 'Not linked';
+    if (t.documentType) {
+      docType =
+        t.documentType.documentName ||
+        t.documentType.document_name ||
+        t.documentType.name ||
+        ('#' + t.documentType.id);
+    }
+
+    document.getElementById('viewTemplateName').textContent = t.templateName || '';
+    document.getElementById('viewTemplateKey').textContent = t.templateKey || '';
+    document.getElementById('viewSubject').textContent = t.subject || '';
+    document.getElementById('viewDocumentType').textContent = docType;
+    document.getElementById('viewBodyHtml').innerHTML = t.bodyHtml || '';
+
+    var modalEl = document.getElementById('viewEmailTemplateModal');
+    var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+
+  // ---------- Save (create / update) ----------
+  async function saveEmailTemplate() {
+    var templateName = document.getElementById('templateName').value.trim();
+    var subject = document.getElementById('subject').value.trim();
+    var bodyHtml = document.getElementById('bodyHtml').value;
+    var isDefault = document.getElementById('isDefault').checked;
+
+    if (!templateName || !subject || !bodyHtml) {
+      showAlert('Please fill all required fields.', 'danger');
+      return;
+    }
+
+    // Generate template key from template name
+    var templateKey = generateTemplateKey(templateName);
+    if (!templateKey) {
+      showAlert('Template name is required to generate template key.', 'danger');
+      return;
+    }
+
+    var payload = {
+      templateKey: templateKey,
+      templateName: templateName,
+      subject: subject,
+      bodyHtml: bodyHtml,
+      documentTypeId: null,
+      isDefault: isDefault,
+    };
+
+    try {
+      if (currentEditingId) {
+        await apiCall('/email-templates/' + currentEditingId, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiCall('/email-templates', {
+          method: 'POST',
+          body: JSON.stringify(payload),
+        });
+      }
+
+      var modalEl = document.getElementById('emailTemplateModal');
+      var modal = bootstrap.Modal.getInstance(modalEl);
+      modal.hide();
+
+      showAlert('Email template saved successfully.', 'success');
+      await loadEmailTemplates();
+    } catch (err) {
+      console.error('Save error:', err);
+      showAlert('Failed to save email template.', 'danger');
+    }
+  }
+
+  // ---------- Delete ----------
+  function deleteTemplate(id) {
+    const template = emailTemplates.find(t => t.id === id);
+    if (!template) return;
+
+    currentDeleteId = id;
+    
+    // Populate delete modal with template info
+    document.getElementById('deleteTemplateName').textContent = template.templateName || 'Untitled';
+    document.getElementById('deleteTemplateKey').textContent = template.templateKey || '—';
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('deleteEmailTemplateModal'));
+    modal.show();
+  }
+
+  async function confirmDeleteEmailTemplate() {
+    if (!currentDeleteId) return;
+
+    try {
+      await apiCall('/email-templates/' + currentDeleteId, {
+        method: 'DELETE',
+      });
+
+      // Hide modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteEmailTemplateModal'));
+      modal?.hide();
+
+      showAlert('Email template deleted successfully.', 'success');
+      await loadEmailTemplates();
+    } catch (err) {
+      console.error('Delete error:', err);
+      showAlert('Failed to delete email template.', 'danger');
+    } finally {
+      currentDeleteId = null;
+    }
+  }
+
+  // ---------- Alert helper ----------
+  function showAlert(message, type) {
+    var alertDiv = document.createElement('div');
+    alertDiv.className =
+      'alert alert-' + type + ' alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText =
+      'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML =
+      message +
+      '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+    document.body.appendChild(alertDiv);
+
+    setTimeout(function () {
+      if (alertDiv.parentNode) {
+        alertDiv.parentNode.removeChild(alertDiv);
+      }
+    }, 5000);
+  }
+
+  // ---------- Tab Switching ----------
+  function switchTab(tabType) {
+    // Update tab buttons
+    document.querySelectorAll('.template-tab').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    document.querySelector(`[data-tab="${tabType}"]`).classList.add('active');
+
+    // Update tab content
+    document.querySelectorAll('.template-tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    document.getElementById(`${tabType}TabContent`).classList.add('active');
+
+    // Update new template button
+    const newBtn = document.getElementById('newTemplateBtn');
+    if (tabType === 'email') {
+      newBtn.setAttribute('data-bs-target', '#emailTemplateModal');
+      newBtn.innerHTML = '<i class="fas fa-plus me-2"></i>New Email Template';
+    } else {
+      newBtn.setAttribute('data-bs-target', '#whatsappTemplateModal');
+      newBtn.innerHTML = '<i class="fas fa-plus me-2"></i>New WhatsApp Template';
+    }
+
+    // Load templates for the active tab
+    if (tabType === 'email') {
+      loadEmailTemplates();
+    } else {
+      loadWhatsAppTemplates();
+    }
+  }
+
+  // ---------- WhatsApp Templates Functions ----------
+  let whatsappTemplates = [];
+  let whatsappSource = 'meta';
+
+  async function loadWhatsAppTemplates() {
+    const container = document.getElementById('whatsappTemplatesContainer');
+    if (container) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="mt-3 mb-0 text-muted">Loading WhatsApp templates...</p>
+          </div>
+        </div>
+      `;
+    }
+
+    try {
+      let data;
+      if (whatsappSource === 'meta') {
+        const resp = await apiCall('/templates/meta');
+        const rows = (resp && (resp.data || resp.templates || resp.items)) || [];
+        whatsappTemplates = normalizeMetaTemplates(rows);
+      } else {
+        const resp = await apiCall('/templates');
+        whatsappTemplates = Array.isArray(resp) ? resp : ((resp && (resp.data || resp.items)) || []);
+      }
+      renderWhatsAppTemplates();
+    } catch (error) {
+      console.error('Error loading WhatsApp templates:', error);
+      if (container) {
+        container.innerHTML = `
+          <div class="col-12">
+            <div class="empty-state">
+              <div class="empty-state-icon text-danger">
+                <i class="fas fa-exclamation-triangle"></i>
+              </div>
+              <div class="empty-state-text text-danger">Failed to load WhatsApp templates</div>
+              <div class="empty-state-subtext">Please try refreshing the page</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  function normalizeMetaTemplates(rows) {
+    const arr = Array.isArray(rows) ? rows : (rows?.data || []);
+    return arr.map(r => ({
+      __meta: true,
+      id: r.id || r.name,
+      waName: r.name || r.waName || '—',
+      displayName: r.display_name || r.displayName || r.name || '—',
+      category: (r.category || '').toLowerCase(),
+      language: r.language || 'en_US',
+      status: r.status || r.approval_status || '—',
+      quality: r.quality_score || '—',
+      rejectionReason: r.rejection_reason || r.latest_rejection_reason || '',
+      _raw: r,
+      createdAt: r.last_updated_time || r.created_time || null,
+      htmlContent: ''
+    }));
+  }
+
+  function renderWhatsAppTemplates() {
+    const container = document.getElementById('whatsappTemplatesContainer');
+    if (!container) return;
+
+    if (!whatsappTemplates.length) {
+      container.innerHTML = `
+        <div class="col-12">
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <div class="empty-state-text">No WhatsApp templates found</div>
+            <div class="empty-state-subtext">Click "New WhatsApp Template" to create your first template</div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const cardsHtml = whatsappTemplates.map(t => {
+      const isMeta = !!t.__meta;
+      const statusBadge = isMeta && t.status
+        ? `<span class="badge bg-${t.status === 'APPROVED' ? 'success' : (t.status === 'REJECTED' ? 'danger' : 'secondary')} ms-1">${t.status}</span>`
+        : '';
+      
+      return `
+        <div class="col-md-6 col-lg-4">
+          <div class="template-card">
+            <div class="template-card-header">
+              <div class="template-icon" style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);">
+                <i class="fab fa-whatsapp"></i>
+              </div>
+              <h5 class="template-title">${escapeHtml(t.displayName || t.waName || 'Untitled')}</h5>
+              <div class="template-key">${escapeHtml(t.waName || '')}</div>
+            </div>
+            <div class="template-card-body">
+              <div class="template-info-item">
+                <span class="template-info-label">Category:</span>
+                <span class="template-info-value">${escapeHtml(t.category || '-')}</span>
+              </div>
+              <div class="template-info-item">
+                <span class="template-info-label">Language:</span>
+                <span class="template-info-value">${escapeHtml(t.language || '-')}</span>
+              </div>
+              <div class="template-info-item">
+                <span class="template-info-label">Status:</span>
+                <span class="template-info-value">${statusBadge || '-'}</span>
+              </div>
+            </div>
+            <div class="template-card-footer">
+              ${!isMeta ? `
+                <button class="btn-template btn-template-edit" onclick="editWhatsAppTemplate(${t.id})">
+                  <i class="fas fa-edit me-1"></i>Edit
+                </button>
+                <button class="btn-template btn-template-delete" onclick="deleteWhatsAppTemplate(${t.id})">
+                  <i class="fas fa-trash me-1"></i>Delete
+                </button>
+              ` : '<span class="text-muted small">Meta templates cannot be edited</span>'}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = cardsHtml;
+  }
+
+  function searchWhatsAppTemplates() {
+    const q = document.getElementById('whatsappSearchInput').value.toLowerCase().trim();
+    const filtered = whatsappTemplates.filter(t =>
+      (t.waName || '').toLowerCase().includes(q) ||
+      (t.displayName || '').toLowerCase().includes(q) ||
+      (t.category || '').toLowerCase().includes(q)
+    );
+    const original = whatsappTemplates;
+    whatsappTemplates = filtered;
+    renderWhatsAppTemplates();
+    whatsappTemplates = original;
+  }
+
+  function filterWhatsAppByCategory() {
+    const cat = document.getElementById('whatsappCategoryFilter').value;
+    const q = document.getElementById('whatsappSearchInput').value.toLowerCase().trim();
+    let list = whatsappTemplates || [];
+    if (cat) list = list.filter(t => (t.category || '') === cat);
+    if (q) {
+      list = list.filter(t =>
+        (t.waName || '').toLowerCase().includes(q) ||
+        (t.displayName || '').toLowerCase().includes(q) ||
+        (t.category || '').toLowerCase().includes(q)
+      );
+    }
+    const original = whatsappTemplates;
+    whatsappTemplates = list;
+    renderWhatsAppTemplates();
+    whatsappTemplates = original;
+  }
+
+  function editWhatsAppTemplate(id) {
+    showAlert('WhatsApp template editing coming soon', 'info');
+  }
+
+  function deleteWhatsAppTemplate(id) {
+    showAlert('WhatsApp template deletion coming soon', 'info');
+  }
+
+  function openCreateTemplateModal() {
+    const activeTab = document.querySelector('.template-tab.active').dataset.tab;
+    if (activeTab === 'email') {
+      openCreateEmailTemplateModal();
+    } else {
+      showAlert('WhatsApp template creation coming soon', 'info');
+    }
+  }
+
+  function openCreateEmailTemplateModal() {
+    currentEditingId = null;
+    document.getElementById('emailTemplateModalTitle').textContent = 'Add Email Template';
+    document.getElementById('emailTemplateForm').reset();
+    document.getElementById('emailTemplateId').value = '';
+    document.getElementById('isDefault').checked = false;
+    document.getElementById('templateKeyPreview').style.display = 'none';
+
+    const modalEl = document.getElementById('emailTemplateModal');
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  }
+
+  // ---------- Init ----------
+  document.addEventListener('DOMContentLoaded', function () {
+    loadEmailTemplates();
+
+    // Setup WhatsApp source toggle
+    document.getElementById('srcMeta')?.addEventListener('change', () => {
+      whatsappSource = 'meta';
+      loadWhatsAppTemplates();
+    });
+    document.getElementById('srcLocal')?.addEventListener('change', () => {
+      whatsappSource = 'local';
+      loadWhatsAppTemplates();
+    });
+
+    // Setup Template Key preview on Template Name input
+    const templateNameInput = document.getElementById('templateName');
+    if (templateNameInput) {
+      templateNameInput.addEventListener('input', updateTemplateKeyPreview);
+      templateNameInput.addEventListener('keyup', updateTemplateKeyPreview);
+    }
+  });
+</script>

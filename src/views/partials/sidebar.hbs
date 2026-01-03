@@ -36,11 +36,11 @@
 
     <!-- Navigation Menu -->
     <nav class="sidebar-nav">
-      <!-- Account Settings Menu Item -->
+      <!-- Settings Menu Item -->
       <div class="nav-item">
         <a class="nav-link {{#if (eq activePage 'profile')}}active{{/if}}" href="/profile">
           <i class="fas fa-user-circle"></i>
-          <span class="nav-text">Account Settings</span>
+          <span class="nav-text">Settings</span>
         </a>
       </div>
 
@@ -56,54 +56,23 @@
         <div class="submenu show" id="whatsapp-submenu">
           {{#if menuItems}}
             {{#each menuItems}}
-              {{#if this.isLocked}}
-                {{!-- Locked/Disabled menu items - Show for all locked items including free plan --}}
-                {{#if (eq this.key 'invoice')}}
-                  {{!-- Invoice has special handling --}}
-                  <a class="nav-link submenu-link disabled-menu-item" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="{{#if this.isFreePlan}}Upgrade from Free plan to access this feature{{else if this.requiresUpgrade}}Upgrade to {{this.requiresPlan}} plan or higher to access this feature{{else}}This feature is locked for your plan{{/if}}">
-                    <i class="{{this.icon}}"></i>
-                    <span class="nav-text">{{this.label}}</span>
-                    <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
-                  </a>
-                {{else}}
+              {{!-- Skip Invoice menu item --}}
+              {{#unless (eq this.key 'invoice')}}
+                {{#if this.isLocked}}
+                  {{!-- Locked/Disabled menu items - Show for all locked items including free plan --}}
                   <a class="nav-link submenu-link disabled-menu-item" href="#" onclick="event.preventDefault(); showLockedFeatureMessage('{{this.label}}', '{{#if this.isFreePlan}}Free plan{{else if this.requiresUpgrade}}{{this.requiresPlan}}{{else}}your current plan{{/if}}');" title="{{#if this.isFreePlan}}Upgrade from Free plan to access this feature{{else if this.requiresUpgrade}}Upgrade to {{this.requiresPlan}} plan or higher to access this feature{{else}}This feature is locked for your plan{{/if}}">
                     <i class="{{this.icon}}"></i>
                     <span class="nav-text">{{this.label}}</span>
                     <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
                   </a>
-                {{/if}}
-              {{else}}
-                {{!-- Active/Unlocked menu items --}}
-                {{#if (eq this.key 'invoice')}}
-                  {{!-- Invoice has special handling based on plan feature flag --}}
-                  {{#if ../user.plan}}
-                    {{#if ../user.plan.hasInvoice}}
-                    <a class="nav-link submenu-link {{#if (eq ../activePage 'invoice')}}active{{/if}}" href="{{this.route}}">
-                      <i class="{{this.icon}}"></i>
-                      <span class="nav-text">{{this.label}}</span>
-                    </a>
-                    {{else}}
-                    <a class="nav-link submenu-link disabled-menu-item" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
-                      <i class="{{this.icon}}"></i>
-                      <span class="nav-text">{{this.label}}</span>
-                      <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
-                    </a>
-                    {{/if}}
-                  {{else}}
-                  <a class="nav-link submenu-link disabled-menu-item" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
-                    <i class="{{this.icon}}"></i>
-                    <span class="nav-text">{{this.label}}</span>
-                    <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
-                  </a>
-                  {{/if}}
                 {{else}}
-                  {{!-- Regular unlocked menu items --}}
+                  {{!-- Active/Unlocked menu items --}}
                   <a class="nav-link submenu-link {{#if (eq ../activePage this.key)}}active{{/if}}" href="{{this.route}}">
                     <i class="{{this.icon}}"></i>
                     <span class="nav-text">{{this.label}}</span>
                   </a>
                 {{/if}}
-              {{/if}}
+              {{/unless}}
             {{/each}}
           {{else}}
             {{!-- Fallback to hardcoded menu items if menuItems not available --}}
@@ -143,26 +112,10 @@
               <i class="fas fa-share-alt"></i>
               <span class="nav-text">Social Publisher</span>
             </a>
-            {{#if user.plan}}
-              {{#if user.plan.hasInvoice}}
-              <a class="nav-link submenu-link {{#if (eq activePage 'invoice')}}active{{/if}}" href="/invoice">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <span class="nav-text">Invoice</span>
-              </a>
-              {{else}}
-              <a class="nav-link submenu-link disabled-invoice" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <span class="nav-text">Invoice</span>
-                <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
-              </a>
-              {{/if}}
-            {{else}}
-              <a class="nav-link submenu-link disabled-invoice" href="#" onclick="showUpgradeMessage(event, 'invoice')" title="Upgrade to Silver or Gold plan to access Invoice feature">
-                <i class="fas fa-file-invoice-dollar"></i>
-                <span class="nav-text">Invoice</span>
-                <i class="fas fa-lock ms-auto" style="font-size: 0.75rem; opacity: 0.6;"></i>
-              </a>
-            {{/if}}
+            <a class="nav-link submenu-link {{#if (eq activePage 'templates')}}active{{/if}}" href="/templates">
+              <i class="fas fa-file-alt"></i>
+              <span class="nav-text">Message Templates</span>
+            </a>
           {{/if}}
         </div>
       </div>
@@ -184,32 +137,11 @@
           Documents</a>
       </div> --}}
 
-      <!-- Settings Section -->
-      <div class="nav-section">
-        <div class="menu-toggle collapsed" onclick="toggleMenu('utilities-submenu')">
-          <div class="nav-link">
-            <i class="fas fa-cog"></i>
-            <span class="nav-text">Settings</span>
-            <i class="fas fa-chevron-down nav-arrow"></i>
-          </div>
-        </div>
-        <div class="submenu" id="utilities-submenu">
-          <a class="nav-link submenu-link {{#if (eq activePage 'email-templates')}}active{{/if}}" href="/email-templates">
-            <i class="fas fa-envelope-open-text"></i>
-            <span class="nav-text">Email Templates</span>
-          </a>
-          <a class="nav-link submenu-link {{#if (eq activePage 'templates')}}active{{/if}}" href="/templates">
-            <i class="fas fa-comment-dots"></i>
-            <span class="nav-text">WhatsApp Templates</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Subscription Section -->
+      <!-- Billing & Plan Section -->
       <div class="nav-item">
         <a class="nav-link {{#if (eq activePage 'plans')}}active{{/if}}" href="/plans">
           <i class="fas fa-crown"></i>
-          <span class="nav-text">Subscription</span>
+          <span class="nav-text">Billing & Plan</span>
         </a>
       </div>
 

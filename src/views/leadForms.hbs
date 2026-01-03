@@ -1,47 +1,83 @@
-<div class="container-fluid">
+<div class="container-fluid lead-forms-container">
   <div class="row">
     {{> sidebar}}
 
-    <div class="col-md-9 col-lg-10 main-content">
-      <div class="container-fluid p-4">
+    <div class="col-md-9 col-lg-10">
+      <div class="main-content p-4">
         <style>
-          .main-content {
+          /* Page Background */
+          .lead-forms-container {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
-            position: relative;
+            padding: 2rem 0;
           }
 
-          .main-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-              radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%),
-              radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 0;
+          .main-content {
+            background: transparent;
           }
 
-          .container-fluid.p-4 {
-            position: relative;
+          /* Page Header */
+          .page-header {
+            margin-bottom: 2rem;
           }
 
-          .forms-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 24px;
-            padding: 3rem 2.5rem;
-            margin-bottom: 2.5rem;
-            color: white;
-            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
-          }
-
-          .forms-header h2 {
+          .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
             margin: 0;
-            font-weight: 800;
-            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+          }
+
+          .page-title::before {
+            content: '';
+            width: 4px;
+            height: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+          }
+
+          .page-subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+          }
+
+          /* Premium Button */
+          .btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.2);
+          }
+
+          .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+            color: white;
+          }
+
+          /* Responsive */
+          @media (max-width: 768px) {
+            .page-title {
+              font-size: 1.5rem;
+            }
+
+            .page-header {
+              margin-bottom: 1.5rem;
+            }
+
+            .btn-premium {
+              padding: 0.625rem 1.25rem;
+              font-size: 0.875rem;
+            }
           }
 
           .form-card {
@@ -366,14 +402,14 @@
           }
         </style>
 
-        <!-- Header -->
-        <div class="forms-header">
-          <div class="d-flex justify-content-between align-items-center">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
             <div>
-              <h2><i class="fas fa-wpforms me-2"></i>Lead Capture Forms</h2>
-              <p class="mb-0 mt-2 opacity-90">Create professional forms to capture leads from your website</p>
+              <h1 class="page-title">Lead Capture Forms</h1>
+              <p class="page-subtitle">Create professional forms to capture leads from your website</p>
             </div>
-            <button class="btn btn-light btn-lg" onclick="showCreateFormModal()">
+            <button class="btn btn-premium" onclick="showCreateFormModal()">
               <i class="fas fa-plus me-2"></i>Create Form
             </button>
           </div>
@@ -751,13 +787,211 @@
   </div>
 </div>
 
+<!-- Submissions Modal -->
+<div class="modal fade" id="submissionsModal" tabindex="-1" aria-labelledby="submissionsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="submissionsModalLabel">
+          <i class="fas fa-list me-2"></i>Submissions — <span id="submissionsFormName"></span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Search and Filters -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-search"></i></span>
+              <input type="text" class="form-control" id="submissionsSearch" placeholder="Search by name, email, phone, or message...">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="submissionsPageSize">
+              <option value="10">10 per page</option>
+              <option value="25" selected>25 per page</option>
+              <option value="50">50 per page</option>
+            </select>
+          </div>
+          <div class="col-md-3 text-end">
+            <span class="text-muted" id="submissionsCount">0 submissions</span>
+          </div>
+        </div>
+
+        <!-- Submissions Table -->
+        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+          <table class="table table-hover">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th style="cursor: pointer;" onclick="sortSubmissions('submittedAt')">
+                  Submitted At <i class="fas fa-sort" id="sort-submittedAt"></i>
+                </th>
+                <th style="cursor: pointer;" onclick="sortSubmissions('name')">
+                  Name <i class="fas fa-sort" id="sort-name"></i>
+                </th>
+                <th style="cursor: pointer;" onclick="sortSubmissions('email')">
+                  Email <i class="fas fa-sort" id="sort-email"></i>
+                </th>
+                <th style="cursor: pointer;" onclick="sortSubmissions('phone')">
+                  Phone <i class="fas fa-sort" id="sort-phone"></i>
+                </th>
+                <th>Source</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="submissionsTableBody">
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                  <i class="fas fa-spinner fa-spin me-2"></i>Loading submissions...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Submissions pagination">
+          <ul class="pagination justify-content-center mt-3" id="submissionsPagination">
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Submission Details Modal -->
+<div class="modal fade" id="submissionDetailsModal" tabindex="-1" aria-labelledby="submissionDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="submissionDetailsModalLabel">
+          <i class="fas fa-eye me-2"></i>Submission Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="submissionDetailsContent">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SortableJS for drag and drop -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<!-- QR Code library -->
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<!-- QR Code library - Load with multiple fallbacks -->
+<script>
+  // Load QRCode library with multiple fallback options
+  (function() {
+    // Try different CDN sources and library versions
+    const cdnSources = [
+      'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js',
+      'https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js',
+      'https://cdn.jsdelivr.net/npm/qrcode@latest/build/qrcode.min.js',
+      'https://unpkg.com/qrcode@latest/build/qrcode.min.js'
+    ];
+    
+    let currentIndex = 0;
+    let loaded = false;
+    
+    function loadQRCode() {
+      if (loaded) return;
+      
+      if (currentIndex >= cdnSources.length) {
+        console.error('All QRCode CDN sources failed. QR code generation will be disabled.');
+        window.QRCodeLoaded = false;
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = cdnSources[currentIndex];
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      
+      // Set timeout to detect if script never loads
+      const timeout = setTimeout(() => {
+        if (!loaded) {
+          console.warn(`QRCode CDN source ${currentIndex + 1} timed out, trying next...`);
+          script.remove();
+          currentIndex++;
+          loadQRCode();
+        }
+      }, 5000);
+      
+      script.onload = function() {
+        clearTimeout(timeout);
+        // Wait a bit for QRCode to be available
+        setTimeout(() => {
+          if (typeof QRCode !== 'undefined' && typeof QRCode.toCanvas === 'function') {
+            console.log(`QRCode library loaded successfully from source ${currentIndex + 1}`);
+            window.QRCodeLoaded = true;
+            loaded = true;
+          } else {
+            console.warn(`QRCode library loaded but QRCode object not found, trying next...`);
+            script.remove();
+            currentIndex++;
+            loadQRCode();
+          }
+        }, 100);
+      };
+      
+      script.onerror = function() {
+        clearTimeout(timeout);
+        console.warn(`QRCode CDN source ${currentIndex + 1} failed, trying next...`);
+        currentIndex++;
+        loadQRCode();
+      };
+      
+      document.head.appendChild(script);
+    }
+    
+    // Start loading after a short delay to ensure DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadQRCode);
+    } else {
+      loadQRCode();
+    }
+  })();
+</script>
 
 <script>
-  const API_BASE = '{{apiBase}}' || 'http://localhost:3002/api/v1';
+  // API_BASE is already declared globally in main.hbs layout
+  
+  // Fallback: Generate QR code using API service
+  function generateQRCodeViaAPI(url, container) {
+    console.log('Using API fallback for QR code generation');
+    // Use a free QR code API service
+    const encodedUrl = encodeURIComponent(url);
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedUrl}`;
+    
+    container.innerHTML = `
+      <div class="text-center">
+        <img src="${qrApiUrl}" alt="QR Code" style="max-width: 200px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.5rem; background: white;" 
+             onerror="this.parentElement.innerHTML='<p class=\\'text-muted\\'>QR code generation failed. <a href=\\'${url}\\' target=\\'_blank\\' class=\\'btn btn-sm btn-primary\\'>Open form link</a></p>'">
+        <p class="text-muted small mt-2">Scan to open form</p>
+      </div>
+    `;
+  }
+
+  // Wait for QRCode library to load
+  function waitForQRCode(callback, maxAttempts = 50) {
+    // Check if QRCode is available (either from library or our flag)
+    if (typeof QRCode !== 'undefined' && typeof QRCode.toCanvas === 'function') {
+      callback(true);
+      return;
+    }
+    
+    // Check if library failed to load
+    if (window.QRCodeLoaded === false || maxAttempts <= 0) {
+      console.error('QRCode library failed to load after multiple attempts');
+      callback(false);
+      return;
+    }
+    
+    // Wait and retry
+    setTimeout(() => waitForQRCode(callback, maxAttempts - 1), 100);
+  }
   let allForms = [];
   let fieldCounter = 0;
   let currentFields = [];
@@ -1070,6 +1304,16 @@
     }
   }
 
+  // Submissions Modal State (defined early so it's available when displayForms runs)
+  let currentFormId = null;
+  let currentFormName = '';
+  let submissionsData = [];
+  let currentPage = 1;
+  let pageSize = 25;
+  let sortBy = 'submittedAt';
+  let sortOrder = 'DESC';
+  let searchQuery = '';
+
   function displayForms(forms) {
     const container = document.getElementById('formsList');
     
@@ -1101,7 +1345,7 @@
               <div class="form-meta mt-2">
                 <span><i class="fas fa-link"></i> ${formUrl}</span>
                 <span class="status-badge ${status}">${status === 'published' ? 'Published' : 'Draft'}</span>
-                ${form.analytics ? `<span><i class="fas fa-chart-line"></i> ${form.analytics.submissions || 0} submissions</span>` : ''}
+                ${form.analytics ? `<span class="submissions-link" style="cursor: pointer; color: #667eea; text-decoration: underline;" onclick="showSubmissionsModal(${form.id}, '${escapeHtml(form.name)}')"><i class="fas fa-chart-line"></i> ${form.analytics.submissions || 0} submissions</span>` : ''}
               </div>
             </div>
             <div class="form-card-actions">
@@ -1283,48 +1527,395 @@
     }
   }
 
-  async function showPublishModal(id) {
-    const form = allForms.find(f => f.id === id);
-    if (!form) return;
+  // Show submissions modal (make it globally accessible)
+  window.showSubmissionsModal = async function(formId, formName) {
+    currentFormId = formId;
+    currentFormName = formName;
+    currentPage = 1;
+    searchQuery = '';
+    sortBy = 'submittedAt';
+    sortOrder = 'DESC';
+    
+    document.getElementById('submissionsFormName').textContent = formName;
+    document.getElementById('submissionsSearch').value = '';
+    document.getElementById('submissionsPageSize').value = '25';
+    
+    const modal = new bootstrap.Modal(document.getElementById('submissionsModal'));
+    modal.show();
+    
+    await loadSubmissions();
+  };
 
+  // Load submissions
+  async function loadSubmissions() {
     try {
-      const response = await fetch(`${API_BASE}/lead-forms/${id}/embed?type=iframe`, {
+      const tbody = document.getElementById('submissionsTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading submissions...</td></tr>';
+
+      const params = new URLSearchParams({
+        page: currentPage,
+        limit: pageSize,
+        sortBy: sortBy,
+        sortOrder: sortOrder
+      });
+
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
+      const response = await fetch(`${API_BASE}/lead-forms/${currentFormId}/submissions?${params}`, {
         method: 'GET',
         credentials: 'include'
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        throw new Error('Failed to load submissions');
+      }
 
-      if (response.ok) {
-        const nodeEnv = '{{nodeEnv}}' || 'development';
-        const productionUrl = '{{productionUrl}}' || 'https://petserviceinhome.com';
-        const developmentUrl = '{{developmentUrl}}' || 'http://localhost:3002';
-        const baseUrl = (nodeEnv === 'prod' || nodeEnv === 'production') ? productionUrl : developmentUrl;
-        const formUrl = `${baseUrl}/forms/${form.slug}`;
+      const result = await response.json();
+      submissionsData = result.data.submissions || [];
+      const pagination = result.data.pagination || {};
+
+      document.getElementById('submissionsCount').textContent = `${pagination.total || 0} submissions`;
+
+      if (submissionsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No submissions found.</td></tr>';
+        document.getElementById('submissionsPagination').innerHTML = '';
+        return;
+      }
+
+      renderSubmissionsTable();
+      renderPagination(pagination);
+    } catch (error) {
+      console.error('Error loading submissions:', error);
+      document.getElementById('submissionsTableBody').innerHTML = 
+        '<tr><td colspan="6" class="text-center text-danger py-4">Failed to load submissions. Please try again.</td></tr>';
+    }
+  }
+
+  // Render submissions table
+  function renderSubmissionsTable() {
+    const tbody = document.getElementById('submissionsTableBody');
+    tbody.innerHTML = '';
+
+    submissionsData.forEach(submission => {
+      const row = document.createElement('tr');
+      const submittedDate = new Date(submission.submittedAt);
+      const dateStr = submittedDate.toLocaleDateString() + ' ' + submittedDate.toLocaleTimeString();
+      
+      row.innerHTML = `
+        <td>${dateStr}</td>
+        <td>${escapeHtml(submission.name)}</td>
+        <td>${escapeHtml(submission.email)}</td>
+        <td>${escapeHtml(submission.phone)}</td>
+        <td><span class="badge bg-secondary">${escapeHtml(submission.source)}</span></td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="viewSubmissionDetails(${submission.id})">
+            <i class="fas fa-eye"></i> View
+          </button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // Render pagination
+  function renderPagination(pagination) {
+    const paginationEl = document.getElementById('submissionsPagination');
+    paginationEl.innerHTML = '';
+
+    if (pagination.totalPages <= 1) return;
+
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${pagination.page === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="changeSubmissionsPage(${pagination.page - 1}); return false;">Previous</a>`;
+    paginationEl.appendChild(prevLi);
+
+    // Page numbers
+    for (let i = 1; i <= pagination.totalPages; i++) {
+      if (i === 1 || i === pagination.totalPages || (i >= pagination.page - 2 && i <= pagination.page + 2)) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === pagination.page ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="changeSubmissionsPage(${i}); return false;">${i}</a>`;
+        paginationEl.appendChild(li);
+      } else if (i === pagination.page - 3 || i === pagination.page + 3) {
+        const li = document.createElement('li');
+        li.className = 'page-item disabled';
+        li.innerHTML = '<span class="page-link">...</span>';
+        paginationEl.appendChild(li);
+      }
+    }
+
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${pagination.page === pagination.totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="changeSubmissionsPage(${pagination.page + 1}); return false;">Next</a>`;
+    paginationEl.appendChild(nextLi);
+  }
+
+  // Change page
+  function changeSubmissionsPage(page) {
+    currentPage = page;
+    loadSubmissions();
+  }
+
+  // Sort submissions
+  function sortSubmissions(column) {
+    if (sortBy === column) {
+      sortOrder = sortOrder === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+      sortBy = column;
+      sortOrder = 'DESC';
+    }
+    
+    // Update sort icons
+    document.querySelectorAll('[id^="sort-"]').forEach(icon => {
+      icon.className = 'fas fa-sort';
+    });
+    const sortIcon = document.getElementById(`sort-${column}`);
+    if (sortIcon) {
+      sortIcon.className = sortOrder === 'ASC' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+    }
+    
+    currentPage = 1;
+    loadSubmissions();
+  }
+
+  // View submission details
+  async function viewSubmissionDetails(submissionId) {
+    const submission = submissionsData.find(s => s.id === submissionId);
+    if (!submission) return;
+
+    const content = document.getElementById('submissionDetailsContent');
+    const submittedDate = new Date(submission.submittedAt);
+    
+    let detailsHtml = `
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Submitted At:</strong><br>
+          ${submittedDate.toLocaleString()}
+        </div>
+        <div class="col-md-6">
+          <strong>Status:</strong><br>
+          <span class="badge bg-${submission.status === 'new' ? 'primary' : submission.status === 'processed' ? 'success' : 'secondary'}">${submission.status}</span>
+        </div>
+      </div>
+      <hr>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Name:</strong><br>
+          ${escapeHtml(submission.name)}
+        </div>
+        <div class="col-md-6">
+          <strong>Email:</strong><br>
+          ${escapeHtml(submission.email)}
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Phone:</strong><br>
+          ${escapeHtml(submission.phone)}
+        </div>
+        <div class="col-md-6">
+          <strong>Source:</strong><br>
+          ${escapeHtml(submission.source)}
+        </div>
+      </div>
+    `;
+
+    if (submission.utmSource || submission.utmCampaign || submission.utmMedium) {
+      detailsHtml += `
+        <hr>
+        <h6>UTM Parameters</h6>
+        <div class="row mb-3">
+          ${submission.utmSource ? `<div class="col-md-4"><strong>Source:</strong><br>${escapeHtml(submission.utmSource)}</div>` : ''}
+          ${submission.utmCampaign ? `<div class="col-md-4"><strong>Campaign:</strong><br>${escapeHtml(submission.utmCampaign)}</div>` : ''}
+          ${submission.utmMedium ? `<div class="col-md-4"><strong>Medium:</strong><br>${escapeHtml(submission.utmMedium)}</div>` : ''}
+        </div>
+      `;
+    }
+
+    if (submission.submittedData) {
+      detailsHtml += `
+        <hr>
+        <h6>Form Data</h6>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      Object.entries(submission.submittedData).forEach(([key, value]) => {
+        if (key !== 'name' && key !== 'email' && key !== 'phone') {
+          detailsHtml += `
+            <tr>
+              <td><strong>${escapeHtml(key)}</strong></td>
+              <td>${escapeHtml(String(value))}</td>
+            </tr>
+          `;
+        }
+      });
+      
+      detailsHtml += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    if (submission.ipAddress || submission.userAgent) {
+      detailsHtml += `
+        <hr>
+        <h6>Technical Details</h6>
+        <div class="row mb-3">
+          ${submission.ipAddress ? `<div class="col-md-6"><strong>IP Address:</strong><br><code>${escapeHtml(submission.ipAddress)}</code></div>` : ''}
+          ${submission.userAgent ? `<div class="col-md-6"><strong>User Agent:</strong><br><small>${escapeHtml(submission.userAgent)}</small></div>` : ''}
+        </div>
+      `;
+    }
+
+    content.innerHTML = detailsHtml;
+    const modal = new bootstrap.Modal(document.getElementById('submissionDetailsModal'));
+    modal.show();
+  }
+
+  async function showPublishModal(id) {
+    console.log('showPublishModal called with id:', id);
+    const form = allForms.find(f => f.id === id);
+    if (!form) {
+      console.error('Form not found in allForms:', id, allForms);
+      alert('Form not found. Please refresh the page.');
+      return;
+    }
+
+    console.log('Form found:', form);
+
+    try {
+      const response = await fetch(`${API_BASE}/lead-forms/${id}/embed?type=iframe`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Embed API response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Embed API error:', response.status, errorText);
+        alert(`Failed to load publish info: ${response.status}. Please check console for details.`);
+        return;
+      }
+
+      const result = await response.json();
+      console.log('Embed API result:', result);
+
+      // Get base URL from environment or use defaults
+      const nodeEnv = '{{nodeEnv}}' || 'development';
+      const productionUrl = '{{productionUrl}}' || 'https://petserviceinhome.com';
+      const developmentUrl = '{{developmentUrl}}' || 'http://localhost:3002';
+      const baseUrl = (nodeEnv === 'prod' || nodeEnv === 'production') ? productionUrl : developmentUrl;
+      const formUrl = `${baseUrl}/forms/${form.slug}`;
+      
+      // Set hosted URL
+      const hostedUrlInput = document.getElementById('hostedUrl');
+      if (hostedUrlInput) {
+        hostedUrlInput.value = formUrl;
+      } else {
+        console.error('hostedUrl element not found');
+      }
+      
+      // Set embed code
+      const embedCodeElement = document.getElementById('embedCode');
+      if (embedCodeElement) {
+        embedCodeElement.textContent = result.embedCode || `<iframe src="${formUrl}" width="100%" height="600" frameborder="0" style="border: none; border-radius: 8px;"></iframe>`;
+      } else {
+        console.error('embedCode element not found');
+      }
+      
+      // Generate QR code
+      const qrContainer = document.getElementById('qrCodeContainer');
+      if (qrContainer) {
+        qrContainer.innerHTML = '<p class="text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Generating QR code...</p>';
         
-        document.getElementById('hostedUrl').value = formUrl;
-        document.getElementById('embedCode').textContent = result.embedCode;
-        
-        // Generate QR code
-        const qrContainer = document.getElementById('qrCodeContainer');
-        qrContainer.innerHTML = '';
-        QRCode.toCanvas(qrContainer, formUrl, {
-          width: 200,
-          margin: 2,
-          color: {
-            dark: '#000000',
-            light: '#FFFFFF'
+        // Wait for QRCode library to load, then generate QR code
+        waitForQRCode((loaded) => {
+          if (!loaded || typeof QRCode === 'undefined' || typeof QRCode.toCanvas !== 'function') {
+            console.error('QRCode library not available');
+            qrContainer.innerHTML = `
+              <div class="text-center p-3">
+                <p class="text-muted mb-2"><i class="fas fa-exclamation-triangle me-2"></i>QR code library not available</p>
+                <p class="text-muted small mb-2">The QR code library failed to load from CDN. You can still use the form link above.</p>
+                <a href="${formUrl}" target="_blank" class="btn btn-sm btn-primary">
+                  <i class="fas fa-external-link-alt me-2"></i>Open Form Link
+                </a>
+                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="location.reload()">
+                  <i class="fas fa-sync me-2"></i>Reload Page
+                </button>
+              </div>
+            `;
+            return;
           }
-        }, function (error) {
-          if (error) {
-            qrContainer.innerHTML = '<p class="text-muted">QR code generation failed</p>';
+          
+          try {
+            // Try to use QRCode library if available
+            if (typeof QRCode !== 'undefined' && typeof QRCode.toCanvas === 'function') {
+              // Create a canvas element for QR code
+              qrContainer.innerHTML = '';
+              const canvas = document.createElement('canvas');
+              qrContainer.appendChild(canvas);
+              
+              console.log('Generating QR code for URL:', formUrl);
+              QRCode.toCanvas(canvas, formUrl, {
+                width: 200,
+                margin: 2,
+                color: {
+                  dark: '#000000',
+                  light: '#FFFFFF'
+                },
+                errorCorrectionLevel: 'M'
+              }, function (error) {
+                if (error) {
+                  console.error('QR code generation error:', error);
+                  // Fallback to API-based QR code
+                  generateQRCodeViaAPI(formUrl, qrContainer);
+                } else {
+                  console.log('QR code generated successfully');
+                }
+              });
+            } else {
+              // Fallback to API-based QR code
+              generateQRCodeViaAPI(formUrl, qrContainer);
+            }
+          } catch (error) {
+            console.error('Error generating QR code:', error);
+            // Fallback to API-based QR code
+            generateQRCodeViaAPI(formUrl, qrContainer);
           }
         });
-        
-        new bootstrap.Modal(document.getElementById('publishModal')).show();
+      } else {
+        console.error('qrCodeContainer element not found');
+      }
+      
+      // Show modal
+      const publishModal = document.getElementById('publishModal');
+      if (publishModal) {
+        const modal = new bootstrap.Modal(publishModal);
+        modal.show();
+      } else {
+        console.error('publishModal element not found');
+        alert('Publish modal not found. Please refresh the page.');
       }
     } catch (error) {
       console.error('Error loading publish info:', error);
+      alert('Failed to load publish information: ' + error.message);
     }
   }
 
@@ -1356,4 +1947,287 @@
   });
 </script>
 
+<script>
+  // Search submissions event listeners (submissions functions already defined earlier)
+  let searchTimeout;
+    currentFormId = formId;
+    currentFormName = formName;
+    currentPage = 1;
+    searchQuery = '';
+    sortBy = 'submittedAt';
+    sortOrder = 'DESC';
+    
+    document.getElementById('submissionsFormName').textContent = formName;
+    document.getElementById('submissionsSearch').value = '';
+    document.getElementById('submissionsPageSize').value = '25';
+    
+    const modal = new bootstrap.Modal(document.getElementById('submissionsModal'));
+    modal.show();
+    
+    await loadSubmissions();
+  }
 
+  // Load submissions
+  async function loadSubmissions() {
+    try {
+      const tbody = document.getElementById('submissionsTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin me-2"></i>Loading submissions...</td></tr>';
+
+      const params = new URLSearchParams({
+        page: currentPage,
+        limit: pageSize,
+        sortBy: sortBy,
+        sortOrder: sortOrder
+      });
+
+      if (searchQuery) {
+        params.append('search', searchQuery);
+      }
+
+      const response = await fetch(`${API_BASE}/lead-forms/${currentFormId}/submissions?${params}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load submissions');
+      }
+
+      const result = await response.json();
+      submissionsData = result.data.submissions || [];
+      const pagination = result.data.pagination || {};
+
+      document.getElementById('submissionsCount').textContent = `${pagination.total || 0} submissions`;
+
+      if (submissionsData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No submissions found.</td></tr>';
+        document.getElementById('submissionsPagination').innerHTML = '';
+        return;
+      }
+
+      renderSubmissionsTable();
+      renderPagination(pagination);
+    } catch (error) {
+      console.error('Error loading submissions:', error);
+      document.getElementById('submissionsTableBody').innerHTML = 
+        '<tr><td colspan="6" class="text-center text-danger py-4">Failed to load submissions. Please try again.</td></tr>';
+    }
+  }
+
+  // Render submissions table
+  function renderSubmissionsTable() {
+    const tbody = document.getElementById('submissionsTableBody');
+    tbody.innerHTML = '';
+
+    submissionsData.forEach(submission => {
+      const row = document.createElement('tr');
+      const submittedDate = new Date(submission.submittedAt);
+      const dateStr = submittedDate.toLocaleDateString() + ' ' + submittedDate.toLocaleTimeString();
+      
+      row.innerHTML = `
+        <td>${dateStr}</td>
+        <td>${escapeHtml(submission.name)}</td>
+        <td>${escapeHtml(submission.email)}</td>
+        <td>${escapeHtml(submission.phone)}</td>
+        <td><span class="badge bg-secondary">${escapeHtml(submission.source)}</span></td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick="viewSubmissionDetails(${submission.id})">
+            <i class="fas fa-eye"></i> View
+          </button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // Render pagination
+  function renderPagination(pagination) {
+    const paginationEl = document.getElementById('submissionsPagination');
+    paginationEl.innerHTML = '';
+
+    if (pagination.totalPages <= 1) return;
+
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${pagination.page === 1 ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="changeSubmissionsPage(${pagination.page - 1}); return false;">Previous</a>`;
+    paginationEl.appendChild(prevLi);
+
+    // Page numbers
+    for (let i = 1; i <= pagination.totalPages; i++) {
+      if (i === 1 || i === pagination.totalPages || (i >= pagination.page - 2 && i <= pagination.page + 2)) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === pagination.page ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="changeSubmissionsPage(${i}); return false;">${i}</a>`;
+        paginationEl.appendChild(li);
+      } else if (i === pagination.page - 3 || i === pagination.page + 3) {
+        const li = document.createElement('li');
+        li.className = 'page-item disabled';
+        li.innerHTML = '<span class="page-link">...</span>';
+        paginationEl.appendChild(li);
+      }
+    }
+
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${pagination.page === pagination.totalPages ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="changeSubmissionsPage(${pagination.page + 1}); return false;">Next</a>`;
+    paginationEl.appendChild(nextLi);
+  }
+
+  // Change page
+  function changeSubmissionsPage(page) {
+    currentPage = page;
+    loadSubmissions();
+  }
+
+  // Sort submissions
+  function sortSubmissions(column) {
+    if (sortBy === column) {
+      sortOrder = sortOrder === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+      sortBy = column;
+      sortOrder = 'DESC';
+    }
+    
+    // Update sort icons
+    document.querySelectorAll('[id^="sort-"]').forEach(icon => {
+      icon.className = 'fas fa-sort';
+    });
+    const sortIcon = document.getElementById(`sort-${column}`);
+    if (sortIcon) {
+      sortIcon.className = sortOrder === 'ASC' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+    }
+    
+    currentPage = 1;
+    loadSubmissions();
+  }
+
+  // View submission details
+  async function viewSubmissionDetails(submissionId) {
+    const submission = submissionsData.find(s => s.id === submissionId);
+    if (!submission) return;
+
+    const content = document.getElementById('submissionDetailsContent');
+    const submittedDate = new Date(submission.submittedAt);
+    
+    let detailsHtml = `
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Submitted At:</strong><br>
+          ${submittedDate.toLocaleString()}
+        </div>
+        <div class="col-md-6">
+          <strong>Status:</strong><br>
+          <span class="badge bg-${submission.status === 'new' ? 'primary' : submission.status === 'processed' ? 'success' : 'secondary'}">${submission.status}</span>
+        </div>
+      </div>
+      <hr>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Name:</strong><br>
+          ${escapeHtml(submission.name)}
+        </div>
+        <div class="col-md-6">
+          <strong>Email:</strong><br>
+          ${escapeHtml(submission.email)}
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <strong>Phone:</strong><br>
+          ${escapeHtml(submission.phone)}
+        </div>
+        <div class="col-md-6">
+          <strong>Source:</strong><br>
+          ${escapeHtml(submission.source)}
+        </div>
+      </div>
+    `;
+
+    if (submission.utmSource || submission.utmCampaign || submission.utmMedium) {
+      detailsHtml += `
+        <hr>
+        <h6>UTM Parameters</h6>
+        <div class="row mb-3">
+          ${submission.utmSource ? `<div class="col-md-4"><strong>Source:</strong><br>${escapeHtml(submission.utmSource)}</div>` : ''}
+          ${submission.utmCampaign ? `<div class="col-md-4"><strong>Campaign:</strong><br>${escapeHtml(submission.utmCampaign)}</div>` : ''}
+          ${submission.utmMedium ? `<div class="col-md-4"><strong>Medium:</strong><br>${escapeHtml(submission.utmMedium)}</div>` : ''}
+        </div>
+      `;
+    }
+
+    if (submission.submittedData) {
+      detailsHtml += `
+        <hr>
+        <h6>Form Data</h6>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      Object.entries(submission.submittedData).forEach(([key, value]) => {
+        if (key !== 'name' && key !== 'email' && key !== 'phone') {
+          detailsHtml += `
+            <tr>
+              <td><strong>${escapeHtml(key)}</strong></td>
+              <td>${escapeHtml(String(value))}</td>
+            </tr>
+          `;
+        }
+      });
+      
+      detailsHtml += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    if (submission.ipAddress || submission.userAgent) {
+      detailsHtml += `
+        <hr>
+        <h6>Technical Details</h6>
+        <div class="row mb-3">
+          ${submission.ipAddress ? `<div class="col-md-6"><strong>IP Address:</strong><br><code>${escapeHtml(submission.ipAddress)}</code></div>` : ''}
+          ${submission.userAgent ? `<div class="col-md-6"><strong>User Agent:</strong><br><small>${escapeHtml(submission.userAgent)}</small></div>` : ''}
+        </div>
+      `;
+    }
+
+    content.innerHTML = detailsHtml;
+    const modal = new bootstrap.Modal(document.getElementById('submissionDetailsModal'));
+    modal.show();
+  }
+
+  // Search submissions
+  let searchTimeout;
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('submissionsSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          searchQuery = e.target.value;
+          currentPage = 1;
+          loadSubmissions();
+        }, 500);
+      });
+    }
+
+    const pageSizeSelect = document.getElementById('submissionsPageSize');
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener('change', function(e) {
+        pageSize = parseInt(e.target.value);
+        currentPage = 1;
+        loadSubmissions();
+      });
+    }
+  });
+</script>

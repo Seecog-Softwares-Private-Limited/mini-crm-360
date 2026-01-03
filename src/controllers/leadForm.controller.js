@@ -3,9 +3,11 @@ import { LeadForm } from '../models/LeadForm.js';
 import { Customer } from '../models/Customer.js';
 import { Business } from '../models/Business.js';
 import { User } from '../models/User.js';
+import { FormSubmission } from '../models/FormSubmission.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
+import { sequelize } from '../db/index.js';
 import { autoLogEvent } from './note.controller.js';
 import crypto from 'crypto';
 
@@ -62,10 +64,10 @@ export const renderPublicForm = async (req, res) => {
   try {
     const { slug } = req.params;
 
+    // First check if form exists (without isActive filter to get better error message)
     const form = await LeadForm.findOne({
       where: {
-        slug,
-        isActive: true
+        slug
       },
       include: [
         { model: Business, as: 'business', required: false }
@@ -73,7 +75,33 @@ export const renderPublicForm = async (req, res) => {
     });
 
     if (!form) {
-      return res.status(404).send('Form not found or inactive');
+      console.error(`Form with slug "${slug}" not found`);
+      return res.status(404).send(`
+        <html>
+          <head><title>Form Not Found</title></head>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1>Form Not Found</h1>
+            <p>The form you're looking for doesn't exist.</p>
+            <p><small>Slug: ${slug}</small></p>
+          </body>
+        </html>
+      `);
+    }
+
+    // Check if form is active/published
+    if (!form.isActive || form.status !== 'published') {
+      console.error(`Form "${slug}" exists but is not active. isActive: ${form.isActive}, status: ${form.status}`);
+      return res.status(404).send(`
+        <html>
+          <head><title>Form Not Available</title></head>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+            <h1>Form Not Available</h1>
+            <p>This form is currently inactive or not published.</p>
+            <p><small>Status: ${form.status}, Active: ${form.isActive ? 'Yes' : 'No'}</small></p>
+            <p><small>Please contact the form owner to publish this form.</small></p>
+          </body>
+        </html>
+      `);
     }
 
     // Prepare fields with helper properties for Handlebars
@@ -114,8 +142,36 @@ export const getLeadForms = asyncHandler(async (req, res) => {
       order: [['createdAt', 'DESC']]
     });
 
+    // Ensure analytics are initialized and calculate accurate submission counts
+    const formsWithAnalytics = await Promise.all(forms.map(async (form) => {
+      const formData = form.toJSON();
+      
+      // Get actual submission count from FormSubmission table
+      const submissionCount = await FormSubmission.count({
+        where: { formId: form.id }
+      });
+      
+      // Initialize analytics if not present
+      if (!formData.analytics) {
+        formData.analytics = { views: 0, submissions: 0, conversionRate: 0 };
+      }
+      
+      // Update with actual count
+      formData.analytics.submissions = submissionCount;
+      formData.analytics.conversionRate = formData.analytics.views > 0 
+        ? ((submissionCount / formData.analytics.views) * 100).toFixed(2)
+        : 0;
+      
+      // Update in database if analytics were missing or count was wrong
+      if (!form.analytics || form.analytics.submissions !== submissionCount) {
+        await form.update({ analytics: formData.analytics });
+      }
+      
+      return formData;
+    }));
+
     return res.status(200).json(
-      new ApiResponse(200, forms, 'Lead forms fetched successfully')
+      new ApiResponse(200, formsWithAnalytics, 'Lead forms fetched successfully')
     );
   } catch (error) {
     console.error('Error fetching lead forms:', error);
@@ -723,6 +779,114 @@ export const getEmbedCode = asyncHandler(async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Failed to generate embed code',
+      error: error.message
+    });
+  }
+});
+
+// Get form submissions
+export const getFormSubmissions = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const { page = 1, limit = 25, search = '', sortBy = 'createdAt', sortOrder = 'DESC' } = req.query;
+
+    // Verify form belongs to user
+    const form = await LeadForm.findOne({
+      where: {
+        id,
+        userId
+      }
+    });
+
+    if (!form) {
+      return res.status(404).json({
+        success: false,
+        message: 'Lead form not found'
+      });
+    }
+
+    // Build where clause for search
+    const whereClause = { formId: id };
+    
+    // Build search conditions - use JSON_EXTRACT for MySQL JSON fields
+    const searchConditions = [];
+    if (search) {
+      const searchPattern = `%${search}%`;
+      searchConditions.push(
+        Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.name')) LIKE '${searchPattern.replace(/'/g, "''")}'`),
+        Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.email')) LIKE '${searchPattern.replace(/'/g, "''")}'`),
+        Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.phone')) LIKE '${searchPattern.replace(/'/g, "''")}'`),
+        Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.message')) LIKE '${searchPattern.replace(/'/g, "''")}'`),
+        Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.fullName')) LIKE '${searchPattern.replace(/'/g, "''")}'`)
+      );
+    }
+
+    const where = searchConditions.length > 0 
+      ? { ...whereClause, [Op.or]: searchConditions }
+      : whereClause;
+
+    // Calculate pagination
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const totalCount = await FormSubmission.count({ where });
+
+    // Fetch submissions with customer info
+    const submissions = await FormSubmission.findAll({
+      where,
+      include: [
+        { model: Customer, as: 'customer', required: false }
+      ],
+      order: [
+        // Map frontend column names to database columns
+        sortBy === 'name' ? [Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.name'))`), sortOrder] :
+        sortBy === 'email' ? [Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.email'))`), sortOrder] :
+        sortBy === 'phone' ? [Sequelize.literal(`JSON_UNQUOTE(JSON_EXTRACT(submittedData, '$.phone'))`), sortOrder] :
+        sortBy === 'submittedAt' ? ['createdAt', sortOrder] :
+        [sortBy, sortOrder] // Default to database column
+      ],
+      limit: parseInt(limit),
+      offset: offset
+    });
+
+    // Format submissions for response
+    const formattedSubmissions = submissions.map(submission => {
+      const data = submission.toJSON();
+      const submittedData = data.submittedData || {};
+      
+      return {
+        id: data.id,
+        submittedAt: data.createdAt,
+        name: submittedData.name || submittedData.fullName || data.customer?.name || 'N/A',
+        email: submittedData.email || data.customer?.email || 'N/A',
+        phone: submittedData.phone || data.customer?.phoneE164 || 'N/A',
+        source: data.referrer || data.utmSource || 'Direct',
+        status: data.status,
+        submittedData: submittedData,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+        utmSource: data.utmSource,
+        utmCampaign: data.utmCampaign,
+        utmMedium: data.utmMedium,
+        customerId: data.customerId
+      };
+    });
+
+    return res.status(200).json(
+      new ApiResponse(200, {
+        submissions: formattedSubmissions,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: totalCount,
+          totalPages: Math.ceil(totalCount / parseInt(limit))
+        }
+      }, 'Submissions fetched successfully')
+    );
+  } catch (error) {
+    console.error('Error fetching form submissions:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to fetch submissions',
       error: error.message
     });
   }

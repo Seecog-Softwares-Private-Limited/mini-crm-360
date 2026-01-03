@@ -33,6 +33,12 @@ import { SocialTemplate } from './SocialTemplate.js';
 import { MediaAsset } from './MediaAsset.js';
 import { PublishAttempt } from './PublishAttempt.js';
 import { SocialAuditLog } from './SocialAuditLog.js';
+import { LeadRecord } from './LeadRecord.js';
+import { LeadTag } from './LeadTag.js';
+import { LeadTagMap } from './LeadTagMap.js';
+import { LeadNote } from './LeadNote.js';
+import { LeadTask } from './LeadTask.js';
+import { LeadAuditLog } from './LeadAuditLog.js';
 
 // Billing models - define locally to avoid circular dependency
 // The actual models are in src/billing/store/SequelizeStore.js
@@ -258,6 +264,80 @@ Customer.hasMany(FormSubmission, { foreignKey: 'customerId', as: 'formSubmission
 FormSubmission.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
 
 /* =========================================================
+   LEAD RECORDS ↔ FORM SUBMISSION ↔ USER ↔ BUSINESS ↔ CUSTOMER
+========================================================= */
+FormSubmission.hasOne(LeadRecord, { foreignKey: 'submissionId', as: 'leadRecord' });
+LeadRecord.belongsTo(FormSubmission, { foreignKey: 'submissionId', as: 'submission' });
+
+User.hasMany(LeadRecord, { foreignKey: 'userId', as: 'leadRecords' });
+LeadRecord.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Business.hasMany(LeadRecord, { foreignKey: 'businessId', as: 'leadRecords' });
+LeadRecord.belongsTo(Business, { foreignKey: 'businessId', as: 'business' });
+
+Customer.hasMany(LeadRecord, { foreignKey: 'customerId', as: 'leadRecords' });
+LeadRecord.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+
+User.hasMany(LeadRecord, { foreignKey: 'assignedTo', as: 'assignedLeads' });
+LeadRecord.belongsTo(User, { foreignKey: 'assignedTo', as: 'assignedUser' });
+
+/* =========================================================
+   LEAD RECORDS ↔ LEAD TAGS (Many-to-Many via lead_tag_map)
+========================================================= */
+LeadRecord.belongsToMany(LeadTag, {
+  through: LeadTagMap,
+  foreignKey: 'leadId',
+  otherKey: 'tagId',
+  as: 'tags'
+});
+
+LeadTag.belongsToMany(LeadRecord, {
+  through: LeadTagMap,
+  foreignKey: 'tagId',
+  otherKey: 'leadId',
+  as: 'leads'
+});
+
+LeadRecord.hasMany(LeadTagMap, { foreignKey: 'leadId', as: 'tagMappings' });
+LeadTagMap.belongsTo(LeadRecord, { foreignKey: 'leadId', as: 'lead' });
+
+LeadTag.hasMany(LeadTagMap, { foreignKey: 'tagId', as: 'leadMappings' });
+LeadTagMap.belongsTo(LeadTag, { foreignKey: 'tagId', as: 'tag' });
+
+User.hasMany(LeadTag, { foreignKey: 'userId', as: 'leadTags' });
+LeadTag.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+/* =========================================================
+   LEAD RECORDS ↔ LEAD NOTES
+========================================================= */
+LeadRecord.hasMany(LeadNote, { foreignKey: 'leadId', as: 'leadNotes' });
+LeadNote.belongsTo(LeadRecord, { foreignKey: 'leadId', as: 'lead' });
+
+User.hasMany(LeadNote, { foreignKey: 'userId', as: 'leadNotes' });
+LeadNote.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+/* =========================================================
+   LEAD RECORDS ↔ LEAD TASKS
+========================================================= */
+LeadRecord.hasMany(LeadTask, { foreignKey: 'leadId', as: 'tasks' });
+LeadTask.belongsTo(LeadRecord, { foreignKey: 'leadId', as: 'lead' });
+
+User.hasMany(LeadTask, { foreignKey: 'userId', as: 'leadTasks' });
+LeadTask.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+User.hasMany(LeadTask, { foreignKey: 'assignedTo', as: 'assignedLeadTasks' });
+LeadTask.belongsTo(User, { foreignKey: 'assignedTo', as: 'assignedUser' });
+
+/* =========================================================
+   LEAD RECORDS ↔ LEAD AUDIT LOGS
+========================================================= */
+LeadRecord.hasMany(LeadAuditLog, { foreignKey: 'leadId', as: 'auditLogs' });
+LeadAuditLog.belongsTo(LeadRecord, { foreignKey: 'leadId', as: 'lead' });
+
+User.hasMany(LeadAuditLog, { foreignKey: 'userId', as: 'leadAuditLogs' });
+LeadAuditLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+/* =========================================================
    USER ↔ USER SESSION ↔ ACTIVITY LOG
 ========================================================= */
 User.hasMany(UserSession, { foreignKey: 'userId', as: 'sessions' });
@@ -372,6 +452,14 @@ export {
   MediaAsset,
   PublishAttempt,
   SocialAuditLog,
+  
+  // Lead Management models
+  LeadRecord,
+  LeadTag,
+  LeadTagMap,
+  LeadNote,
+  LeadTask,
+  LeadAuditLog,
   
   // Billing models
   PaymentLog,

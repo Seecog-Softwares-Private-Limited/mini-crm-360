@@ -18,6 +18,7 @@
         .sidebar {
             min-height: 100vh;
             height: 100vh;
+            max-height: 100vh;
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
@@ -27,6 +28,33 @@
             position: sticky;
             top: 0;
             align-self: flex-start;
+            z-index: 1000;
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+            width: 250px; /* Fixed width */
+        }
+
+        /* Ensure sidebar column wrapper is also sticky */
+        .col-md-3.col-lg-2.px-0 {
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: visible;
+            z-index: 1000;
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+            width: 250px !important; /* Fixed width */
+            flex: 0 0 250px !important; /* Fixed width, don't grow or shrink */
+            max-width: 250px !important;
+        }
+        
+        /* Adjust main content to account for fixed sidebar */
+        .col-md-9.col-lg-10.main-content {
+            flex: 1 1 auto;
+            width: calc(100% - 250px) !important;
+            max-width: calc(100% - 250px) !important;
         }
 
         /* Custom Scrollbar */
@@ -472,9 +500,43 @@
             overflow-x: hidden;
         }
 
-        /* Prevent body scroll when content is long */
-        body {
+        /* Reset default margins/padding to remove top gap */
+        html, body {
+            margin: 0;
+            padding: 0;
             overflow-x: hidden;
+        }
+
+        /* Ensure container-fluid has no top padding */
+        .container-fluid {
+            padding-top: 0 !important;
+        }
+
+        /* Ensure row has no top margin */
+        .row {
+            margin-top: 0 !important;
+        }
+
+        /* Ensure sidebar column wrapper is sticky and has no top padding/margin */
+        .col-md-3.col-lg-2.px-0 {
+            padding-top: 0 !important;
+            margin-top: 0 !important;
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: visible;
+            z-index: 1000;
+        }
+
+        /* Ensure sidebar starts from the very top and is sticky */
+        .sidebar {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         .card {
             border: none;

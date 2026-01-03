@@ -9,7 +9,8 @@ import {
   updateLeadForm,
   deleteLeadForm,
   submitLeadForm,
-  getEmbedCode
+  getEmbedCode,
+  getFormSubmissions
 } from "../controllers/leadForm.controller.js";
 import { verifyUser } from "../middleware/authMiddleware.js";
 
@@ -27,6 +28,7 @@ router.post("/api/v1/lead-forms", verifyUser, createLeadForm); // Create form
 router.put("/api/v1/lead-forms/:id", verifyUser, updateLeadForm); // Update form
 router.delete("/api/v1/lead-forms/:id", verifyUser, deleteLeadForm); // Delete form
 router.get("/api/v1/lead-forms/:id/embed", verifyUser, getEmbedCode); // Get embed code
+router.get("/api/v1/lead-forms/:id/submissions", verifyUser, getFormSubmissions); // Get form submissions
 
 export default router;
 
