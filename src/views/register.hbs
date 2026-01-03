@@ -425,6 +425,121 @@
     transform: none;
   }
 
+  /* Email Validation Feedback */
+  .email-feedback {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .email-feedback.error {
+    color: #ef4444;
+  }
+
+  .email-feedback.success {
+    color: #10b981;
+  }
+
+  .email-feedback.checking {
+    color: #64748b;
+  }
+
+  .email-feedback i {
+    font-size: 0.875rem;
+  }
+
+  .form-control.is-invalid {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+  }
+
+  .form-control.is-valid {
+    border-color: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Password Strength Indicator */
+  .password-strength {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .password-strength.weak {
+    color: #ef4444;
+  }
+
+  .password-strength.medium {
+    color: #f59e0b;
+  }
+
+  .password-strength.strong {
+    color: #10b981;
+  }
+
+  .password-strength i {
+    font-size: 0.875rem;
+  }
+
+  /* Password Strength Meter */
+  .password-strength-meter {
+    width: 100%;
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .password-strength-meter-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+  }
+
+  .password-strength-meter-bar.weak {
+    width: 33%;
+    background: #ef4444;
+  }
+
+  .password-strength-meter-bar.medium {
+    width: 66%;
+    background: #f59e0b;
+  }
+
+  .password-strength-meter-bar.strong {
+    width: 100%;
+    background: #10b981;
+  }
+
+  .password-strength-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
   /* Alert Container */
   #alertContainer {
     margin-bottom: 1.5rem;
@@ -648,6 +763,7 @@
             autocomplete="email"
           >
         </div>
+        <div id="emailFeedback" class="email-feedback d-none"></div>
       </div>
 
       <div class="form-group">
@@ -664,6 +780,31 @@
             autocomplete="new-password"
           >
         </div>
+        <div id="passwordStrengthFeedback" class="password-strength d-none">
+          <i class="fas fa-info-circle"></i>
+          <span id="passwordStrengthText"></span>
+        </div>
+        <div id="passwordStrengthMeter" class="password-strength-meter d-none">
+          <div id="passwordStrengthMeterBar" class="password-strength-meter-bar"></div>
+        </div>
+        <div id="passwordStrengthLabel" class="password-strength-text d-none"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Re-Type Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input 
+            type="password" 
+            class="form-control" 
+            id="confirmPassword" 
+            name="confirmPassword" 
+            placeholder="Re-enter your password"
+            required
+            autocomplete="new-password"
+          >
+        </div>
+        <div id="passwordMatchFeedback" class="email-feedback d-none"></div>
       </div>
 
       <button type="submit" class="btn-register" id="registerBtn">
@@ -779,15 +920,455 @@
     this.value = this.value.replace(/\D/g, '');
   });
 
+  // Email validation state
+  let emailCheckTimeout = null;
+  let isEmailValid = false;
+  let isCheckingEmail = false;
+
+  // Password validation state
+  let isPasswordMatch = false;
+  let passwordStrength = null; // 'weak', 'medium', 'strong', or null
+
+  // Email validation function
+  function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Check if email exists
+  async function checkEmailExists(email) {
+    if (!email || !validateEmail(email)) {
+      return false;
+    }
+
+    try {
+      isCheckingEmail = true;
+      // Normalize email: trim and convert to lowercase
+      const normalizedEmail = email.trim().toLowerCase();
+      const response = await fetch(`${API_BASE}/users/check-email?email=${encodeURIComponent(normalizedEmail)}`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      
+      if (data.success !== undefined && data.data) {
+        return data.data.exists;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error checking email:', error);
+      return false;
+    } finally {
+      isCheckingEmail = false;
+    }
+  }
+
+  // Show email feedback
+  function showEmailFeedback(message, type) {
+    const emailFeedback = document.getElementById('emailFeedback');
+    const emailInput = document.getElementById('email');
+
+    emailFeedback.className = `email-feedback ${type}`;
+    emailFeedback.innerHTML = message;
+    emailFeedback.classList.remove('d-none');
+
+    // Update input styling
+    emailInput.classList.remove('is-valid', 'is-invalid');
+    if (type === 'error') {
+      emailInput.classList.add('is-invalid');
+      isEmailValid = false;
+    } else if (type === 'success') {
+      emailInput.classList.add('is-valid');
+      isEmailValid = true;
+    } else {
+      isEmailValid = false;
+    }
+    
+    // Update button state
+    updateRegisterButtonState();
+  }
+
+  // Hide email feedback
+  function hideEmailFeedback() {
+    const emailFeedback = document.getElementById('emailFeedback');
+    const emailInput = document.getElementById('email');
+    emailFeedback.classList.add('d-none');
+    emailInput.classList.remove('is-valid', 'is-invalid');
+    isEmailValid = false;
+  }
+
+  // Show password match feedback
+  function showPasswordMatchFeedback(message, type) {
+    const passwordFeedback = document.getElementById('passwordMatchFeedback');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const registerBtn = document.getElementById('registerBtn');
+
+    passwordFeedback.className = `email-feedback ${type}`;
+    passwordFeedback.innerHTML = message;
+    passwordFeedback.classList.remove('d-none');
+
+    // Update input styling
+    confirmPasswordInput.classList.remove('is-valid', 'is-invalid');
+    if (type === 'error') {
+      confirmPasswordInput.classList.add('is-invalid');
+      isPasswordMatch = false;
+      registerBtn.disabled = true;
+    } else if (type === 'success') {
+      confirmPasswordInput.classList.add('is-valid');
+      isPasswordMatch = true;
+      // Only enable button if email is also valid
+      if (isEmailValid) {
+        registerBtn.disabled = false;
+      }
+    }
+  }
+
+  // Hide password match feedback
+  function hidePasswordMatchFeedback() {
+    const passwordFeedback = document.getElementById('passwordMatchFeedback');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    passwordFeedback.classList.add('d-none');
+    confirmPasswordInput.classList.remove('is-valid', 'is-invalid');
+    isPasswordMatch = false;
+  }
+
+  // Check password strength
+  function checkPasswordStrength(password) {
+    if (!password) {
+      return null;
+    }
+
+    let strength = 0;
+    let feedback = [];
+
+    // Length check
+    if (password.length >= 8) {
+      strength += 1;
+    } else {
+      feedback.push('at least 8 characters');
+    }
+
+    // Lowercase check
+    if (/[a-z]/.test(password)) {
+      strength += 1;
+    } else {
+      feedback.push('lowercase letter');
+    }
+
+    // Uppercase check
+    if (/[A-Z]/.test(password)) {
+      strength += 1;
+    } else {
+      feedback.push('uppercase letter');
+    }
+
+    // Number check
+    if (/[0-9]/.test(password)) {
+      strength += 1;
+    } else {
+      feedback.push('number');
+    }
+
+    // Special character check
+    if (/[^a-zA-Z0-9]/.test(password)) {
+      strength += 1;
+    } else {
+      feedback.push('special character');
+    }
+
+    // Length bonus
+    if (password.length >= 12) {
+      strength += 1;
+    }
+
+    // Determine strength level
+    let strengthLevel = 'weak';
+    let strengthText = 'Weak Password';
+    let strengthIcon = 'fas fa-times-circle';
+    let strengthMessage = '';
+
+    if (strength <= 2) {
+      strengthLevel = 'weak';
+      strengthText = 'Weak Password';
+      strengthIcon = 'fas fa-times-circle';
+      strengthMessage = `Password is weak. Add: ${feedback.slice(0, 2).join(', ')}`;
+    } else if (strength <= 4) {
+      strengthLevel = 'medium';
+      strengthText = 'Medium Password';
+      strengthIcon = 'fas fa-exclamation-circle';
+      if (feedback.length > 0) {
+        strengthMessage = `Password is medium. Add: ${feedback.slice(0, 1).join(', ')} for stronger password`;
+      } else {
+        strengthMessage = 'Password is medium. Good, but could be stronger';
+      }
+    } else {
+      strengthLevel = 'strong';
+      strengthText = 'Strong Password';
+      strengthIcon = 'fas fa-check-circle';
+      strengthMessage = 'Password is strong and secure';
+    }
+
+    return {
+      level: strengthLevel,
+      text: strengthText,
+      icon: strengthIcon,
+      message: strengthMessage,
+      score: strength
+    };
+  }
+
+  // Show password strength feedback
+  function showPasswordStrengthFeedback(strength) {
+    const passwordStrengthFeedback = document.getElementById('passwordStrengthFeedback');
+    const passwordStrengthText = document.getElementById('passwordStrengthText');
+    const passwordStrengthMeter = document.getElementById('passwordStrengthMeter');
+    const passwordStrengthMeterBar = document.getElementById('passwordStrengthMeterBar');
+    const passwordStrengthLabel = document.getElementById('passwordStrengthLabel');
+    const passwordInput = document.getElementById('password');
+    const registerBtn = document.getElementById('registerBtn');
+
+    if (!strength) {
+      hidePasswordStrengthFeedback();
+      return;
+    }
+
+    // Update feedback text
+    passwordStrengthFeedback.className = `password-strength ${strength.level}`;
+    passwordStrengthText.textContent = strength.message;
+    passwordStrengthFeedback.classList.remove('d-none');
+
+    // Update meter
+    passwordStrengthMeterBar.className = `password-strength-meter-bar ${strength.level}`;
+    passwordStrengthMeter.classList.remove('d-none');
+
+    // Update label
+    passwordStrengthLabel.textContent = strength.text;
+    passwordStrengthLabel.className = `password-strength-text ${strength.level}`;
+    passwordStrengthLabel.classList.remove('d-none');
+
+    // Update input styling
+    passwordInput.classList.remove('is-valid', 'is-invalid');
+    if (strength.level === 'weak') {
+      passwordInput.classList.add('is-invalid');
+      registerBtn.disabled = true;
+    } else if (strength.level === 'strong') {
+      passwordInput.classList.add('is-valid');
+    }
+
+    // Update button state based on password strength
+    updateRegisterButtonState();
+  }
+
+  // Hide password strength feedback
+  function hidePasswordStrengthFeedback() {
+    const passwordStrengthFeedback = document.getElementById('passwordStrengthFeedback');
+    const passwordStrengthMeter = document.getElementById('passwordStrengthMeter');
+    const passwordStrengthLabel = document.getElementById('passwordStrengthLabel');
+    const passwordInput = document.getElementById('password');
+    
+    passwordStrengthFeedback.classList.add('d-none');
+    passwordStrengthMeter.classList.add('d-none');
+    passwordStrengthLabel.classList.add('d-none');
+    passwordInput.classList.remove('is-valid', 'is-invalid');
+    passwordStrength = null;
+  }
+
+  // Update register button state based on all validations
+  function updateRegisterButtonState() {
+    const registerBtn = document.getElementById('registerBtn');
+    
+    // Button should be disabled if:
+    // 1. Email is invalid or exists
+    // 2. Password is weak
+    // 3. Passwords don't match (if confirm password is entered)
+    
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const shouldDisable = !isEmailValid || 
+                         passwordStrength === 'weak' || 
+                         (confirmPassword && !isPasswordMatch);
+    
+    registerBtn.disabled = shouldDisable;
+  }
+
+  // Check password match
+  function checkPasswordMatch() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const registerBtn = document.getElementById('registerBtn');
+
+    // If confirm password is empty, hide feedback
+    if (!confirmPassword) {
+      hidePasswordMatchFeedback();
+      updateRegisterButtonState();
+      return;
+    }
+
+    // If password is empty, show error
+    if (!password) {
+      showPasswordMatchFeedback('<i class="fas fa-times-circle"></i> Please enter password first', 'error');
+      updateRegisterButtonState();
+      return;
+    }
+
+    // Check if passwords match
+    if (password === confirmPassword) {
+      showPasswordMatchFeedback('<i class="fas fa-check-circle"></i> Passwords match', 'success');
+    } else {
+      showPasswordMatchFeedback('<i class="fas fa-times-circle"></i> Passwords do not match', 'error');
+    }
+    
+    updateRegisterButtonState();
+  }
+
+  // Real-time email validation with debouncing
+  document.getElementById('email').addEventListener('input', function (e) {
+    const email = this.value.trim();
+    const registerBtn = document.getElementById('registerBtn');
+
+    // Clear previous timeout
+    if (emailCheckTimeout) {
+      clearTimeout(emailCheckTimeout);
+    }
+
+    // Hide feedback if email is empty
+    if (!email) {
+      hideEmailFeedback();
+      registerBtn.disabled = false; // Re-enable button if email is cleared
+      return;
+    }
+
+    // Validate email format first
+    if (!validateEmail(email)) {
+      showEmailFeedback('<i class="fas fa-times-circle"></i> Please enter a valid email address', 'error');
+      return;
+    }
+
+    // Show checking state
+    showEmailFeedback('<i class="fas fa-spinner fa-spin"></i> Checking email availability...', 'checking');
+
+    // Debounce: Wait 500ms after user stops typing
+    emailCheckTimeout = setTimeout(async () => {
+      const exists = await checkEmailExists(email);
+      
+      if (exists) {
+        showEmailFeedback('<i class="fas fa-times-circle"></i> Email already exists', 'error');
+      } else {
+        showEmailFeedback('<i class="fas fa-check-circle"></i> Email is available', 'success');
+      }
+    }, 500);
+  });
+
+  // Also check on blur (when user leaves the field)
+  document.getElementById('email').addEventListener('blur', async function (e) {
+    const email = this.value.trim();
+    
+    if (!email || !validateEmail(email)) {
+      return;
+    }
+
+    // Clear timeout if still pending
+    if (emailCheckTimeout) {
+      clearTimeout(emailCheckTimeout);
+    }
+
+    // Check immediately on blur
+    const exists = await checkEmailExists(email);
+    if (exists) {
+      showEmailFeedback('<i class="fas fa-times-circle"></i> Email already exists', 'error');
+    } else if (email) {
+      showEmailFeedback('<i class="fas fa-check-circle"></i> Email is available', 'success');
+    }
+  });
+
+  // Password strength and match validation - check when password changes
+  document.getElementById('password').addEventListener('input', function (e) {
+    const password = this.value;
+    
+    // Check password strength
+    const strength = checkPasswordStrength(password);
+    passwordStrength = strength ? strength.level : null;
+    showPasswordStrengthFeedback(strength);
+    
+    // Check password match if confirm password is entered
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    if (confirmPassword) {
+      checkPasswordMatch();
+    }
+  });
+
+  // Password match validation - check when confirm password changes
+  document.getElementById('confirmPassword').addEventListener('input', function (e) {
+    checkPasswordMatch();
+  });
+
+  // Also check on blur
+  document.getElementById('confirmPassword').addEventListener('blur', function (e) {
+    checkPasswordMatch();
+  });
+
   // Handle form submit
   document.getElementById('registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const email = document.getElementById('email').value.trim();
     const phoneNumber = document.getElementById('phoneNo').value.trim();
+
+    // Validate email
+    if (!email) {
+      showAlert('Please enter your email address', 'danger');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      showAlert('Please enter a valid email address', 'danger');
+      return;
+    }
+
+    // Check if email exists (final check before submission)
+    if (!isEmailValid) {
+      const exists = await checkEmailExists(email);
+      if (exists) {
+        showAlert('This email is already registered. Please use a different email or sign in.', 'danger');
+        showEmailFeedback('<i class="fas fa-times-circle"></i> Email already exists', 'error');
+        return;
+      }
+    }
 
     // Validate phone number
     if (!phoneNumber || phoneNumber.length !== 10 || !/^\d{10}$/.test(phoneNumber)) {
       showAlert('Please enter a valid 10-digit phone number', 'danger');
+      return;
+    }
+
+    // Validate password
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (!password) {
+      showAlert('Please enter a password', 'danger');
+      return;
+    }
+
+    // Check password strength
+    const strength = checkPasswordStrength(password);
+    if (!strength || strength.level === 'weak') {
+      showAlert('Password is too weak. Please use a stronger password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.', 'danger');
+      return;
+    }
+
+    if (!confirmPassword) {
+      showAlert('Please confirm your password', 'danger');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showAlert('Passwords do not match. Please re-enter your password', 'danger');
+      showPasswordMatchFeedback('<i class="fas fa-times-circle"></i> Passwords do not match', 'error');
       return;
     }
 
@@ -796,7 +1377,7 @@
       lastName: document.getElementById('lastName').value.trim(),
       phoneNo: '+91' + phoneNumber,
       email: document.getElementById('email').value.trim(),
-      password: document.getElementById('password').value
+      password: password
     };
 
     const registerBtn = document.getElementById('registerBtn');
@@ -837,12 +1418,12 @@
           localStorage.setItem('accessToken', data.data.tokens.accessToken);
         }
 
-        // Show success and redirect to login
-        showAlert('Registration successful! Redirecting to login...', 'success');
+        // Show success message about email activation
+        showAlert('Registration successful! Please check your email to activate your account before logging in.', 'success');
 
         setTimeout(() => {
           window.location.replace('/login');
-        }, 1500); // small delay so user can see the alert
+        }, 3000); // Give user time to read the message
       } else {
         showAlert(data?.message || data?.error || 'Registration failed', 'danger');
       }

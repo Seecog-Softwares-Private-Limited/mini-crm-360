@@ -53,3 +53,4 @@ const ActivityLog = sequelize.define('ActivityLog', {
 
 export { ActivityLog };
 
+

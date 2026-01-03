@@ -32,3 +32,4 @@ CREATE TABLE IF NOT EXISTS `form_submissions` (
   INDEX `idx_submissions_created` (`createdAt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+

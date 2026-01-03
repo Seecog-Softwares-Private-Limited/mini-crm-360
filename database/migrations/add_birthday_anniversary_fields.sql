@@ -5,3 +5,4 @@ ADD COLUMN `anniversaryDate` DATE NULL AFTER `dateOfBirth`,
 ADD INDEX `idx_customers_dob` (`dateOfBirth`),
 ADD INDEX `idx_customers_anniversary` (`anniversaryDate`);
 
+

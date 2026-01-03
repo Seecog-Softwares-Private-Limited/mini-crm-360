@@ -1,15 +1,17 @@
 // src/utils/plan.util.js
 import { UserPlan } from '../models/UserPlan.js';
 import { Plan } from '../models/Plan.js';
+import { Op } from 'sequelize';
 
 /**
  * Get the current plan for a user
+ * If user doesn't have a plan, automatically assign free trial plan
  * @param {number} userId - User ID
  * @returns {Promise<Object|null>} - Plan object with features or null
  */
 export async function getUserPlan(userId) {
   try {
-    const userPlan = await UserPlan.findOne({
+    let userPlan = await UserPlan.findOne({
       where: {
         userId,
         isCurrent: true
@@ -21,8 +23,31 @@ export async function getUserPlan(userId) {
       }]
     });
 
+    // If user doesn't have a plan, assign free trial plan automatically
     if (!userPlan || !userPlan.plan) {
-      return null;
+      console.log(`User ${userId} has no plan, assigning free trial plan...`);
+      const assignedPlan = await assignFreeTrialPlan(userId);
+      
+      if (assignedPlan) {
+        // Fetch the newly assigned plan
+        userPlan = await UserPlan.findOne({
+          where: {
+            userId,
+            isCurrent: true
+          },
+          include: [{
+            model: Plan,
+            as: 'plan',
+            required: true
+          }]
+        });
+      }
+      
+      // If still no plan, return null
+      if (!userPlan || !userPlan.plan) {
+        console.warn(`Could not assign free trial plan to user ${userId}`);
+        return null;
+      }
     }
 
     const plan = userPlan.plan.get ? userPlan.plan.get({ plain: true }) : userPlan.plan;
@@ -59,21 +84,12 @@ export async function getUserPlan(userId) {
 
 /**
  * Assign Free Trial plan to a user
+ * First tries 'free-trial', then 'free', then any plan with slug containing 'free'
  * @param {number} userId - User ID
  * @returns {Promise<Object|null>} - Created UserPlan or null
  */
 export async function assignFreeTrialPlan(userId) {
   try {
-    // Find Free Trial plan
-    const freeTrialPlan = await Plan.findOne({
-      where: { slug: 'free-trial' }
-    });
-
-    if (!freeTrialPlan) {
-      console.error('Free Trial plan not found in database');
-      return null;
-    }
-
     // Check if user already has a plan
     const existingPlan = await UserPlan.findOne({
       where: {
@@ -87,17 +103,51 @@ export async function assignFreeTrialPlan(userId) {
       return existingPlan;
     }
 
+    // Try to find Free Trial plan, then Free plan, then any free plan
+    let freePlan = await Plan.findOne({
+      where: { slug: 'free-trial' }
+    });
+
+    if (!freePlan) {
+      freePlan = await Plan.findOne({
+        where: { slug: 'free' }
+      });
+    }
+
+    if (!freePlan) {
+      // Try to find any plan with 'free' in the slug
+      freePlan = await Plan.findOne({
+        where: {
+          slug: { [Op.like]: '%free%' }
+        },
+        order: [['price', 'ASC']] // Get the cheapest free plan
+      });
+    }
+
+    if (!freePlan) {
+      // Last resort: get the cheapest active plan
+      freePlan = await Plan.findOne({
+        where: { isActive: true },
+        order: [['price', 'ASC']]
+      });
+    }
+
+    if (!freePlan) {
+      console.error('No free plan found in database. Please create a free plan first.');
+      return null;
+    }
+
     // Create new user plan
     const userPlan = await UserPlan.create({
       userId,
-      planId: freeTrialPlan.id,
+      planId: freePlan.id,
       status: 'trial',
       startDate: new Date(),
       endDate: null, // Free trial has no end date
       isCurrent: true
     });
 
-    console.log(`✅ Assigned Free Trial plan to user ${userId}`);
+    console.log(`✅ Assigned ${freePlan.slug} plan to user ${userId}`);
     return userPlan;
   } catch (error) {
     console.error('Error assigning Free Trial plan:', error);

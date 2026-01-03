@@ -4,6 +4,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { User } from "../models/User.js"
 import { decodeExpUnix, verifyAccessToken } from "../utils/token.util.js"
 import { getUserPlan } from "../utils/plan.util.js"
+import { getAvailableMenuItems } from "../utils/menu.util.js"
 
 export const verifyUser = asyncHandler(async (req, res, next) => {
     try {
@@ -52,11 +53,31 @@ export const verifyUser = asyncHandler(async (req, res, next) => {
           user.plan = null; // Set to null if error
         }
 
+        // Attach available menu items
+        try {
+          const menuItems = await getAvailableMenuItems(user.id, 'crm_tools');
+          res.locals.menuItems = menuItems; // Make available to views
+        } catch (menuError) {
+          console.error('Error fetching menu items:', menuError);
+          res.locals.menuItems = []; // Set to empty array on error
+        }
+
         req.user = user;
         console.log("verify User")
         next()
     } catch (error) {
         console.log("Auth error:", error.message);
+        
+        // For API requests, always return JSON
+        if (req.path.startsWith('/api/')) {
+            // Clear the invalid token cookie
+            res.clearCookie('accessToken');
+            return res.status(401).json({ 
+                success: false,
+                message: 'Authentication failed', 
+                error: error.message 
+            });
+        }
         
         // Check if this is a frontend request (HTML) or API request (JSON)
         if (req.accepts('html')) {
